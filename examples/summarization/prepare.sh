@@ -2,7 +2,7 @@
 # Follow https://github.com/nlpyang/BertSum
 
 apt-get update && apt-get install -y wget default-jre
-pip install multiprocess pyrouge
+pip install torch pytorch_pretrained_bert multiprocess pyrouge tensorboardX
 
 DATA_URLS=(
     "https://drive.google.com/uc?export=download&id=0BwmD_VLjROrfTHk4NFg2SndKcjQ"
@@ -49,11 +49,11 @@ export CLASSPATH=$(pwd)/${TOOL_FILE%.*}/$JAR_FILE
 echo "CLASSPATH=$CLASSPATH"
 
 if ! [ -d "BertSum" ]; then
-    git clone https://github.com/nlpyang/BertSum
-    cp pytorch_pretrained_bert.py BertSum/src
+    git clone https://github.com/shi2yu3/BertSum
+    #cp pytorch_pretrained_bert.py BertSum/src
 fi
-if ! [ -d "/workspace/logs" ]; then
-    mkdir /workspace/logs
+if ! [ -d "logs" ]; then
+    mkdir logs
 fi
 
 for ((i=0;i<${#DATA_URLS[@]};++i)); do
@@ -83,12 +83,32 @@ for ((i=0;i<${#DATA_URLS[@]};++i)); do
     #    unzip $file
     #fi
 
-    echo "tokenizing $file"
-    if ! [ -d $dir/tokens ]; then
-        mkdir $dir/tokens
-    fi
     cd BertSum/src
-    python preprocess.py -mode tokenize -raw_path ../../$dir/stories -save_path ../../$dir/tokens > ../../logs/$dir.log 2>&1
+
+    echo "fixing missing period in $file"
+    if ! [ -d ../../$dir/period_fixed ]; then
+        mkdir ../../$dir/period_fixed
+    fi
+    python3 preprocess.py -mode fix_missing_period -raw_path ../../$dir/stories -save_path ../../$dir/period_fixed -log_file "" > ../../logs/${dir}_fix.log 2>&1
+
+    echo "tokenizing $file"
+    if ! [ -d ../../$dir/tokens ]; then
+        mkdir ../../$dir/tokens
+    fi
+    python3 preprocess.py -mode tokenize -raw_path ../../$dir/period_fixed -save_path ../../$dir/tokens -log_file "" > ../../logs/${dir}_tok.log 2>&1
+
+    echo "splitting $file"
+    if ! [ -d ../../$dir/split ]; then
+        mkdir ../../$dir/split
+    fi
+    python3 preprocess.py -mode format_to_lines -raw_path ../../$dir/tokens -save_path ../../$dir/split/$dir -map_path ../urls -lower -log_file "" > ../../logs/${dir}_split.log 2>&1
+
+    echo "generating bert data for $file"
+    if ! [ -d ../../$dir/bert ]; then
+        mkdir ../../$dir/bert
+    fi
+    python3 preprocess.py -mode format_to_bert -raw_path ../../$dir/split -save_path ../../$dir/bert -oracle_mode greedy -n_cpus 4 -log_file ""  > ../../logs/${dir}_bert.log 2>&1
+
     cd ../..
 done
 
