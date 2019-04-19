@@ -12,7 +12,8 @@ Data pre-processing: build vocabularies and binarize training data.
 from collections import Counter
 from itertools import zip_longest
 
-from fairseq import options, tasks
+import fairseq.options as options
+import fairseq.tasks as tasks
 from fairseq.data import indexed_dataset
 from fairseq.binarizer import Binarizer
 from fairseq.utils import import_user_module
