@@ -34,11 +34,16 @@ tar zxf dailymail_stories.tgz
 rm dailymail_stories.tgz
 ```
 
-## Install packages within docker image
 ```
-docker run --rm -it -v $(pwd):/workspace pytorch/pytorch
-apt-get update && apt-get install -y default-jre
-pip install pytorch_pretrained_bert multiprocess tensorboardX pyrouge
+mkdir -p cnndm/stories
+find cnn/stories -type f -name "*.story" -exec cp {} cnndm/stories/ \; -print
+find dailymail/stories -type f -name "*.story" -exec cp {} cnndm/stories/ \; -print
+```
+
+## Build Docker image
+```
+docker build -t bertsum .
+docker run --rm -it -v $(pwd):/workspace bertsum
 ```
 
 ## Set path for Standford CoreNLP
@@ -48,30 +53,28 @@ export CLASSPATH=$(pwd)/stanford-corenlp-full-2018-10-05/stanford-corenlp-3.9.2.
 
 ## Process data
 
-**CNN**
 ```
-python BertSum/src/preprocess.py -mode fix_missing_period -raw_path cnn/stories -save_path cnn/period_fixed
-python BertSum/src/preprocess.py -mode tokenize -raw_path cnn/period_fixed -save_path cnn/tokens
-python BertSum/src/preprocess.py -mode format_to_translation -raw_path cnn/tokens -save_path cnn/trans -map_path BertSum/urls -n_cpus 4 -max_src_ntokens 400
+python BertSum/src/preprocess.py -mode fix_missing_period -raw_path cnndm/stories -save_path cnndm/period_fixed
+python BertSum/src/preprocess.py -mode tokenize -raw_path cnndm/period_fixed -save_path cnndm/tokens
 ```
-
-**Dailymail**
 ```
-python BertSum/src/preprocess.py -mode fix_missing_period -raw_path dailymail/stories -save_path dailymail/period_fixed
-python BertSum/src/preprocess.py -mode tokenize -raw_path dailymail/period_fixed -save_path dailymail/tokens
-python BertSum/src/preprocess.py -mode format_to_translation -raw_path dailymail/tokens -save_path dailymail/trans -map_path BertSum/urls -n_cpus 4 -max_src_ntokens 400
+python BertSum/src/preprocess.py -mode format_to_lines -raw_path cnndm/tokens -save_path cnndm/splits/cnndm -map_path BertSum/urls -lower 
+python BertSum/src/preprocess.py -mode format_to_bert -raw_path cnndm/splits/cnndm -save_path cnndm/bert -oracle_mode greedy -n_cpus 4  -max_src_ntokens 400
+```
+```
+python BertSum/src/preprocess.py -mode format_to_translation -raw_path cnndm/tokens -save_path cnndm/pairs -map_path BertSum/urls -n_cpus 4 -max_src_ntokens 400
 ```
 
 ## Generate BPE code
 ```
-mkdir cnndm
-cat cnn/trans/train.src.txt dailymail/trans/train.src.txt > cnndm/train.src.txt
-cat cnn/trans/train.tgt.txt dailymail/trans/train.tgt.txt > cnndm/train.tgt.txt
-cat cnn/trans/test.src.txt dailymail/trans/test.src.txt > cnndm/test.src.txt
-cat cnn/trans/test.tgt.txt dailymail/trans/test.tgt.txt > cnndm/test.tgt.txt
-cat cnn/trans/valid.src.txt dailymail/trans/valid.src.txt > cnndm/valid.src.txt
-cat cnn/trans/valid.tgt.txt dailymail/trans/valid.tgt.txt > cnndm/valid.tgt.txt
-cat cnndm/train.src.txt cnndm/train.tgt.txt > cnndm/train.txt
+#cat cnn/trans/train.src.txt dailymail/trans/train.src.txt > cnndm/train.src.txt
+#cat cnn/trans/train.tgt.txt dailymail/trans/train.tgt.txt > cnndm/train.tgt.txt
+#cat cnn/trans/test.src.txt dailymail/trans/test.src.txt > cnndm/test.src.txt
+#cat cnn/trans/test.tgt.txt dailymail/trans/test.tgt.txt > cnndm/test.tgt.txt
+#cat cnn/trans/valid.src.txt dailymail/trans/valid.src.txt > cnndm/valid.src.txt
+#cat cnn/trans/valid.tgt.txt dailymail/trans/valid.tgt.txt > cnndm/valid.tgt.txt
+#cat cnndm/train.src.txt cnndm/train.tgt.txt > cnndm/train.txt
+cat cnndm/pairs/train.src.txt cnndm/pairs/train.tgt.txt > cnndm/train.txt
 python subword-nmt/learn_bpe.py -s 30000 < cnndm/train.txt > cnndm/code
 ```
 
@@ -140,7 +143,7 @@ epsilon_ls: label smoothing
 ```
 arch=transformer_vaswani_wmt_en_de_big
 mkdir -p checkpoints/$arch
-python train.py data-bin/cnndm -s src -t tgt --max-tokens 4000 -a $arch --share-all-embeddings --dropout 0.3 --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.0 --weight-decay 0.0001 --lr 0.0005 --warmup-init-lr 1e-07 --warmup-updates 4000 --lr-scheduler inverse_sqrt --min-lr 1e-09 --criterion label_smoothed_cross_entropy --label-smoothing 0.1 --max-update 50000 --save-dir checkpoints/$arch
+python train.py data-bin/cnndm -s src -t tgt --max-tokens 4000 -a $arch --share-all-embeddings --dropout 0.3 --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.0 --weight-decay 0.0001 --lr 0.0005 --warmup-init-lr 1e-07 --warmup-updates 4000 --lr-scheduler inverse_sqrt --min-lr 1e-09 --criterion label_smoothed_cross_entropy --label-smoothing 0.1 --max-update 300000 --save-dir checkpoints/$arch
 python scripts/average_checkpoints.py --inputs checkpoints/$arch --num-epoch-checkpoints 20 --output checkpoints/$arch/model.pt
 python generate.py data-bin/cnndm --path checkpoints/$arch/model.pt --batch-size 128 --beam 5 --remove-bpe --no-repeat-ngram-size 3
 ```
