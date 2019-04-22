@@ -5,7 +5,7 @@
 # the root directory of this source tree. An additional grant of patent rights
 # can be found in the PATENTS file in the same directory.
 
-from .dictionary import Dictionary, TruncatedDictionary
+from .dictionary import Dictionary, TruncatedDictionary, BertDictionary
 from .fairseq_dataset import FairseqDataset
 from .backtranslation_dataset import BacktranslationDataset
 from .concat_dataset import ConcatDataset
@@ -18,6 +18,7 @@ from .round_robin_zip_datasets import RoundRobinZipDatasets
 from .token_block_dataset import TokenBlockDataset
 from .transform_eos_dataset import TransformEosDataset
 from .transform_eos_lang_pair_dataset import TransformEosLangPairDataset
+from .bertsum_dataset import BertSumDataset
 
 from .iterators import (
     CountingIterator,
@@ -31,6 +32,7 @@ __all__ = [
     'ConcatDataset',
     'CountingIterator',
     'Dictionary',
+    'BertDictionary',
     'EpochBatchIterator',
     'FairseqDataset',
     'GroupedIterator',
@@ -46,4 +48,5 @@ __all__ = [
     'TokenBlockDataset',
     'TransformEosDataset',
     'TransformEosLangPairDataset',
+    'BertSumDataset',
 ]

@@ -337,3 +337,31 @@ class FairseqEncoderModel(BaseFairseqModel):
     def remove_head(self):
         """Removes the head of the model (e.g. the softmax layer) to conserve space when it is not needed"""
         raise NotImplementedError()
+
+
+class FairseqBertSumModel(BaseFairseqModel):
+    def __init__(self, encoder, mid_layer, embed_out, feature_dim, enforce_idempotence=False):
+        super().__init__()
+        self.encoder = encoder
+        self.mid_layer = mid_layer
+        self.embed_out = embed_out
+        self.classifier = nn.Linear(feature_dim, 1)
+        self.enforce_idempotence = enforce_idempotence
+        assert isinstance(self.encoder, FairseqEncoder)
+
+    def forward(self, src_tokens, src_lengths, segment, output_mask):
+        encoder_return_value = self.encoder(src_tokens, src_lengths, segment, output_mask)
+        encoder_out = encoder_return_value['encoder_out']  # (B + N) x C
+        mlm_out = F.linear(self.mid_layer(encoder_out[src_tokens.size(0):]), self.embed_out)  # N x V
+        nsp_out = self.classifier(encoder_out[:src_tokens.size(0)]).view(-1)  # B
+        if self.enforce_idempotence:
+            embedding_out = encoder_return_value['embedding_out']  # T x B x C
+            # TODO: 1 => padding_idx ; 0.15 => masked_lm_prob
+            emb_mask = (src_tokens != 1) & (torch.rand_like(src_tokens, dtype=torch.float) < 0.15)
+            mlm_out_0 = F.linear(self.mid_layer(embedding_out.transpose(0, 1)[emb_mask]), self.embed_out)  # M x V
+            return mlm_out, nsp_out, mlm_out_0, emb_mask
+        else:
+            return mlm_out, nsp_out
+
+    def max_positions(self):
+        return self.encoder.max_positions()

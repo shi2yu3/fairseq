@@ -18,6 +18,7 @@ from .fairseq_model import (
     FairseqMultiModel,  # noqa: F401
     FairseqLanguageModel,  # noqa: F401
     FairseqEncoderModel,  # noqa: F401
+    FairseqBertSumModel,  # noqa: F401
 )
 
 from .composite_encoder import CompositeEncoder  # noqa: F401
