@@ -22,7 +22,7 @@ rm stanford-corenlp-full-2018-10-05.zip
 ```
 curl -c /tmp/cookies "https://drive.google.com/uc?export=download&id=0BwmD_VLjROrfTHk4NFg2SndKcjQ" > /tmp/intermezzo.html
 curl -L -b /tmp/cookies "https://drive.google.com$(cat /tmp/intermezzo.html | grep -Po 'uc-download-link" [^>]* href="\K[^"]*' | sed 's/\&amp;/\&/g')" > cnn_stories.tgz
-tar zxf cnn_stories.tgz
+tar zxf cnn_stories.tgz -C cnndm --strip-components=2
 rm cnn_stories.tgz
 ```
 
@@ -30,14 +30,8 @@ rm cnn_stories.tgz
 ```
 curl -c /tmp/cookies "https://drive.google.com/uc?export=download&id=0BwmD_VLjROrfM1BxdkxVaTY2bWs" > /tmp/intermezzo.html
 curl -L -b /tmp/cookies "https://drive.google.com$(cat /tmp/intermezzo.html | grep -Po 'uc-download-link" [^>]* href="\K[^"]*' | sed 's/\&amp;/\&/g')" > dailymail_stories.tgz
-tar zxf dailymail_stories.tgz
+tar zxf dailymail_stories.tgz -C cnndm --strip-components=2
 rm dailymail_stories.tgz
-```
-
-```
-mkdir -p cnndm/stories
-find cnn/stories -type f -name "*.story" -exec cp {} cnndm/stories/ \; -print
-find dailymail/stories -type f -name "*.story" -exec cp {} cnndm/stories/ \; -print
 ```
 
 ## Build Docker image
@@ -59,33 +53,26 @@ python BertSum/src/preprocess.py -mode tokenize -raw_path cnndm/period_fixed -sa
 ```
 ```
 python BertSum/src/preprocess.py -mode format_to_lines -raw_path cnndm/tokens -save_path cnndm/splits/cnndm -map_path BertSum/urls -lower 
-python BertSum/src/preprocess.py -mode format_to_bert -raw_path cnndm/splits/cnndm -save_path cnndm/bert -oracle_mode greedy -n_cpus 4  -max_src_ntokens 400
+python BertSum/src/preprocess.py -mode format_to_bert -raw_path cnndm/splits -save_path cnndm/bert_data -oracle_mode greedy -n_cpus 4
 ```
 ```
-python BertSum/src/preprocess.py -mode format_to_translation -raw_path cnndm/tokens -save_path cnndm/pairs -map_path BertSum/urls -n_cpus 4 -max_src_ntokens 400
+python BertSum/src/preprocess.py -mode format_to_fairseq -raw_path cnndm/tokens -save_path cnndm/fairseq_data -map_path BertSum/urls -n_cpus 4 -max_src_ntokens 400
 ```
 
 ## Generate BPE code
 ```
-#cat cnn/trans/train.src.txt dailymail/trans/train.src.txt > cnndm/train.src.txt
-#cat cnn/trans/train.tgt.txt dailymail/trans/train.tgt.txt > cnndm/train.tgt.txt
-#cat cnn/trans/test.src.txt dailymail/trans/test.src.txt > cnndm/test.src.txt
-#cat cnn/trans/test.tgt.txt dailymail/trans/test.tgt.txt > cnndm/test.tgt.txt
-#cat cnn/trans/valid.src.txt dailymail/trans/valid.src.txt > cnndm/valid.src.txt
-#cat cnn/trans/valid.tgt.txt dailymail/trans/valid.tgt.txt > cnndm/valid.tgt.txt
-#cat cnndm/train.src.txt cnndm/train.tgt.txt > cnndm/train.txt
-cat cnndm/pairs/train.src.txt cnndm/pairs/train.tgt.txt > cnndm/train.txt
-python subword-nmt/learn_bpe.py -s 30000 < cnndm/train.txt > cnndm/code
+cat cnndm/fairseq_data/train.src.txt cnndm/fairseq_data/train.tgt.txt > cnndm/fairseq_data/train.txt
+python subword-nmt/learn_bpe.py -s 30000 < cnndm/fairseq_data/train.txt > cnndm/fairseq_data/code
 ```
 
 ## Tokenization
 ```
-python subword-nmt/apply_bpe.py -c cnndm/code < cnndm/train.src.txt > cnndm/train.src
-python subword-nmt/apply_bpe.py -c cnndm/code < cnndm/train.tgt.txt > cnndm/train.tgt
-python subword-nmt/apply_bpe.py -c cnndm/code < cnndm/test.src.txt > cnndm/test.src
-python subword-nmt/apply_bpe.py -c cnndm/code < cnndm/test.tgt.txt > cnndm/test.tgt
-python subword-nmt/apply_bpe.py -c cnndm/code < cnndm/valid.src.txt > cnndm/valid.src
-python subword-nmt/apply_bpe.py -c cnndm/code < cnndm/valid.tgt.txt > cnndm/valid.tgt
+python subword-nmt/apply_bpe.py -c cnndm/fairseq_data/code < cnndm/fairseq_data/train.src.txt > cnndm/fairseq_data/train.src
+python subword-nmt/apply_bpe.py -c cnndm/fairseq_data/code < cnndm/fairseq_data/train.tgt.txt > cnndm/fairseq_data/train.tgt
+python subword-nmt/apply_bpe.py -c cnndm/fairseq_data/code < cnndm/fairseq_data/test.src.txt > cnndm/fairseq_data/test.src
+python subword-nmt/apply_bpe.py -c cnndm/fairseq_data/code < cnndm/fairseq_data/test.tgt.txt > cnndm/fairseq_data/test.tgt
+python subword-nmt/apply_bpe.py -c cnndm/fairseq_data/code < cnndm/fairseq_data/valid.src.txt > cnndm/fairseq_data/valid.src
+python subword-nmt/apply_bpe.py -c cnndm/fairseq_data/code < cnndm/fairseq_data/valid.tgt.txt > cnndm/fairseq_data/valid.tgt
 ```
 
 # Training
@@ -93,23 +80,23 @@ python subword-nmt/apply_bpe.py -c cnndm/code < cnndm/valid.tgt.txt > cnndm/vali
 ## Binarize the dataset
 
 ```
-docker run --rm -it -v $(pwd):/workspace pytorch/pytorch
-python preprocess.py --source-lang src --target-lang tgt --joined-dictionary --trainpref examples/summarization/cnndm/train --validpref examples/summarization/cnndm/valid --testpref examples/summarization/cnndm/test --destdir data-bin/cnndm
+docker run --rm -it -v $(pwd):/workspace bertsum
+python preprocess.py --source-lang src --target-lang tgt --joined-dictionary --trainpref examples/summarization/cnndm/fairseq_data/train --validpref examples/summarization/cnndm/fairseq_data/valid --testpref examples/summarization/cnndm/fairseq_data/test --destdir data-bin/cnndm
 ```
 Output
 ```
-| [src] Dictionary: 30375 types
-| [src] examples/summarization/cnndm/train.src: 287227 sents, 118048588 tokens, 0.0% replaced by <unk>
-| [src] Dictionary: 30375 types
-| [src] examples/summarization/cnndm/valid.src: 13368 sents, 5452619 tokens, 0.000147% replaced by <unk>
-| [src] Dictionary: 30375 types
-| [src] examples/summarization/cnndm/test.src: 11490 sents, 4701891 tokens, 0.000425% replaced by <unk>
-| [tgt] Dictionary: 29847 types
-| [tgt] examples/summarization/cnndm/train.tgt: 287227 sents, 16975103 tokens, 0.0% replaced by <unk>
-| [tgt] Dictionary: 29847 types
-| [tgt] examples/summarization/cnndm/valid.tgt: 13368 sents, 886324 tokens, 0.00226% replaced by <unk>
-| [tgt] Dictionary: 29847 types
-| [tgt] examples/summarization/cnndm/test.tgt: 11490 sents, 726243 tokens, 0.0022% replaced by <unk>
+| [src] Dictionary: 30391 types
+| [src] examples/summarization/cnndm/fairseq_data/train.src: 287227 sents, 118030308 tokens, 0.0% replaced by <unk>
+| [src] Dictionary: 30391 types
+| [src] examples/summarization/cnndm/fairseq_data/valid.src: 13368 sents, 5451317 tokens, 0.000147% replaced by <unk>
+| [src] Dictionary: 30391 types
+| [src] examples/summarization/cnndm/fairseq_data/test.src: 11490 sents, 4700782 tokens, 0.000425% replaced by <unk>
+| [tgt] Dictionary: 30391 types
+| [tgt] examples/summarization/cnndm/fairseq_data/train.tgt: 287227 sents, 17123886 tokens, 0.0% replaced by <unk>
+| [tgt] Dictionary: 30391 types
+| [tgt] examples/summarization/cnndm/fairseq_data/valid.tgt: 13368 sents, 886214 tokens, 0.0% replaced by <unk>
+| [tgt] Dictionary: 30391 types
+| [tgt] examples/summarization/cnndm/fairseq_data/test.tgt: 11490 sents, 726123 tokens, 0.000275% replaced by <unk>
 ```
 
 ## Train
