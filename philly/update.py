@@ -2,7 +2,8 @@ import argparse
 import subprocess
 import os
 
-FILE_MAP = {"train.py": ""}
+FILE_MAP = {"train.py": "",
+            "generate.py": ""}
 FOLDER_MAP = {"data-bin/cnndm": "data-bin",
               "fairseq": ""}
 
