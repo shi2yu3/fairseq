@@ -53,7 +53,7 @@ python BertSum/src/preprocess.py -mode tokenize -raw_path cnndm/period_fixed -sa
 ```
 ```
 python BertSum/src/preprocess.py -mode format_to_lines -raw_path cnndm/tokens -save_path cnndm/splits/cnndm -map_path BertSum/urls -lower 
-python BertSum/src/preprocess.py -mode format_to_bert -raw_path cnndm/splits -save_path cnndm/bert_data -oracle_mode greedy -n_cpus 4
+python BertSum/src/preprocess.py -mode format_to_bert -raw_path cnndm/splits -save_path cnndm/bert_data_regenerated -oracle_mode greedy -n_cpus 4
 ```
 ```
 python BertSum/src/preprocess.py -mode format_to_fairseq -raw_path cnndm/tokens -save_path cnndm/fairseq_data -map_path BertSum/urls -n_cpus 4 -max_src_ntokens 400
@@ -203,5 +203,14 @@ rm WordNet-2.0.exc.db
 cd ../../../..
 apt-get update && apt-get install -y perl synaptic
 pip install pyrouge
+```
+
+## Download result
+```
+id=1555486458178_7344
+sudo bash /home/yushi/philly-fs.bash -cp //philly/eu2/ipgsrch/sys/jobs/application_$id/cnndm_step50000.candidate results/
+sudo bash /home/yushi/philly-fs.bash -cp //philly/eu2/ipgsrch/sys/jobs/application_$id/cnndm_step50000.gold results/
+docker run --rm -it -v $(pwd):/workspace bertsum
 pyrouge_set_rouge_path pyrouge/tools/ROUGE-1.5.5
+python src/rouge.py
 ```
