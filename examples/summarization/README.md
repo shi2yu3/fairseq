@@ -1,102 +1,59 @@
-# Paper list
-
-```
-https://github.com/mathsyouth/awesome-text-summarization
-```
-
 # Data processing
+
+This need be run in folder examples/summarization
+
+## Generate raw data by following https://github.com/shi2yu3/BertSum/PROCESS.md, the copy data to this folder
+```
+mkdir fairseq_data/
+cp -r BertSum/fairseq_data/trunc400/ fairseq_data/
+```
 
 ## Download tools
 
 ```
-git clone https://github.com/shi2yu3/BertSum
 git clone https://github.com/rsennrich/subword-nmt.git
-wget http://nlp.stanford.edu/software/stanford-corenlp-full-2018-10-05.zip
-unzip -o -q stanford-corenlp-full-2018-10-05.zip
-rm stanford-corenlp-full-2018-10-05.zip
-```
-
-## Download data
-
-**CNN**
-```
-curl -c /tmp/cookies "https://drive.google.com/uc?export=download&id=0BwmD_VLjROrfTHk4NFg2SndKcjQ" > /tmp/intermezzo.html
-curl -L -b /tmp/cookies "https://drive.google.com$(cat /tmp/intermezzo.html | grep -Po 'uc-download-link" [^>]* href="\K[^"]*' | sed 's/\&amp;/\&/g')" > cnn_stories.tgz
-tar zxf cnn_stories.tgz -C cnndm --strip-components=2
-rm cnn_stories.tgz
-```
-
-**Dailymail**
-```
-curl -c /tmp/cookies "https://drive.google.com/uc?export=download&id=0BwmD_VLjROrfM1BxdkxVaTY2bWs" > /tmp/intermezzo.html
-curl -L -b /tmp/cookies "https://drive.google.com$(cat /tmp/intermezzo.html | grep -Po 'uc-download-link" [^>]* href="\K[^"]*' | sed 's/\&amp;/\&/g')" > dailymail_stories.tgz
-tar zxf dailymail_stories.tgz -C cnndm --strip-components=2
-rm dailymail_stories.tgz
-```
-
-## Build Docker image
-```
-docker build -t bertsum .
-docker run --rm -it -v $(pwd):/workspace bertsum
-```
-
-## Set path for Standford CoreNLP
-```
-export CLASSPATH=$(pwd)/stanford-corenlp-full-2018-10-05/stanford-corenlp-3.9.2.jar
-```
-
-## Process data
-
-```
-python BertSum/src/preprocess.py -mode fix_missing_period -raw_path cnndm/stories -save_path cnndm/period_fixed
-python BertSum/src/preprocess.py -mode tokenize -raw_path cnndm/period_fixed -save_path cnndm/tokens
-```
-```
-python BertSum/src/preprocess.py -mode format_to_lines -raw_path cnndm/tokens -save_path cnndm/splits/cnndm -map_path BertSum/urls -lower 
-python BertSum/src/preprocess.py -mode format_to_bert -raw_path cnndm/splits -save_path cnndm/bert_data_regenerated -oracle_mode greedy -n_cpus 4
-```
-```
-python BertSum/src/preprocess.py -mode format_to_fairseq -raw_path cnndm/tokens -save_path cnndm/fairseq_data -map_path BertSum/urls -n_cpus 4 -max_src_ntokens 400
 ```
 
 ## Generate BPE code
 ```
-cat cnndm/fairseq_data/train.src.txt cnndm/fairseq_data/train.tgt.txt > cnndm/fairseq_data/train.txt
-python subword-nmt/learn_bpe.py -s 30000 < cnndm/fairseq_data/train.txt > cnndm/fairseq_data/code
+cat fairseq_data/trunc400/train.src.txt fairseq_data/trunc400/train.tgt.txt > fairseq_data/trunc400/train.txt
+python subword-nmt/learn_bpe.py -s 30000 < fairseq_data/trunc400/train.txt > fairseq_data/trunc400/code
 ```
 
 ## Tokenization
 ```
-python subword-nmt/apply_bpe.py -c cnndm/fairseq_data/code < cnndm/fairseq_data/train.src.txt > cnndm/fairseq_data/train.src
-python subword-nmt/apply_bpe.py -c cnndm/fairseq_data/code < cnndm/fairseq_data/train.tgt.txt > cnndm/fairseq_data/train.tgt
-python subword-nmt/apply_bpe.py -c cnndm/fairseq_data/code < cnndm/fairseq_data/test.src.txt > cnndm/fairseq_data/test.src
-python subword-nmt/apply_bpe.py -c cnndm/fairseq_data/code < cnndm/fairseq_data/test.tgt.txt > cnndm/fairseq_data/test.tgt
-python subword-nmt/apply_bpe.py -c cnndm/fairseq_data/code < cnndm/fairseq_data/valid.src.txt > cnndm/fairseq_data/valid.src
-python subword-nmt/apply_bpe.py -c cnndm/fairseq_data/code < cnndm/fairseq_data/valid.tgt.txt > cnndm/fairseq_data/valid.tgt
+python subword-nmt/apply_bpe.py -c fairseq_data/trunc400/code < fairseq_data/trunc400/train.src.txt > fairseq_data/trunc400/train.src
+python subword-nmt/apply_bpe.py -c fairseq_data/trunc400/code < fairseq_data/trunc400/train.tgt.txt > fairseq_data/trunc400/train.tgt
+python subword-nmt/apply_bpe.py -c fairseq_data/trunc400/code < fairseq_data/trunc400/test.src.txt > fairseq_data/trunc400/test.src
+python subword-nmt/apply_bpe.py -c fairseq_data/trunc400/code < fairseq_data/trunc400/test.tgt.txt > fairseq_data/trunc400/test.tgt
+python subword-nmt/apply_bpe.py -c fairseq_data/trunc400/code < fairseq_data/trunc400/valid.src.txt > fairseq_data/trunc400/valid.src
+python subword-nmt/apply_bpe.py -c fairseq_data/trunc400/code < fairseq_data/trunc400/valid.tgt.txt > fairseq_data/trunc400/valid.tgt
 ```
 
 # Training
+
+This need be run in the root folder
 
 ## Binarize the dataset
 
 ```
 docker run --rm -it -v $(pwd):/workspace bertsum
-python preprocess.py --source-lang src --target-lang tgt --joined-dictionary --trainpref examples/summarization/cnndm/fairseq_data/train --validpref examples/summarization/cnndm/fairseq_data/valid --testpref examples/summarization/cnndm/fairseq_data/test --destdir data-bin/cnndm
+python preprocess.py --source-lang src --target-lang tgt --joined-dictionary --trainpref examples/summarization/fairseq_data/trunc400/train --validpref examples/summarization/fairseq_data/trunc400/valid --testpref examples/summarization/fairseq_data/trunc400/test --destdir data-bin/cnndm
 ```
 Output
 ```
 | [src] Dictionary: 30391 types
-| [src] examples/summarization/cnndm/fairseq_data/train.src: 287227 sents, 118030308 tokens, 0.0% replaced by <unk>
+| [src] examples/summarization/fairseq_data/trunc400/train.src: 287227 sents, 118030308 tokens, 0.0% replaced by <unk>
 | [src] Dictionary: 30391 types
-| [src] examples/summarization/cnndm/fairseq_data/valid.src: 13368 sents, 5451317 tokens, 0.000147% replaced by <unk>
+| [src] examples/summarization/fairseq_data/trunc400/valid.src: 13368 sents, 5451317 tokens, 0.000147% replaced by <unk>
 | [src] Dictionary: 30391 types
-| [src] examples/summarization/cnndm/fairseq_data/test.src: 11490 sents, 4700782 tokens, 0.000425% replaced by <unk>
+| [src] examples/summarization/fairseq_data/trunc400/test.src: 11490 sents, 4700782 tokens, 0.000425% replaced by <unk>
 | [tgt] Dictionary: 30391 types
-| [tgt] examples/summarization/cnndm/fairseq_data/train.tgt: 287227 sents, 17123886 tokens, 0.0% replaced by <unk>
+| [tgt] examples/summarization/fairseq_data/trunc400/train.tgt: 287227 sents, 17123886 tokens, 0.0% replaced by <unk>
 | [tgt] Dictionary: 30391 types
-| [tgt] examples/summarization/cnndm/fairseq_data/valid.tgt: 13368 sents, 886214 tokens, 0.0% replaced by <unk>
+| [tgt] examples/summarization/fairseq_data/trunc400/valid.tgt: 13368 sents, 886214 tokens, 0.0% replaced by <unk>
 | [tgt] Dictionary: 30391 types
-| [tgt] examples/summarization/cnndm/fairseq_data/test.tgt: 11490 sents, 726123 tokens, 0.000275% replaced by <unk>
+| [tgt] examples/summarization/fairseq_data/trunc400/test.tgt: 11490 sents, 726123 tokens, 0.000275% replaced by <unk>
 ```
 
 ## Train
@@ -128,11 +85,21 @@ epsilon_ls: label smoothing
 
 **Big transformer**
 ```
+# Local
 arch=transformer_vaswani_wmt_en_de_big
 mkdir -p checkpoints/$arch
 python train.py data-bin/cnndm -s src -t tgt --max-tokens 4000 -a $arch --share-all-embeddings --dropout 0.3 --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.0 --weight-decay 0.0001 --lr 0.0005 --warmup-init-lr 1e-07 --warmup-updates 4000 --lr-scheduler inverse_sqrt --min-lr 1e-09 --criterion label_smoothed_cross_entropy --label-smoothing 0.1 --max-update 300000 --save-dir checkpoints/$arch
 python scripts/average_checkpoints.py --inputs checkpoints/$arch --num-epoch-checkpoints 20 --output checkpoints/$arch/model.pt
 python generate.py data-bin/cnndm --path checkpoints/$arch/model.pt --batch-size 128 --beam 5 --remove-bpe --no-repeat-ngram-size 3
+
+# Philly environmentVariables 
+rootdir: "/philly/eu2/ipgsrch/yushi/fairseq",
+arch: "transformer_vaswani_wmt_en_de_big",
+datadir: "data-bin/cnndm"
+
+# Philly commandLine
+python $rootdir/train.py $rootdir/$datadir -s src -t tgt --max-tokens 4000 -a $arch --share-all-embeddings --dropout 0.3 --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.0 --weight-decay 0.0001 --lr 0.0005 --warmup-init-lr 1e-07 --warmup-updates 4000 --lr-scheduler inverse_sqrt --min-lr 1e-09 --criterion label_smoothed_cross_entropy --label-smoothing 0.1 --max-update 300000 --save-dir $PHILLY_JOB_DIRECTORY
+python $rootdir/generate.py $rootdir/$datadir --path ${modelpath}_1555486458178_5362/checkpoint_best.pt --batch-size 128 --beam 5 --remove-bpe --no-repeat-ngram-size 3
 ```
 
 
