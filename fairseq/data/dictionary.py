@@ -298,3 +298,17 @@ class TruncatedDictionary(object):
         if i < self.length:
             return self.wrapped_dict[i]
         return self.wrapped_dict.unk()
+
+
+class BertDictionary(Dictionary):
+    def __init__(self):
+        super(BertDictionary, self).__init__()
+        self.mask_index = self.add_symbol('<mask>')
+        self.cls_index = self.add_symbol('<cls>')
+        self.nspecial = len(self.symbols)
+
+    def mask(self):
+        return self.mask_index
+
+    def cls(self):
+        return self.cls_index
