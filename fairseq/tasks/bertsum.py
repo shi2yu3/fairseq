@@ -11,7 +11,7 @@ import os
 from fairseq import options, utils
 from fairseq.data import (
     BertDictionary,
-    BertDataset
+    BertSumDataset
 )
 
 from . import FairseqTask, register_task
