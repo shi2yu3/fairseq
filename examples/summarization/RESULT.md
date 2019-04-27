@@ -32,16 +32,16 @@ weight-decay = 0.0001
 label-smoothing = 0.1
 ```
 > train: [1555486458178_12550](https://philly/#/job/eu2/ipgsrch/1555486458178_12550)
+
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
 
 ## Learning rate tuning
 
-* train: [1555486458178_12556](https://philly/#/job/eu2/ipgsrch/1555486458178_12556)
-```
-lr = 0.005
-```
+**lr = 0.05**
+> train: [1555486458178_12556](https://philly/#/job/eu2/ipgsrch/1555486458178_12556)
+
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
