@@ -130,9 +130,9 @@ def main(args):
 
                 if not args.quiet:
                     if src_dict is not None:
-                        print('S-{}\t{}'.format(sample_id, src_str))
+                        print('S-{}\t{}'.format(sample_id, src_str.encoding('utf-8')))
                     if has_target:
-                        print('T-{}\t{}'.format(sample_id, target_str))
+                        print('T-{}\t{}'.format(sample_id, target_str.encoding('utf-8')))
 
                 # Process top predictions
                 for i, hypo in enumerate(hypos[i][:min(len(hypos), args.nbest)]):
@@ -146,7 +146,7 @@ def main(args):
                     )
 
                     if not args.quiet:
-                        print('H-{}\t{}\t{}'.format(sample_id, hypo['score'], hypo_str))
+                        print('H-{}\t{}\t{}'.format(sample_id, hypo['score'], hypo_str.encoding('utf-8')))
                         print('P-{}\t{}'.format(
                             sample_id,
                             ' '.join(map(
