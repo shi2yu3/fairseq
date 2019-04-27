@@ -45,6 +45,18 @@ label-smoothing = 0.1
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
+* **lr = 0.0003**
+> train: [1555486458178_13655](https://philly/#/job/eu2/ipgsrch/1555486458178_13655)
+
+| test | epoch | rouge-1 | rouge-2 | rouge-l | 
+| --- | --- | --- | --- | --- |
+
+* **lr = 0.0001**
+> train: [1555486458178_13653](https://philly/#/job/eu2/ipgsrch/1555486458178_13653)
+
+| test | epoch | rouge-1 | rouge-2 | rouge-l | 
+| --- | --- | --- | --- | --- |
+
 * **lr = 0.00009**
 > train: [1555486458178_13519](https://philly/#/job/eu2/ipgsrch/1555486458178_13519)
 
@@ -59,6 +71,7 @@ label-smoothing = 0.1
 
 * **lr = 0.00005**
 > train: [1555486458178_13517](https://philly/#/job/eu2/ipgsrch/1555486458178_13517)
+
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
