@@ -41,7 +41,7 @@ label-smoothing = 0.1
 
 * **lr = 0.05**
 > train: [1555486458178_12556](https://philly/#/job/eu2/ipgsrch/1555486458178_12556)
-
+``````
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
@@ -51,10 +51,9 @@ label-smoothing = 0.1
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
-* train: [1555486458178_13518](https://philly/#/job/eu2/ipgsrch/1555486458178_13518)
-```
-lr = 0.00007
-```
+* **lr = 0.00007**
+> train: [1555486458178_13518](https://philly/#/job/eu2/ipgsrch/1555486458178_13518)
+
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
