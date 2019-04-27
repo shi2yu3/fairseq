@@ -25,13 +25,13 @@ python $rootdir/generate.py $rootdir/$datadir --path $modelpath$model/checkpoint
 
 ## Baseline
 
-* train: [1555486458178_12550](https://philly/#/job/eu2/ipgsrch/1555486458178_12550)
 ```
 lr = 0.0005
 dropout = 0.3
 weight-decay = 0.0001
 label-smoothing = 0.1
 ```
+> train: [1555486458178_12550](https://philly/#/job/eu2/ipgsrch/1555486458178_12550)
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
