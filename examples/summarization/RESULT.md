@@ -39,16 +39,15 @@ label-smoothing = 0.1
 
 ## Learning rate tuning
 
-**lr = 0.05**
+* **lr = 0.05**
 > train: [1555486458178_12556](https://philly/#/job/eu2/ipgsrch/1555486458178_12556)
 
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
-* train: [1555486458178_13519](https://philly/#/job/eu2/ipgsrch/1555486458178_13519)
-```
-lr = 0.00009
-```
+* **lr = 0.00009**
+> train: [1555486458178_13519](https://philly/#/job/eu2/ipgsrch/1555486458178_13519)
+
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
