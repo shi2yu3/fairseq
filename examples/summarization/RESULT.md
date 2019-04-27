@@ -25,7 +25,7 @@ python $rootdir/generate.py $rootdir/$datadir --path $modelpath$model/checkpoint
 
 ## Baseline
 
-train: [1555486458178_12550](https://philly/#/job/eu2/ipgsrch/1555486458178_12550)
+* train: [1555486458178_12550](https://philly/#/job/eu2/ipgsrch/1555486458178_12550)
 ```
 lr = 0.0005
 dropout = 0.3
@@ -38,42 +38,42 @@ label-smoothing = 0.1
 
 ## Learning rate tuning
 
-train: [1555486458178_12556](https://philly/#/job/eu2/ipgsrch/1555486458178_12556)
+* train: [1555486458178_12556](https://philly/#/job/eu2/ipgsrch/1555486458178_12556)
 ```
 lr = 0.005
 ```
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
-train: [1555486458178_13511](https://philly/#/job/eu2/ipgsrch/1555486458178_13511)
+* train: [1555486458178_13511](https://philly/#/job/eu2/ipgsrch/1555486458178_13511)
 ```
 lr = 0.00009
 ```
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
-train: [1555486458178_13510](https://philly/#/job/eu2/ipgsrch/1555486458178_13510)
+* train: [1555486458178_13510](https://philly/#/job/eu2/ipgsrch/1555486458178_13510)
 ```
 lr = 0.00007
 ```
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
-train: [1555486458178_12557](https://philly/#/job/eu2/ipgsrch/1555486458178_12557)
+* train: [1555486458178_12557](https://philly/#/job/eu2/ipgsrch/1555486458178_12557)
 ```
 lr = 0.00005
 ```
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
-train: [1555486458178_13508](https://philly/#/job/eu2/ipgsrch/1555486458178_13508)
+* train: [1555486458178_13508](https://philly/#/job/eu2/ipgsrch/1555486458178_13508)
 ```
 lr = 0.00003
 ```
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
-train: [1555486458178_13509](https://philly/#/job/eu2/ipgsrch/1555486458178_13509)
+* train: [1555486458178_13509](https://philly/#/job/eu2/ipgsrch/1555486458178_13509)
 ```
 lr = 0.00001
 ```
@@ -83,21 +83,21 @@ lr = 0.00001
 
 ## Dropout rate tuning
 
-train: [1555486458178_12831](https://philly/#/job/eu2/ipgsrch/1555486458178_12831)
+* train: [1555486458178_12831](https://philly/#/job/eu2/ipgsrch/1555486458178_12831)
 ```
 dropout = 0.0
 ```
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
-train: [1555486458178_12857](https://philly/#/job/eu2/ipgsrch/1555486458178_12857)
+* train: [1555486458178_12857](https://philly/#/job/eu2/ipgsrch/1555486458178_12857)
 ```
 dropout = 0.1
 ```
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
-train: [1555486458178_12861](https://philly/#/job/eu2/ipgsrch/1555486458178_12861)
+* train: [1555486458178_12861](https://philly/#/job/eu2/ipgsrch/1555486458178_12861)
 ```
 dropout = 0.2
 ```
@@ -107,14 +107,14 @@ dropout = 0.2
 
 ## Weight decay tuning
 
-train: [1555486458178_12865](https://philly/#/job/eu2/ipgsrch/1555486458178_12865)
+* train: [1555486458178_12865](https://philly/#/job/eu2/ipgsrch/1555486458178_12865)
 ```
 weight-decay = 0.00001
 ```
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
-train: [1555486458178_12866](https://philly/#/job/eu2/ipgsrch/1555486458178_12866)
+* train: [1555486458178_12866](https://philly/#/job/eu2/ipgsrch/1555486458178_12866)
 ```
 weight-decay = 0.00005
 ```
@@ -124,14 +124,14 @@ weight-decay = 0.00005
 
 ## Label smoothing tuning
 
-train: [1555486458178_12880](https://philly/#/job/eu2/ipgsrch/1555486458178_12880)
+* train: [1555486458178_12880](https://philly/#/job/eu2/ipgsrch/1555486458178_12880)
 ```
 label-smoothing = 0.01
 ```
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
-train: [1555486458178_12881](https://philly/#/job/eu2/ipgsrch/1555486458178_12881)
+* train: [1555486458178_12881](https://philly/#/job/eu2/ipgsrch/1555486458178_12881)
 ```
 label-smoothing = 0.05
 ```
