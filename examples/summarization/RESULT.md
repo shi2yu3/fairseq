@@ -45,35 +45,35 @@ lr = 0.005
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
-* train: [1555486458178_13511](https://philly/#/job/eu2/ipgsrch/1555486458178_13511)
+* train: [1555486458178_13519](https://philly/#/job/eu2/ipgsrch/1555486458178_13519)
 ```
 lr = 0.00009
 ```
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
-* train: [1555486458178_13510](https://philly/#/job/eu2/ipgsrch/1555486458178_13510)
+* train: [1555486458178_13518](https://philly/#/job/eu2/ipgsrch/1555486458178_13518)
 ```
 lr = 0.00007
 ```
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
-* train: [1555486458178_12557](https://philly/#/job/eu2/ipgsrch/1555486458178_12557)
+* train: [1555486458178_13517](https://philly/#/job/eu2/ipgsrch/1555486458178_13517)
 ```
 lr = 0.00005
 ```
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
-* train: [1555486458178_13508](https://philly/#/job/eu2/ipgsrch/1555486458178_13508)
+* train: [1555486458178_13516](https://philly/#/job/eu2/ipgsrch/1555486458178_13516)
 ```
 lr = 0.00003
 ```
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
 
-* train: [1555486458178_13509](https://philly/#/job/eu2/ipgsrch/1555486458178_13509)
+* train: [1555486458178_13515](https://philly/#/job/eu2/ipgsrch/1555486458178_13515)
 ```
 lr = 0.00001
 ```
