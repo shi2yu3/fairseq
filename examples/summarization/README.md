@@ -2,7 +2,7 @@
 
 This need be run in folder examples/summarization
 
-## Generate raw data by following https://github.com/shi2yu3/BertSum/PROCESS.md, the copy data to this folder
+## Generate raw data by following https://github.com/shi2yu3/BertSum/PROCESS.md, then copy data to this folder
 ```
 mkdir fairseq_data/
 cp -r BertSum/fairseq_data/trunc400/ fairseq_data/
@@ -90,7 +90,12 @@ arch=transformer_vaswani_wmt_en_de_big
 mkdir -p checkpoints/$arch
 python train.py data-bin/cnndm -s src -t tgt --max-tokens 4000 -a $arch --share-all-embeddings --dropout 0.3 --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.0 --weight-decay 0.0001 --lr 0.0005 --warmup-init-lr 1e-07 --warmup-updates 4000 --lr-scheduler inverse_sqrt --min-lr 1e-09 --criterion label_smoothed_cross_entropy --label-smoothing 0.1 --max-update 300000 --save-dir checkpoints/$arch
 python scripts/average_checkpoints.py --inputs checkpoints/$arch --num-epoch-checkpoints 20 --output checkpoints/$arch/model.pt
-python generate.py data-bin/cnndm --path checkpoints/$arch/model.pt --batch-size 128 --beam 5 --remove-bpe --no-repeat-ngram-size 3
+python generate.py data-bin/cnndm --path checkpoints/$arch/model.pt --batch-size 128 --beam 5 --remove-bpe --no-repeat-ngram-size 3 --print-alignment --output_dir results
+docker run --rm -it -v $(pwd):/workspace bertsum
+pyrouge_set_rouge_path examples/summarization/BertSum/pyrouge/tools/ROUGE-1.5.5
+python examples/summarization/BertSum/src/rouge.py
+exit
+
 
 # Philly environmentVariables 
 rootdir: "/philly/eu2/ipgsrch/yushi/fairseq",
