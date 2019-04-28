@@ -436,6 +436,8 @@ def add_generation_args(parser):
                        help='strength of diversity penalty for Diverse Beam Search')
     group.add_argument('--print-alignment', action='store_true',
                        help='if set, uses attention feedback to compute and print alignment to source tokens')
+    group.add_argument('--output_dir', default=None, type=str, metavar='O',
+                       help='directory to output reference and result files')
     # fmt: on
     return group
 

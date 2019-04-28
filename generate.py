@@ -10,6 +10,7 @@ Translate pre-processed data with a trained model.
 """
 
 import torch
+import os
 
 from fairseq import bleu, options, progress_bar, tasks, utils
 from fairseq.meters import StopwatchMeter, TimeMeter
@@ -28,6 +29,15 @@ def main(args):
     if args.max_tokens is None and args.max_sentences is None:
         args.max_tokens = 12000
     print(args)
+
+    tgt_file = None
+    hypo_file = None
+    if args.output_dir:
+        os.makedirs(args.output_dir, exist_ok=True)
+        tgt_fn = os.path.join(args.output_dir, 'gold')
+        hypo_fn = os.path.join(args.output_dir, 'candidate')
+        tgt_file = open(tgt_fn, 'w', encoding='utf-8')
+        hypo_file = open(hypo_fn, 'w', encoding='utf-8')
 
     use_cuda = torch.cuda.is_available() and not args.cpu
 
@@ -135,7 +145,7 @@ def main(args):
                         print('T-{}\t{}'.format(sample_id, target_str.encode(encoding='utf-8')))
 
                 # Process top predictions
-                for i, hypo in enumerate(hypos[i][:min(len(hypos), args.nbest)]):
+                for j, hypo in enumerate(hypos[i][:min(len(hypos[i]), args.nbest)]):
                     hypo_tokens, hypo_str, alignment = utils.post_process_prediction(
                         hypo_tokens=hypo['tokens'].int().cpu(),
                         src_str=src_str,
@@ -162,7 +172,7 @@ def main(args):
                             ))
 
                     # Score only the top hypothesis
-                    if has_target and i == 0:
+                    if has_target and j == 0:
                         if align_dict is not None or args.remove_bpe is not None:
                             # Convert back to tokens for evaluation with unk replacement and/or without BPE
                             target_tokens = tgt_dict.encode_line(target_str, add_if_not_exist=True)
@@ -171,9 +181,18 @@ def main(args):
                         else:
                             scorer.add(target_tokens, hypo_tokens)
 
+                        if args.output_dir:
+                            tgt_file.writelines(target_str + '\n')
+                            hypo_file.writelines(hypo_str + '\n')
+
             wps_meter.update(num_generated_tokens)
             t.log({'wps': round(wps_meter.avg)})
             num_sentences += sample['nsentences']
+
+            break
+
+    tgt_file.close()
+    hypo_file.close()
 
     print('| Translated {} sentences ({} tokens) in {:.1f}s ({:.2f} sentences/s, {:.2f} tokens/s)'.format(
         num_sentences, gen_timer.n, gen_timer.sum, num_sentences / gen_timer.sum, 1. / gen_timer.avg))
