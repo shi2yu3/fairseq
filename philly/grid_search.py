@@ -101,7 +101,7 @@ def main():
         summary.append('\n'.join(job_info))
 
     summary = '\n\n'.join(summary)
-    with open('grid-search.md', 'w') as f:
+    with open('grid_search.md', 'w') as f:
         f.writelines(summary)
     print(summary)
 
