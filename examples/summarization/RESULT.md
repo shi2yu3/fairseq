@@ -12,8 +12,8 @@
     1. [Baseline](#baseline)
     1. [Learning rate tuning](#learning-rate-tuning)
     1. [Dropout rate tuning](#dropout-rate-tuning)
-    1. [Weight decay tuning](#weight-decay-tuning)
-    1. [Label smoothing tuning](#label-smoothing-tuning)
+    1. [Weight decay tuning](#weight_decay-tuning)
+    1. [Label smoothing tuning](#label_smoothing-tuning)
     1. [Minimum length tunning](#minimum-length-tunning)
 
 
@@ -68,12 +68,12 @@ language model was trained on `newscrawl and CNN-Dailymail`, totalling `193M` se
 
 ## train commandLine
 ```
-python $rootdir/train.py $rootdir/$datadir -s src -t tgt --max-tokens 4000 -a $arch --share-all-embeddings --dropout 0.3 --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.0 --weight-decay 0.0001 --lr 0.0005 --warmup-init-lr 1e-07 --warmup-updates 4000 --lr-scheduler inverse_sqrt --min-lr 1e-09 --criterion label_smoothed_cross_entropy --label-smoothing 0.1 --max-update 30000000 --save-dir $PHILLY_JOB_DIRECTORY
+python $rootdir/train.py $rootdir/$datadir -s src -t tgt --max-tokens 4000 -a $arch --share-all-embeddings --dropout 0.3 --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.0 --weight_decay 0.0001 --lr 0.0005 --warmup-init-lr 1e-07 --warmup-updates 4000 --lr-scheduler inverse_sqrt --min-lr 1e-09 --criterion label_smoothed_cross_entropy --label_smoothing 0.1 --max_update 30000000 --save-dir $PHILLY_JOB_DIRECTORY
 ```
 
 ## generate commandLine
 ```
-python $rootdir/generate.py $rootdir/$datadir --path $modelpath$model/checkpoint$epoch.pt --batch-size 128 --beam 5 --remove-bpe --no-repeat-ngram-size 3 --print-alignment --output_dir $$PHILLY_JOB_DIRECTORY
+python $rootdir/generate.py $rootdir/$datadir --path $modelpath$model/checkpoint$epoch.pt --batch-size 128 --beam 5 --remove-bpe --no-repeat-ngram-size 3 --print-alignment --output_dir $$PHILLY_JOB_DIRECTORY --min_len 1
 ```
 
 ## local scoring
@@ -98,9 +98,10 @@ exit
 ```
 --lr 0.0005
 --dropout 0.3
---weight-decay 0.0001
---label-smoothing 0.1
---max-update 30000000
+--weight_decay 0.0001
+--label_smoothing 0.1
+--max_update 30000000
+--min_len 1
 ```
 > train: [1555486458178_12550](https://philly/#/job/eu2/ipgsrch/1555486458178_12550)
 
@@ -224,7 +225,7 @@ exit
 
 > hyper parameter
 ```
---weight-decay 0.00001
+--weight_decay 0.00001
 ```
 > train: [1555486458178_12865](https://philly/#/job/eu2/ipgsrch/1555486458178_12865)
 
@@ -233,7 +234,7 @@ exit
 
 > hyper parameter
 ```
---weight-decay 0.00005
+--weight_decay 0.00005
 ```
 > train: [1555486458178_12866](https://philly/#/job/eu2/ipgsrch/1555486458178_12866)
 
@@ -245,7 +246,7 @@ exit
 
 > hyper parameter
 ```
---label-smoothing 0.01
+--label_smoothing 0.01
 ```
 > train: [1555486458178_12880](https://philly/#/job/eu2/ipgsrch/1555486458178_12880)
 
@@ -254,7 +255,7 @@ exit
 
 > hyper parameter
 ```
---label-smoothing 0.05
+--label_smoothing 0.05
 ```
 > train: [1555486458178_12881](https://philly/#/job/eu2/ipgsrch/1555486458178_12881)
 
@@ -268,7 +269,7 @@ exit
 
 > hyper parameter
 ```
---min-len 10
+--min_len 10
 ```
 > job: [1555486458178_15953](https://philly/#/job/eu2/ipgsrch/1555486458178_15953)
 
@@ -277,7 +278,7 @@ exit
 
 > hyper parameter
 ```
---min-len 20
+--min_len 20
 ```
 > job: [1555486458178_15954](https://philly/#/job/eu2/ipgsrch/1555486458178_15954)
 
@@ -286,7 +287,7 @@ exit
 
 > hyper parameter
 ```
---min-len 30
+--min_len 30
 ```
 > job: [1555486458178_15955](https://philly/#/job/eu2/ipgsrch/1555486458178_15955)
 
@@ -295,7 +296,7 @@ exit
 
 > hyper parameter
 ```
---min-len 40
+--min_len 40
 ```
 > job: [1555486458178_15956](https://philly/#/job/eu2/ipgsrch/1555486458178_15956)
 
@@ -304,7 +305,7 @@ exit
 
 > hyper parameter
 ```
---min-len 50
+--min_len 50
 ```
 > job: [1555486458178_15958](https://philly/#/job/eu2/ipgsrch/1555486458178_15958)
 
