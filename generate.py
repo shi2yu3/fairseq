@@ -189,8 +189,6 @@ def main(args):
             t.log({'wps': round(wps_meter.avg)})
             num_sentences += sample['nsentences']
 
-            break
-
     tgt_file.close()
     hypo_file.close()
 
