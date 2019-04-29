@@ -25,11 +25,9 @@ class SearchSpace:
 
 
 def parse_command(command):
-    argument_start = command.find('train.py') + len('train.py')
-    entry = command[:argument_start]
-    args = shlex.split(command[argument_start:])
+    args = shlex.split(command)
     args = parse_arguments(args)
-    return entry, args
+    return args
 
 
 def parse_arguments(arguments):
@@ -59,7 +57,7 @@ def main():
 
     philly_job_template = config['philly_config']
 
-    entry, args = parse_command(philly_job_template['resources']['workers']['commandLine'])
+    args = parse_command(philly_job_template['resources']['workers']['commandLine'])
 
     srch_spc = SearchSpace()
     srch_spc.extend(config['args'])
@@ -67,7 +65,7 @@ def main():
     summary = []
     for arguments in srch_spc.arguments:
         philly_config = copy.deepcopy(philly_job_template)
-        job_info = ['* hyper parameter']
+        job_info = ['> hyper parameter']
         job_info += ['```']
         for arg in arguments:
             if arg in philly_config['environmentVariables']:
@@ -77,23 +75,23 @@ def main():
             else:
                 raise ValueError(f'Argument {arg} is not used in command')
             job_info.append(f'{arg} {arguments[arg]}')
-            commandLine = entry
+            commandLine = []
             for k in args:
                 if isinstance(k, str) and ' ' in k:
                     k = f'\'{k}\''
-                commandLine += ' ' + str(k)
+                commandLine.append(str(k))
                 v = args[k]
                 if v:
                     if isinstance(v, str) and ' ' in v:
                         v = f'\'{v}\''
-                    commandLine += ' ' + str(v)
-            philly_config['resources']['workers']['commandLine'] = commandLine
+                    commandLine.append(str(v))
+            philly_config['resources']['workers']['commandLine'] = ' '.join(commandLine)
         job_info.append('```')
 
         json.dump(philly_config, open('grid_search.json', 'w'), indent=2)
         job_id = submit_job("grid_search.json")
         job_id = eval(job_id.decode('utf-8'))["jobId"].replace("application_", "")
-        job_info.append(f'> train: [{job_id}](https://philly/#/job/eu2/ipgsrch/{job_id})')
+        job_info.append(f'> job: [{job_id}](https://philly/#/job/eu2/ipgsrch/{job_id})')
         job_info.append('')
         job_info.append('| test | epoch | rouge-1 | rouge-2 | rouge-l |')
         job_info.append('| --- | --- | --- | --- | --- |')
