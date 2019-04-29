@@ -124,7 +124,8 @@ train: [1555486458178_13517](https://philly/#/job/eu2/ipgsrch/1555486458178_1351
 
 | test | epoch | rouge-1 | rouge-2 | rouge-l | 
 | --- | --- | --- | --- | --- |
-| [1555486458178_15126](https://philly/#/job/eu2/ipgsrch/1555486458178_15126) | 9 | 22.22 | 4.47 | 15.40 |
+| [1555486458178_15628](https://philly/#/job/eu2/ipgsrch/1555486458178_15628) | 9 | xxx | xxx | xxx |
+| [1555486458178_15629](https://philly/#/job/eu2/ipgsrch/1555486458178_15629) | 13 | xxx | xxx | xxx |
 
 * **lr = 0.00003**
 train: [1555486458178_13516](https://philly/#/job/eu2/ipgsrch/1555486458178_13516)
