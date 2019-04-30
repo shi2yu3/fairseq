@@ -273,7 +273,7 @@ bash philly/score.sh <id>...
 **model**: [1555486458178_12557](https://philly/#/job/eu2/ipgsrch/1555486458178_12557)
 **epoch**: 14
 ```
-python philly/grid_search.py
+python philly/grid_search.py hyper_param_generate.json
 ```
 | test | --min_len | rouge-1 | rouge-2 | rouge-l |
 | --- | --- | --- | --- | --- |
