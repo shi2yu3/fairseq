@@ -111,6 +111,18 @@ exit
 
 ## Learning rate tuning
 
+### Single job tuning
+
+> hyper parameter
+```
+--lr 0.0005
+--warmup-updates 40000
+--max-update 40000
+```
+> train: [1555486458178_17334](https://philly/#/job/eu2/ipgsrch/1555486458178_17334)
+
+### Separate tuning
+
 > hyper parameter
 ```
 --lr 0.05
