@@ -87,6 +87,10 @@ pyrouge_set_rouge_path examples/summarization/BertSum/pyrouge/tools/ROUGE-1.5.5
 python examples/summarization/BertSum/src/rouge.py
 exit
 ```
+or simply run
+```
+bash philly/score.sh <id>...
+```
 
 
 # Parameter tuning
@@ -278,50 +282,14 @@ exit
 ## Minimum length tunning
 
 **model**: [1555486458178_12557](https://philly/#/job/eu2/ipgsrch/1555486458178_12557)
+**epoch**: 14
 
-> hyper parameter
-```
---min_len 10
-```
-> job: [1555486458178_15953](https://philly/#/job/eu2/ipgsrch/1555486458178_15953)
-
-| test | epoch | rouge-1 | rouge-2 | rouge-l |
+| test | --min_len | rouge-1 | rouge-2 | rouge-l |
 | --- | --- | --- | --- | --- |
-
-> hyper parameter
-```
---min_len 20
-```
-> job: [1555486458178_15954](https://philly/#/job/eu2/ipgsrch/1555486458178_15954)
-
-| test | epoch | rouge-1 | rouge-2 | rouge-l |
-| --- | --- | --- | --- | --- |
-
-> hyper parameter
-```
---min_len 30
-```
-> job: [1555486458178_15955](https://philly/#/job/eu2/ipgsrch/1555486458178_15955)
-
-| test | epoch | rouge-1 | rouge-2 | rouge-l |
-| --- | --- | --- | --- | --- |
-
-> hyper parameter
-```
---min_len 40
-```
-> job: [1555486458178_15956](https://philly/#/job/eu2/ipgsrch/1555486458178_15956)
-
-| test | epoch | rouge-1 | rouge-2 | rouge-l |
-| --- | --- | --- | --- | --- |
-
-> hyper parameter
-```
---min_len 50
-```
-> job: [1555486458178_15958](https://philly/#/job/eu2/ipgsrch/1555486458178_15958)
-
-| test | epoch | rouge-1 | rouge-2 | rouge-l |
-| --- | --- | --- | --- | --- |
+| [1555486458178_15953](https://philly/#/job/eu2/ipgsrch/1555486458178_15953) | 10 | 21.00 | 3.48 | 13.99 |
+| [1555486458178_15954](https://philly/#/job/eu2/ipgsrch/1555486458178_15954) | 20 | 21.17 | 3.50 | 14.07 |
+| [1555486458178_15955](https://philly/#/job/eu2/ipgsrch/1555486458178_15955) | 30 | 21.58 | 3.57 | 14.26 |
+| [1555486458178_15956](https://philly/#/job/eu2/ipgsrch/1555486458178_15956) | 40 | 22.12 | 3.69 | 14.46 |
+| [1555486458178_15958](https://philly/#/job/eu2/ipgsrch/1555486458178_15958) | 50 | 22.48 | 3.84 | 14.54 |
 
 
