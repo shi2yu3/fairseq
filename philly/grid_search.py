@@ -76,17 +76,17 @@ def main():
             else:
                 raise ValueError(f'Argument {arg} is not used in command')
             job_info.append(f'{arg} {arguments[arg]}')
-            commandLine = []
-            for k in args:
-                if isinstance(k, str) and ' ' in k:
-                    k = f'\'{k}\''
-                commandLine.append(str(k))
-                v = args[k]
-                if v:
-                    if isinstance(v, str) and ' ' in v:
-                        v = f'\'{v}\''
-                    commandLine.append(str(v))
-            philly_config['resources']['workers']['commandLine'] = ' '.join(commandLine)
+        commandLine = []
+        for k in args:
+            if isinstance(k, str) and ' ' in k:
+                k = f'\'{k}\''
+            commandLine.append(str(k))
+            v = args[k]
+            if v != '':
+                if isinstance(v, str) and ' ' in v:
+                    v = f'\'{v}\''
+                commandLine.append(str(v))
+        philly_config['resources']['workers']['commandLine'] = ' '.join(commandLine)
         job_info.append('```')
 
         json.dump(philly_config, open('grid_search.json', 'w'), indent=2)
