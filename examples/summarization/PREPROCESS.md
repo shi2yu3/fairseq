@@ -1,8 +1,13 @@
 # Data processing
 
 This need be run in folder examples/summarization
+```
+cd examples/summarization
+```
 
-## Generate raw data by following https://github.com/shi2yu3/BertSum/PROCESS.md, then copy data to current folder
+## Generate raw data by following https://github.com/shi2yu3/BertSum/PROCESS.md
+
+## Copy data from BertSum to current folder
 ```
 mkdir fairseq_data/
 cp -r BertSum/fairseq_data/trunc400/ fairseq_data/
