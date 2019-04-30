@@ -78,17 +78,6 @@ python $rootdir/generate.py $rootdir/$datadir --path $modelpath$model/checkpoint
 
 ## local scoring
 ```
-phillyfs=philly-fs.bash
-id=1555486458178_15841
-sudo bash $phillyfs -cp //philly/eu2/ipgsrch/sys/jobs/application_$id/candidate results/candidate
-sudo bash $phillyfs -cp //philly/eu2/ipgsrch/sys/jobs/application_$id/gold results/gold
-docker run --rm -it -v $(pwd):/workspace bertsum
-pyrouge_set_rouge_path examples/summarization/BertSum/pyrouge/tools/ROUGE-1.5.5
-python examples/summarization/BertSum/src/rouge.py
-exit
-```
-or simply run
-```
 bash philly/score.sh <id>...
 ```
 
@@ -283,7 +272,9 @@ bash philly/score.sh <id>...
 
 **model**: [1555486458178_12557](https://philly/#/job/eu2/ipgsrch/1555486458178_12557)
 **epoch**: 14
-
+```
+python philly/grid_search.py
+```
 | test | --min_len | rouge-1 | rouge-2 | rouge-l |
 | --- | --- | --- | --- | --- |
 | [1555486458178_15953](https://philly/#/job/eu2/ipgsrch/1555486458178_15953) | 10 | 21.00 | 3.48 | 13.99 |
@@ -291,5 +282,10 @@ bash philly/score.sh <id>...
 | [1555486458178_15955](https://philly/#/job/eu2/ipgsrch/1555486458178_15955) | 30 | 21.58 | 3.57 | 14.26 |
 | [1555486458178_15956](https://philly/#/job/eu2/ipgsrch/1555486458178_15956) | 40 | 22.12 | 3.69 | 14.46 |
 | [1555486458178_15958](https://philly/#/job/eu2/ipgsrch/1555486458178_15958) | 50 | 22.48 | 3.84 | 14.54 |
+| [1555486458178_17378](https://philly/#/job/eu2/ipgsrch/1555486458178_17378) | 60 |  |  |  |
+| [1555486458178_17379](https://philly/#/job/eu2/ipgsrch/1555486458178_17379) | 70 |  |  |  |
+| [1555486458178_17380](https://philly/#/job/eu2/ipgsrch/1555486458178_17380) | 80 |  |  |  |
+| [1555486458178_17381](https://philly/#/job/eu2/ipgsrch/1555486458178_17381) | 90 |  |  |  |
+| [1555486458178_17382](https://philly/#/job/eu2/ipgsrch/1555486458178_17382) | 100 |  |  |  |
 
 
