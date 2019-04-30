@@ -1,3 +1,4 @@
+import sys
 import json
 import shlex
 import copy
@@ -53,7 +54,7 @@ def submit_job(config_fn):
 
 
 def main():
-    config = json.load(open('hyper_param.json'))
+    config = json.load(open(sys.argv[1]))
 
     philly_job_template = config['philly_config']
 
