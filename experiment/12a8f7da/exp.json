@@ -1,0 +1,108 @@
+{
+    "experiment_steps": [
+        {
+            "philly_config": {
+                "version": "2019_04_20",
+                "metadata": {
+                    "name": "fairseq_tr",
+                    "cluster": "eu2",
+                    "vc": "ipgsrch",
+                    "username": "yushi"
+                },
+                "environmentVariables": {
+                    "rootdir": "/philly/eu2/ipgsrch/yushi/fairseq",
+                    "datadir": "data-bin/cnndm",
+                    "arch": "transformer_vaswani_wmt_en_de_big"
+                },
+                "resources": {
+                    "workers": {
+                        "type": "skuResource",
+                        "sku": "G1",
+                        "count": 1,
+                        "image": "phillyregistry.azurecr.io/philly/jobs/custom/pytorch:pytorch1.0.0-py36-vcr",
+                        "commandLine": "python $rootdir/train.py $rootdir/$datadir -s src -t tgt --max-tokens 4000 -a $arch --share-all-embeddings --dropout 0.3 --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.0 --weight-decay 0.0001 --lr 0.0005 --warmup-init-lr 1e-07 --warmup-updates 4000 --lr-scheduler inverse_sqrt --min-lr 1e-09 --criterion label_smoothed_cross_entropy --label-smoothing 0.1 --max-update 30000000 --max-epoch 20 --save-dir $PHILLY_JOB_DIRECTORY"
+                    }
+                }
+            },
+            "args_for_tuning": [
+                {
+                    "name": "--lr",
+                    "values": [
+                        0.0001,
+                        0.0002,
+                        0.0003,
+                        0.0004
+                    ]
+                },
+                {
+                    "name": "--dropout",
+                    "values": [
+                        0.1,
+                        0.2,
+                        0.3
+                    ]
+                },
+                {
+                    "name": "--clip-norm",
+                    "values": [
+                        0.0,
+                        0.1,
+                        0.2
+                    ]
+                },
+                {
+                    "name": "--weight-decay",
+                    "values": [
+                        0.0,
+                        1e-05,
+                        0.0001
+                    ]
+                },
+                {
+                    "name": "--label-smoothing",
+                    "values": [
+                        0.0,
+                        0.1,
+                        0.2
+                    ]
+                }
+            ]
+        },
+        {
+            "philly_config": {
+                "version": "2019_04_20",
+                "metadata": {
+                    "name": "fairseq_gen",
+                    "cluster": "eu2",
+                    "vc": "ipgsrch",
+                    "username": "yushi"
+                },
+                "environmentVariables": {
+                    "rootdir": "/philly/eu2/ipgsrch/yushi/fairseq",
+                    "datadir": "data-bin/cnndm",
+                    "modeldir": "/var/storage/shared/ipgsrch/sys/jobs/application_$PHILLY_JOB_ID",
+                    "epoch": "_best"
+                },
+                "resources": {
+                    "workers": {
+                        "type": "skuResource",
+                        "sku": "G1",
+                        "count": 1,
+                        "image": "phillyregistry.azurecr.io/philly/jobs/custom/pytorch:pytorch1.0.0-py36-vcr",
+                        "commandLine": "python $rootdir/generate.py $rootdir/$datadir --path $modeldir/checkpoint$epoch.pt --batch-size 64 --beam 5 --remove-bpe --no-repeat-ngram-size 3 --print-alignment --output_dir $PHILLY_JOB_DIRECTORY --min-len 10"
+                    }
+                }
+            },
+            "args_for_tuning": [
+                {
+                    "name": "--min-len",
+                    "values": [
+                        50,
+                        60,
+                        70
+                    ]
+                }
+            ]
+        }
+    ]
+}

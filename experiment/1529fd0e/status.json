@@ -1,0 +1,250 @@
+{
+    "finished_step": 0,
+    "status_file": "experiment\\1529fd0e\\status.json",
+    "steps": [
+        {
+            "trials": [
+                {
+                    "args_for_tuning": {
+                        "--clip-norm": 0.0,
+                        "--dropout": 0.0,
+                        "--label-smoothing": 0.0,
+                        "--lr": 5e-06,
+                        "--lr-scheduler": "fixed",
+                        "--max-tokens": 4000,
+                        "--warmup-updates": 0,
+                        "--weight-decay": 0.0
+                    },
+                    "config_file": "experiment\\1529fd0e\\514a081b\\trial.json",
+                    "dir": "experiment\\1529fd0e\\514a081b",
+                    "job_id": "1553675282044_3010",
+                    "parent_trial": null,
+                    "philly_metadata": {
+                        "cluster": "wu3",
+                        "name": "fairseq_tr",
+                        "queue": "sdrg",
+                        "username": "yushi",
+                        "vc": "msrmt"
+                    },
+                    "status": "running"
+                },
+                {
+                    "args_for_tuning": {
+                        "--clip-norm": 0.0,
+                        "--dropout": 0.0,
+                        "--label-smoothing": 0.0,
+                        "--lr": 1e-05,
+                        "--lr-scheduler": "fixed",
+                        "--max-tokens": 4000,
+                        "--warmup-updates": 0,
+                        "--weight-decay": 0.0
+                    },
+                    "config_file": "experiment\\1529fd0e\\b6d2ee6b\\trial.json",
+                    "dir": "experiment\\1529fd0e\\b6d2ee6b",
+                    "job_id": "1553675282044_3018",
+                    "parent_trial": null,
+                    "philly_metadata": {
+                        "cluster": "wu3",
+                        "name": "fairseq_tr",
+                        "queue": "sdrg",
+                        "username": "yushi",
+                        "vc": "msrmt"
+                    },
+                    "status": "running"
+                },
+                {
+                    "args_for_tuning": {
+                        "--clip-norm": 0.0,
+                        "--dropout": 0.0,
+                        "--label-smoothing": 0.0,
+                        "--lr": 5e-05,
+                        "--lr-scheduler": "fixed",
+                        "--max-tokens": 4000,
+                        "--warmup-updates": 0,
+                        "--weight-decay": 0.0
+                    },
+                    "config_file": "experiment\\1529fd0e\\10e41068\\trial.json",
+                    "dir": "experiment\\1529fd0e\\10e41068",
+                    "job_id": "1553675282044_3019",
+                    "parent_trial": null,
+                    "philly_metadata": {
+                        "cluster": "wu3",
+                        "name": "fairseq_tr",
+                        "queue": "sdrg",
+                        "username": "yushi",
+                        "vc": "msrmt"
+                    },
+                    "status": "running"
+                },
+                {
+                    "args_for_tuning": {
+                        "--clip-norm": 0.0,
+                        "--dropout": 0.0,
+                        "--label-smoothing": 0.0,
+                        "--lr": 0.0001,
+                        "--lr-scheduler": "fixed",
+                        "--max-tokens": 4000,
+                        "--warmup-updates": 0,
+                        "--weight-decay": 0.0
+                    },
+                    "config_file": "experiment\\1529fd0e\\738c802f\\trial.json",
+                    "dir": "experiment\\1529fd0e\\738c802f",
+                    "job_id": "1553675282044_3020",
+                    "parent_trial": null,
+                    "philly_metadata": {
+                        "cluster": "wu3",
+                        "name": "fairseq_tr",
+                        "queue": "sdrg",
+                        "username": "yushi",
+                        "vc": "msrmt"
+                    },
+                    "status": "gaveup"
+                },
+                {
+                    "args_for_tuning": {
+                        "--clip-norm": 0.0,
+                        "--dropout": 0.0,
+                        "--label-smoothing": 0.0,
+                        "--lr": 0.0005,
+                        "--lr-scheduler": "fixed",
+                        "--max-tokens": 4000,
+                        "--warmup-updates": 0,
+                        "--weight-decay": 0.0
+                    },
+                    "config_file": "experiment\\1529fd0e\\7aacf11a\\trial.json",
+                    "dir": "experiment\\1529fd0e\\7aacf11a",
+                    "job_id": "1553675282044_3021",
+                    "parent_trial": null,
+                    "philly_metadata": {
+                        "cluster": "wu3",
+                        "name": "fairseq_tr",
+                        "queue": "sdrg",
+                        "username": "yushi",
+                        "vc": "msrmt"
+                    },
+                    "status": "gaveup"
+                },
+                {
+                    "args_for_tuning": {
+                        "--clip-norm": 0.0,
+                        "--dropout": 0.0,
+                        "--label-smoothing": 0.0,
+                        "--lr": 5e-06,
+                        "--lr-scheduler": "fixed",
+                        "--max-tokens": 5000,
+                        "--warmup-updates": 0,
+                        "--weight-decay": 0.0
+                    },
+                    "config_file": "experiment\\1529fd0e\\2c68c3b2\\trial.json",
+                    "dir": "experiment\\1529fd0e\\2c68c3b2",
+                    "job_id": "1553675282044_3013",
+                    "parent_trial": null,
+                    "philly_metadata": {
+                        "cluster": "wu3",
+                        "name": "fairseq_tr",
+                        "queue": "sdrg",
+                        "username": "yushi",
+                        "vc": "msrmt"
+                    },
+                    "status": "gaveup"
+                },
+                {
+                    "args_for_tuning": {
+                        "--clip-norm": 0.0,
+                        "--dropout": 0.0,
+                        "--label-smoothing": 0.0,
+                        "--lr": 1e-05,
+                        "--lr-scheduler": "fixed",
+                        "--max-tokens": 5000,
+                        "--warmup-updates": 0,
+                        "--weight-decay": 0.0
+                    },
+                    "config_file": "experiment\\1529fd0e\\ef667afe\\trial.json",
+                    "dir": "experiment\\1529fd0e\\ef667afe",
+                    "job_id": "1553675282044_3022",
+                    "parent_trial": null,
+                    "philly_metadata": {
+                        "cluster": "wu3",
+                        "name": "fairseq_tr",
+                        "queue": "sdrg",
+                        "username": "yushi",
+                        "vc": "msrmt"
+                    },
+                    "status": "gaveup"
+                },
+                {
+                    "args_for_tuning": {
+                        "--clip-norm": 0.0,
+                        "--dropout": 0.0,
+                        "--label-smoothing": 0.0,
+                        "--lr": 5e-05,
+                        "--lr-scheduler": "fixed",
+                        "--max-tokens": 5000,
+                        "--warmup-updates": 0,
+                        "--weight-decay": 0.0
+                    },
+                    "config_file": "experiment\\1529fd0e\\debcc948\\trial.json",
+                    "dir": "experiment\\1529fd0e\\debcc948",
+                    "job_id": "1553675282044_3023",
+                    "parent_trial": null,
+                    "philly_metadata": {
+                        "cluster": "wu3",
+                        "name": "fairseq_tr",
+                        "queue": "sdrg",
+                        "username": "yushi",
+                        "vc": "msrmt"
+                    },
+                    "status": "gaveup"
+                },
+                {
+                    "args_for_tuning": {
+                        "--clip-norm": 0.0,
+                        "--dropout": 0.0,
+                        "--label-smoothing": 0.0,
+                        "--lr": 0.0001,
+                        "--lr-scheduler": "fixed",
+                        "--max-tokens": 5000,
+                        "--warmup-updates": 0,
+                        "--weight-decay": 0.0
+                    },
+                    "config_file": "experiment\\1529fd0e\\ab41d141\\trial.json",
+                    "dir": "experiment\\1529fd0e\\ab41d141",
+                    "job_id": "1553675282044_3024",
+                    "parent_trial": null,
+                    "philly_metadata": {
+                        "cluster": "wu3",
+                        "name": "fairseq_tr",
+                        "queue": "sdrg",
+                        "username": "yushi",
+                        "vc": "msrmt"
+                    },
+                    "status": "gaveup"
+                },
+                {
+                    "args_for_tuning": {
+                        "--clip-norm": 0.0,
+                        "--dropout": 0.0,
+                        "--label-smoothing": 0.0,
+                        "--lr": 0.0005,
+                        "--lr-scheduler": "fixed",
+                        "--max-tokens": 5000,
+                        "--warmup-updates": 0,
+                        "--weight-decay": 0.0
+                    },
+                    "config_file": "experiment\\1529fd0e\\675c494c\\trial.json",
+                    "dir": "experiment\\1529fd0e\\675c494c",
+                    "job_id": "1553675282044_3025",
+                    "parent_trial": null,
+                    "philly_metadata": {
+                        "cluster": "wu3",
+                        "name": "fairseq_tr",
+                        "queue": "sdrg",
+                        "username": "yushi",
+                        "vc": "msrmt"
+                    },
+                    "status": "gaveup"
+                }
+            ]
+        }
+    ]
+}

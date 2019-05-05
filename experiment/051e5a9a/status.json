@@ -1,0 +1,79 @@
+{
+    "finished_step": 0,
+    "status_file": "experiment\\051e5a9a\\status.json",
+    "steps": [
+        {
+            "trials": [
+                {
+                    "args_for_tuning": {
+                        "--clip-norm": 0.0,
+                        "--dropout": 0.0,
+                        "--label-smoothing": 0.0,
+                        "--lr": 2e-05,
+                        "--lr-scheduler": "fixed",
+                        "--warmup-updates": 0,
+                        "--weight-decay": 0.0
+                    },
+                    "config_file": "experiment\\051e5a9a\\ce4b8a49\\trial.json",
+                    "dir": "experiment\\051e5a9a\\ce4b8a49",
+                    "job_id": "1553675282044_3092",
+                    "parent_trial": null,
+                    "philly_metadata": {
+                        "cluster": "wu3",
+                        "name": "fairseq_tr",
+                        "queue": "sdrg",
+                        "username": "yushi",
+                        "vc": "msrmt"
+                    },
+                    "status": "running"
+                },
+                {
+                    "args_for_tuning": {
+                        "--clip-norm": 0.0,
+                        "--dropout": 0.0,
+                        "--label-smoothing": 0.0,
+                        "--lr": 3e-05,
+                        "--lr-scheduler": "fixed",
+                        "--warmup-updates": 0,
+                        "--weight-decay": 0.0
+                    },
+                    "config_file": "experiment\\051e5a9a\\181f2713\\trial.json",
+                    "dir": "experiment\\051e5a9a\\181f2713",
+                    "job_id": "1553675282044_3093",
+                    "parent_trial": null,
+                    "philly_metadata": {
+                        "cluster": "wu3",
+                        "name": "fairseq_tr",
+                        "queue": "sdrg",
+                        "username": "yushi",
+                        "vc": "msrmt"
+                    },
+                    "status": "running"
+                },
+                {
+                    "args_for_tuning": {
+                        "--clip-norm": 0.0,
+                        "--dropout": 0.0,
+                        "--label-smoothing": 0.0,
+                        "--lr": 4e-05,
+                        "--lr-scheduler": "fixed",
+                        "--warmup-updates": 0,
+                        "--weight-decay": 0.0
+                    },
+                    "config_file": "experiment\\051e5a9a\\c5654df5\\trial.json",
+                    "dir": "experiment\\051e5a9a\\c5654df5",
+                    "job_id": "1553675282044_3094",
+                    "parent_trial": null,
+                    "philly_metadata": {
+                        "cluster": "wu3",
+                        "name": "fairseq_tr",
+                        "queue": "sdrg",
+                        "username": "yushi",
+                        "vc": "msrmt"
+                    },
+                    "status": "running"
+                }
+            ]
+        }
+    ]
+}

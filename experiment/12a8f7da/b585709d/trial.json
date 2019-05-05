@@ -1,0 +1,23 @@
+{
+  "version": "2019_04_20",
+  "metadata": {
+    "name": "fairseq_tr",
+    "cluster": "eu2",
+    "vc": "ipgsrch",
+    "username": "yushi"
+  },
+  "environmentVariables": {
+    "rootdir": "/philly/eu2/ipgsrch/yushi/fairseq",
+    "datadir": "data-bin/cnndm",
+    "arch": "transformer_vaswani_wmt_en_de_big"
+  },
+  "resources": {
+    "workers": {
+      "type": "skuResource",
+      "sku": "G1",
+      "count": 1,
+      "image": "phillyregistry.azurecr.io/philly/jobs/custom/pytorch:pytorch1.0.0-py36-vcr",
+      "commandLine": "python $rootdir/train.py $rootdir/$datadir -s src -t tgt --max-tokens 4000 -a $arch --share-all-embeddings --dropout 0.3 --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.2 --weight-decay 0.0 --lr 0.0002 --warmup-init-lr 1e-07 --warmup-updates 4000 --lr-scheduler inverse_sqrt --min-lr 1e-09 --criterion label_smoothed_cross_entropy --label-smoothing 0.1 --max-update 30000000 --max-epoch 20 --save-dir $PHILLY_JOB_DIRECTORY"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "version": "2019_04_20",
+  "metadata": {
+    "name": "fairseq_gen",
+    "cluster": "eu2",
+    "vc": "ipgsrch",
+    "username": "yushi"
+  },
+  "environmentVariables": {
+    "rootdir": "/philly/eu2/ipgsrch/yushi/fairseq",
+    "datadir": "data-bin/cnndm",
+    "modeldir": "/var/storage/shared/ipgsrch/sys/jobs/application_$PHILLY_JOB_ID",
+    "epoch": "_best"
+  },
+  "resources": {
+    "workers": {
+      "type": "skuResource",
+      "sku": "G1",
+      "count": 1,
+      "image": "phillyregistry.azurecr.io/philly/jobs/custom/pytorch:pytorch1.0.0-py36-vcr",
+      "commandLine": "python $rootdir/generate.py $rootdir/$datadir --path $modeldir/checkpoint$epoch.pt --batch-size 64 --beam 5 --remove-bpe --no-repeat-ngram-size 3 --print-alignment --output_dir $PHILLY_JOB_DIRECTORY --min-len 60"
+    }
+  }
+}
