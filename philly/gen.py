@@ -147,8 +147,11 @@ def test_exp(status_file, epochs, args):
                 job_id = '---'
             else:
                 print(f'\n++++ Epoch {epoch}')
-                config_file = create_config(train_job_id, epoch, cluster, vc, queue)
-                job_id = submit_job(config_file)
+                if epoch == '_best' and best_loss == 1000.0:
+                    print(f'no best epoch')
+                else:
+                    config_file = create_config(train_job_id, epoch, cluster, vc, queue)
+                    job_id = submit_job(config_file)
 
             md_table += f'\n|'
             for arg in concerned_args:
