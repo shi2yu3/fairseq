@@ -13,7 +13,7 @@ from fairseq import utils
 from . import FairseqCriterion, register_criterion
 
 
-@register_criterion('cross_entropy')
+@register_criterion('bertsum_cross_entropy')
 class CrossEntropyCriterion(FairseqCriterion):
 
     def __init__(self, args, task):
