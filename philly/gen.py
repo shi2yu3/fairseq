@@ -28,13 +28,19 @@ def valid_loss(job_id, epochs, cluster, vc):
     max_epoch = max([int(e) for e in epochs]) if epochs else 0
 
     valid_loss = {}
-    retry = 1
+    stdout_num = 1
+    retry = 0
     while True:
         # print(f'stdout/{retry}/stdout.txt')
-        stdout = f'https://storage.{cluster}.philly.selfhost.corp.microsoft.com/{vc}/sys/jobs/application_{job_id}/stdout/{retry}/stdout.txt'
+        stdout = f'https://storage.{cluster}.philly.selfhost.corp.microsoft.com/{vc}/sys/jobs/application_{job_id}/stdout/{stdout_num}/stdout.txt'
         stdout = requests.get(stdout)
         if not stdout.ok:
-            break
+            retry += 1
+            if retry >= 5:
+                break
+            else:
+                stdout_num += 1
+                continue
         for line in stdout.text.split('\n'):
             if "valid on 'valid' subset" in line:
                 segs = line.split(' | ')
@@ -46,10 +52,10 @@ def valid_loss(job_id, epochs, cluster, vc):
                 if best_loss is not None and float(loss) < best_loss:
                     best_loss = float(loss)
                     print(f'epoch {epoch} best loss {best_loss}')
-                if not best_loss and int(epoch) >= max_epoch:
+                if best_loss is None and int(epoch) >= max_epoch:
                     break
-        if best_loss and len(valid_loss) < len(epochs):
-            retry += 1
+        if best_loss or len(valid_loss) < len(epochs):
+            stdout_num += 1
         else:
             break
     for epoch in epochs:
