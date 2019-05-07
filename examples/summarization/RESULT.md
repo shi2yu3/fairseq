@@ -245,6 +245,24 @@ exp ```051e5a9a```
 | 4e-05 | [1553675282044_3094](https://philly/#/job/wu3/msrmt/1553675282044_3094) | 10 | 6.757 | [1553675282044_3197](https://philly/#/job/wu3/msrmt/1553675282044_3197) | 19.62 | 2.70 | 12.71 |
 
 
+## Bayesian optimization
+
+### fixed lr scheduler
+
+exp ```11853456```
+
+### cosine lr scheduler
+
+exp ```07e509b8```
+
+### inverse_sqrt lr scheduler
+
+exp ```9394bf00```
+
+### triangular lr scheduler
+
+exp ```e3f5b02d```
+
 ## Grid search
 
 exp ```12a8f7da```
