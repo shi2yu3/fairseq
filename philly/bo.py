@@ -49,7 +49,7 @@ def load_config(config_file):
         config_file = os.path.join(dir, "exp.json")
         config = json.load(open(config_file))
     else:
-        dir = os.path.join("experiment", str(uuid.uuid4()).split("-")[0])
+        dir = os.path.join("bayesian", str(uuid.uuid4()).split("-")[0])
         os.makedirs(dir, exist_ok=True)
 
         config = json.load(open(config_file))

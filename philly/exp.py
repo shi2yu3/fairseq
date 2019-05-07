@@ -233,7 +233,7 @@ class Experiment(object):
         self.update_status()
 
     def create(self, config_file):
-        dir = os.path.join('experiment', str(uuid.uuid4()).split('-')[0])
+        dir = os.path.join('grid', str(uuid.uuid4()).split('-')[0])
         os.makedirs(dir, exist_ok=True)
 
         config = json.load(open(config_file))
