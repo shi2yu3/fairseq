@@ -1,7 +1,5 @@
 import time
 import random
-from colorama import init
-from termcolor import colored
 import argparse
 import os
 import uuid
@@ -11,7 +9,7 @@ import subprocess
 import glob
 
 from bayes_opt import BayesianOptimization
-from bayes_opt.util import UtilityFunction, Colours
+from bayes_opt.util import UtilityFunction
 
 import asyncio
 import threading
@@ -27,10 +25,6 @@ except ImportError:
         "In order to run this example you must have the libraries: " +
         "`tornado` and `requests` installed."
     )
-
-# f_color = ["grey", "red", "green", "yellow", "blue", "magenta", "cyan", "white"]
-f_color = ["red", "green", "yellow", "blue", "magenta", "cyan"]
-b_color = ["on_grey", "on_red", "on_green", "on_yellow", "on_blue", "on_magenta", "on_cyan", "on_white"]
 
 
 parser = argparse.ArgumentParser()
@@ -98,7 +92,9 @@ def parse_arguments(arguments):
 
 
 def create_config_file(config_file, philly_config, **kwargs):
+    trial_id = os.path.basename(config_file).replace("_job.json", "")
     config = copy.deepcopy(philly_config)
+    config["metadata"]["name"] += f"_{os.path.basename(root_dir)}_{trial_id}"
     args_in_command = parse_command(config["resources"]["workers"]["commandLine"])
 
     for arg in kwargs:
@@ -131,10 +127,30 @@ def submit_job(config_fn):
     cmd = f'curl --silent --ntlm --user : -X POST -H "Content-Type: application/json" --data @{config_fn} https://philly/api/jobs'
     job_id = subprocess.check_output(cmd)
     # job_id = b'{"jobId":"application_1553675282044_3023"}'
-    print(f"new job submitted {job_id}")
-    job_id = job_id.decode("utf-8").replace("true", "True").replace("false", "False")
-    job_id = eval(job_id)["jobId"].replace("application_", "")
+    print(job_id)
+    job_id = job_id.decode("utf-8").replace("true", "True").replace("false", "False").replace("null", "None")
+    job_id = eval(job_id)
+    if "jobId" in job_id:
+        job_id = job_id["jobId"].replace("application_", "")
+        print(f"new job was submitted {job_id}\n")
+    else:
+        print(f"failed to submit job\n")
     return job_id
+
+
+def kill_job(job_id, cluster):
+    cmd = f'curl --silent -k --ntlm --user : "https://philly/api/abort?clusterId={cluster}&jobId=application_{job_id}"'
+    killed = subprocess.check_output(cmd)
+    # killed = b'{"phillyversion": 116, "jobkilled": "application_1553675282044_3310"}'
+    print(killed)
+    killed = killed.decode("utf-8").replace("true", "True").replace("false", "False").replace("null", "None")
+    killed = eval(killed)
+    if "jobkilled" in killed:
+        print(f"job {job_id} was killed")
+        return True
+    else:
+        print(f"failed to kill job {job_id}")
+        return False
 
 
 def job_status(job_id, cluster, vc):
@@ -159,25 +175,37 @@ def val_loss(job_id, cluster, vc):
     best_loss = None
     stdout_num = 1
     retry = 0
+    diverged_steps = 0
     while True:
         stdout = f"https://storage.{cluster}.philly.selfhost.corp.microsoft.com/{vc}/sys/jobs/application_{job_id}/stdout/{stdout_num}/stdout.txt"
         stdout = requests.get(stdout)
         if stdout.status_code == 200:
+            diverged_steps = 0
             for line in stdout.text.split("\n"):
                 if "valid on 'valid' subset" in line:
                     segs = line.split(" | ")
                     epoch = str(int(segs[1].split()[1]))
                     loss = segs[3].split()[1]
+                    print(f"job {job_id} epoch {epoch} loss {loss}")
                     if best_loss is None or float(loss) < best_loss:
                         best_loss = float(loss)
                         best_epoch = epoch
-                        print(f"epoch {best_epoch} best loss {best_loss}")
+                        diverged_steps = 0
+                        # print(f"** job {job_id} epoch {best_epoch} best loss {best_loss}")
+                    else:
+                        diverged_steps += 1
+                        if diverged_steps >= 5:
+                            break
+            if best_loss is not None:
+                print("")
+            if diverged_steps >=5:
+                break
         else:
             retry += 1
             if retry >= 3:
                 break
         stdout_num += 1
-    return best_loss
+    return best_loss, diverged_steps >= 5
 
 
 def wait_for(job_id, cluster, vc, trial_id, **kwargs):
@@ -194,20 +222,30 @@ def wait_for(job_id, cluster, vc, trial_id, **kwargs):
     while True:
         status = job_status(job_id, cluster, vc)
         if status == "finished":
-            loss = val_loss(job_id, cluster, vc)
+            loss, diverged = val_loss(job_id, cluster, vc)
             if loss is not None:
                 job_info["target"] = -loss
-            job_info["status"] = "finished"
+                job_info["status"] = "finished"
+            else:
+                job_info["status"] = "failed"
             json.dump(job_info, open(info_file, "w"), indent=4)
             break
         elif status == "running":
-            print(f"job {job_id} is still running")
+            loss, diverged = val_loss(job_id, cluster, vc)
+            if loss is not None:
+                job_info["target"] = -loss
+            if diverged and kill_job(job_id, cluster):
+                    job_info["status"] = "finished" if loss is not None else "failed"
             json.dump(job_info, open(info_file, "w"), indent=4)
-            time.sleep(1800)
+            if diverged:
+                break
+            else:
+                time.sleep(random.randint(900, 18000))
         else:
             job_info["status"] = "failed"
             json.dump(job_info, open(info_file, "w"), indent=4)
             break
+        print(f"job {job_id} status: {job_info['status']}")
 
     return job_info["target"]
 
@@ -244,7 +282,7 @@ class BayesianOptimizationHandler(RequestHandler):
                 params=body["params"],
                 target=body["target"],
             )
-            print("BO has registered: {} points.".format(len(self._bo.space)), end="\n\n")
+            print(f"BO has registered: {len(self._bo.space)} points.\n\n")
         except KeyError:
             pass
         finally:
@@ -269,13 +307,13 @@ def run_optimizer():
     global optimizers_config
     opt_config = optimizers_config.pop()
     name = opt_config["name"]
-    colour_f = opt_config["colour_f"]
-    colour_b = opt_config["colour_b"]
 
     register_data = {}
     max_target = None
     if "philly_config" in opt_config:
         philly_config = opt_config["philly_config"]
+
+        time.sleep(random.randint(59, 60 * args.num_threads))
 
         for _ in range(10):
             status = name + " wants to register: {}.\n".format(register_data)
@@ -284,6 +322,7 @@ def run_optimizer():
                 url=f"http://localhost:{args.localhost}/bayesian_optimization",
                 json=register_data,
             ).json()
+            print(f"{name} is trying {resp}")
             target = philly_job(philly_config, **resp)
 
             if target is None:
@@ -299,12 +338,14 @@ def run_optimizer():
                 if max_target is None or target > max_target:
                     max_target = target
 
-                status += name + " got {} as target.\n".format(target)
+                status += f"{name} got {target} as target.\n"
 
-            status += name + " will to register next: {}.\n".format(register_data)
-            print(colored(status, colour_f, colour_b), end="\n")
+            status += f"{name} will to register next: {register_data}.\n"
+            print(status)
     elif "job_info" in opt_config:
         job_info = opt_config["job_info"]
+
+        time.sleep(random.randint(1, 45))
 
         status = name + " wants to register: {}.\n".format(register_data)
 
@@ -314,7 +355,7 @@ def run_optimizer():
         )
 
         target = job_info["target"]
-        if target is not None:
+        if job_info["status"] != "running" and target is not None:
             register_data = {
                 "params": job_info["params"],
                 "target": target,
@@ -335,19 +376,20 @@ def run_optimizer():
                     "target": target,
                 }
 
+        if target is not None:
             if max_target is None or target > max_target:
                 max_target = target
 
-            status += name + " got {} as target.\n".format(target)
-        status += name + " will to register next: {}.\n".format(register_data)
-        print(colored(status, colour_f, colour_b), end="\n")
+        status += f"{name} got {target} as target.\n"
+        status += f"{name} will to register next: {register_data}.\n"
+        print(status)
     else:
         raise ValueError("Optimizers config should contain 'philly_config' or 'job_info'")
 
 
     # global results
     results.append((name, max_target))
-    print(colored(name + " is done!", colour_f, colour_b), end="\n\n")
+    print(f"{name} is done!\n")
 
 
 def resume_job_info(config_file):
@@ -362,24 +404,21 @@ def resume_job_info(config_file):
 results = []
 
 if __name__ == "__main__":
-    init()  # init color
     ioloop = tornado.ioloop.IOLoop.instance()
 
     optimizers_config = []
 
     existing_jobs = resume_job_info(input_config_file)
     for i, job_info in enumerate(existing_jobs):
+        # if "3312" not in job_info["philly_id"]:
+        #     continue
         if job_info["status"] != "failed":
             optimizers_config.append({"job_info": job_info,
-                                      "name": f"optimizer {job_info['trial_id']}",
-                                      "colour_f": f_color[(i + args.num_threads) % len(f_color)],
-                                      "colour_b": "on_white"})
+                                      "name": f"optimizer {job_info['trial_id']}"})
 
     for i in range(args.num_threads):
         optimizers_config.append({"philly_config": philly_config,
-                                  "name": f"optimizer {i}",
-                                  "colour_f": f_color[i % len(f_color)],
-                                  "colour_b": "on_grey"})
+                                  "name": f"optimizer {i}"})
 
     app_thread = threading.Thread(target=run_optimization_app)
     app_thread.daemon = True
@@ -398,6 +437,6 @@ if __name__ == "__main__":
         optimizer_thread.join()
 
     for result in results:
-        print(result[0], "found a maximum value of: {}".format(result[1]))
+        print(f"{result[0]} found a maximum value of: {result[1]}")
 
     ioloop.stop()
