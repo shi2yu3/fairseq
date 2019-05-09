@@ -28,10 +28,10 @@ except ImportError:
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--num_threads", default=1, type=int,
+parser.add_argument("--num_new_jobs", default=0, type=int,
                     help="number of parallel threads")
-parser.add_argument("--localhost", default=9009, type=int,
-                    help="the local host")
+parser.add_argument("--num_rounds", default=1, type=int,
+                    help="number of round")
 args, input_config_file = parser.parse_known_args()
 assert len(input_config_file) == 1
 input_config_file = input_config_file[0]
@@ -208,7 +208,7 @@ def val_loss(job_id, cluster, vc):
     return best_loss, diverged_steps >= 5
 
 
-def wait_for(job_id, cluster, vc, trial_id, **kwargs):
+def update_job(job_id, cluster, vc, trial_id, **kwargs):
     info_file = os.path.join(root_dir, f"{trial_id}_info.json")
 
     job_info = {"params": kwargs,
@@ -219,33 +219,34 @@ def wait_for(job_id, cluster, vc, trial_id, **kwargs):
                 "status": "running",
                 "target": None}
 
-    while True:
-        status = job_status(job_id, cluster, vc)
-        if status == "finished":
-            loss, diverged = val_loss(job_id, cluster, vc)
-            if loss is not None:
-                job_info["target"] = -loss
-                job_info["status"] = "finished"
+    if args.num_rounds > 1:
+        while True:
+            status = job_status(job_id, cluster, vc)
+            if status == "finished":
+                loss, diverged = val_loss(job_id, cluster, vc)
+                if loss is not None:
+                    job_info["target"] = -loss
+                    job_info["status"] = "finished"
+                else:
+                    job_info["status"] = "failed"
+                json.dump(job_info, open(info_file, "w"), indent=4)
+                break
+            elif status == "running":
+                loss, diverged = val_loss(job_id, cluster, vc)
+                if loss is not None:
+                    job_info["target"] = -loss
+                if diverged and kill_job(job_id, cluster):
+                        job_info["status"] = "finished" if loss is not None else "failed"
+                json.dump(job_info, open(info_file, "w"), indent=4)
+                if diverged:
+                    break
+                else:
+                    time.sleep(random.randint(900, 18000))
             else:
                 job_info["status"] = "failed"
-            json.dump(job_info, open(info_file, "w"), indent=4)
-            break
-        elif status == "running":
-            loss, diverged = val_loss(job_id, cluster, vc)
-            if loss is not None:
-                job_info["target"] = -loss
-            if diverged and kill_job(job_id, cluster):
-                    job_info["status"] = "finished" if loss is not None else "failed"
-            json.dump(job_info, open(info_file, "w"), indent=4)
-            if diverged:
+                json.dump(job_info, open(info_file, "w"), indent=4)
                 break
-            else:
-                time.sleep(random.randint(900, 18000))
-        else:
-            job_info["status"] = "failed"
-            json.dump(job_info, open(info_file, "w"), indent=4)
-            break
-        print(f"job {job_id} status: {job_info['status']}")
+            print(f"job {job_id} status: {job_info['status']}")
 
     return job_info["target"]
 
@@ -261,7 +262,7 @@ def philly_job(philly_config, **kwargs):
 
     job_id = submit_job(config_file)
 
-    return wait_for(job_id, cluster, vc, trial_id, **kwargs)
+    return update_job(job_id, cluster, vc, trial_id, **kwargs)
 
 
 class BayesianOptimizationHandler(RequestHandler):
@@ -299,7 +300,7 @@ def run_optimization_app():
     server = tornado.httpserver.HTTPServer(
         tornado.web.Application(handlers)
     )
-    server.listen(args.localhost)
+    server.listen(9009)
     tornado.ioloop.IOLoop.instance().start()
 
 
@@ -313,15 +314,18 @@ def run_optimizer():
     if "philly_config" in opt_config:
         philly_config = opt_config["philly_config"]
 
-        time.sleep(random.randint(59, 60 * args.num_threads))
+        time.sleep(random.randint(59, 60 * args.num_new_jobs))
 
-        for _ in range(10):
+        for _ in range(args.num_rounds):
             status = name + " wants to register: {}.\n".format(register_data)
 
             resp = requests.post(
-                url=f"http://localhost:{args.localhost}/bayesian_optimization",
+                url=f"http://localhost:{9009}/bayesian_optimization",
                 json=register_data,
             ).json()
+            if "--max-lr" in resp and "--lr" in resp:
+                if resp["--max-lr"] < resp["--lr"]:
+                    resp["--max-lr"], resp["--lr"] = resp["--lr"], resp["--max-lr"]
             print(f"{name} is trying {resp}")
             target = philly_job(philly_config, **resp)
 
@@ -350,7 +354,7 @@ def run_optimizer():
         status = name + " wants to register: {}.\n".format(register_data)
 
         requests.post(
-            url=f"http://localhost:{args.localhost}/bayesian_optimization",
+            url=f"http://localhost:{9009}/bayesian_optimization",
             json=register_data,
         )
 
@@ -361,11 +365,11 @@ def run_optimizer():
                 "target": target,
             }
         elif job_info["status"] != "failed":
-            target = wait_for(job_info["philly_id"],
-                              job_info["cluster"],
-                              job_info["vc"],
-                              job_info["trial_id"],
-                              **job_info["params"])
+            target = update_job(job_info["philly_id"],
+                                job_info["cluster"],
+                                job_info["vc"],
+                                job_info["trial_id"],
+                                **job_info["params"])
 
             if target is None:
                 register_data = {}
@@ -416,7 +420,7 @@ if __name__ == "__main__":
             optimizers_config.append({"job_info": job_info,
                                       "name": f"optimizer {job_info['trial_id']}"})
 
-    for i in range(args.num_threads):
+    for i in range(args.num_new_jobs):
         optimizers_config.append({"philly_config": philly_config,
                                   "name": f"optimizer {i}"})
 
