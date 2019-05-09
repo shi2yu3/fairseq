@@ -7,7 +7,7 @@ import requests
 
 def job_exists(job_id, cluster, vc):
     print(f'\n++++ Trying to find {job_id} in cluster {cluster} vc {vc}')
-    cmd = f'curl -k --ntlm --user : "https://philly/api/status?clusterId={cluster}&vcId={vc}&jobId=application_{job_id}&jobType=cust&content=full"'
+    cmd = f'curl --silent -k --ntlm --user : "https://philly/api/status?clusterId={cluster}&vcId={vc}&jobId=application_{job_id}&jobType=cust&content=full"'
     status = subprocess.check_output(cmd)
     status = status.decode('utf-8').replace('true', 'True').replace('false', 'False').replace('null', 'None')
     status = eval(status)
@@ -64,7 +64,7 @@ def valid_loss(job_id, epochs, cluster, vc):
     return valid_loss, best_loss
 
 
-def create_config(train_job_id, epoch, cluster, vc, queue):
+def create_config(train_job_id, epoch, min_len, cluster, vc, queue):
     config = {
         'version': str(datetime.date.today()),
         'metadata': {
@@ -86,7 +86,7 @@ def create_config(train_job_id, epoch, cluster, vc, queue):
                 'sku': 'G1',
                 'count': 1,
                 'image': 'phillyregistry.azurecr.io/philly/jobs/custom/pytorch:pytorch1.0.0-py36-vcr',
-                'commandLine': 'python $rootdir/generate.py $rootdir/$datadir --path $modelpath/checkpoint$epoch.pt --batch-size 64 --beam 5 --remove-bpe --no-repeat-ngram-size 3 --print-alignment --output_dir $PHILLY_JOB_DIRECTORY --min-len 60'
+                'commandLine': f'python $rootdir/generate.py $rootdir/$datadir --path $modelpath/checkpoint$epoch.pt --batch-size 64 --beam 5 --remove-bpe --no-repeat-ngram-size 3 --print-alignment --output_dir $PHILLY_JOB_DIRECTORY --min-len {min_len}'
             }
         }
     }
@@ -97,7 +97,7 @@ def create_config(train_job_id, epoch, cluster, vc, queue):
 
 
 def submit_job(config_fn):
-    cmd = f'curl --ntlm --user : -X POST -H "Content-Type: application/json" --data @{config_fn} https://philly/api/jobs'
+    cmd = f'curl --silent -k --ntlm --user : -X POST -H "Content-Type: application/json" --data @{config_fn} https://philly/api/jobs'
     job_id = subprocess.check_output(cmd)
     print(job_id)
     job_id = job_id.decode('utf-8').replace('true', 'True').replace('false', 'False')
@@ -110,7 +110,7 @@ def submit_job(config_fn):
     return job_id
 
 
-def test_exp(status_file, epochs, args):
+def test_exp(status_file, epochs, min_lens, args):
     status = json.load(open(status_file))
 
     trials = status['steps'][0]['trials']
@@ -132,9 +132,9 @@ def test_exp(status_file, epochs, args):
     md_table = f'|'
     for arg in concerned_args:
         md_table += f' {arg} |'
-    md_table += f' train | epoch | loss | test | r-1 | r-2 | r-3 |'
+    md_table += f' train | epoch | loss | test | min_len | r-1 | r-2 | r-3 |'
     md_table += f'\n|'
-    md_table += f' --- |' * (len(concerned_args) + 7)
+    md_table += f' --- |' * (len(concerned_args) + 8)
 
     for trial in trials:
         if trial['status'] == 'gaveup':
@@ -149,41 +149,43 @@ def test_exp(status_file, epochs, args):
         loss, best_loss = valid_loss(train_job_id, epochs, cluster, vc)
 
         for epoch in epochs:
-            if args.dryrun:
-                job_id = '---'
-            else:
-                print(f'\n++++ Epoch {epoch}')
-                if epoch == '_best' and best_loss == 1000.0:
-                    print(f'no best epoch')
+            for min_len in min_lens:
+                if args.dryrun:
+                    job_id = '---'
                 else:
-                    config_file = create_config(train_job_id, epoch, cluster, vc, queue)
-                    job_id = submit_job(config_file)
+                    print(f'\n++++ Epoch {epoch}')
+                    if epoch == '_best' and best_loss == 1000.0:
+                        print(f'no best epoch')
+                    else:
+                        config_file = create_config(train_job_id, epoch, min_len, cluster, vc, queue)
+                        job_id = submit_job(config_file)
 
-            md_table += f'\n|'
-            for arg in concerned_args:
-                md_table += f' {str(trial["args_for_tuning"][arg])} |'
-            md_table += f' [{train_job_id}](https://philly/#/job/{cluster}/{vc}/{train_job_id}) |'
-            md_table += f' {epoch} |'
-            if epoch == '_best':
-                md_table += f' {best_loss} |'
-            else:
-                md_table += f' {loss[epoch]} |'
-            md_table += f' [{job_id}](https://philly/#/job/{cluster}/{vc}/{job_id}) |'
-            md_table += f' --- |'
-            md_table += f' --- |'
-            md_table += f' --- |'
+                md_table += f'\n|'
+                for arg in concerned_args:
+                    md_table += f' {str(trial["args_for_tuning"][arg])} |'
+                md_table += f' [{train_job_id}](https://philly/#/job/{cluster}/{vc}/{train_job_id}) |'
+                md_table += f' {epoch} |'
+                if epoch == '_best':
+                    md_table += f' {best_loss} |'
+                else:
+                    md_table += f' {loss[epoch]} |'
+                md_table += f' [{job_id}](https://philly/#/job/{cluster}/{vc}/{job_id}) |'
+                md_table += f' {min_len} |'
+                md_table += f' --- |'
+                md_table += f' --- |'
+                md_table += f' --- |'
 
     print(f'\n\n==== Markdown Table ====\n\n{md_table}')
 
 
-def test_jobs(train_jobs, epochs, args):
+def test_jobs(train_jobs, epochs, min_lens, args):
     resource = [{"cluster": "eu2", "vc": "ipgsrch", "queue": None},
                 {"cluster": "wu3", "vc": "ipgsp", "queue": "sdrg"},
                 {"cluster": "wu3", "vc": "msrmt", "queue": "sdrg"},
                 {"cluster": "rr1", "vc": "ipgsrch", "queue": None}]
 
-    md_table = '| train | epoch | loss | test | r-1 | r-2 | r-3 |'
-    md_table += '\n| --- | --- | --- | --- | --- | --- | --- |'
+    md_table = '| train | epoch | loss | test | min_len | r-1 | r-2 | r-3 |'
+    md_table += '\n| --- | --- | --- | --- | --- | --- | --- | --- |'
 
     for train_job_id in train_jobs:
         print(f'\n\n==== Training Job {train_job_id} ====')
@@ -201,24 +203,26 @@ def test_jobs(train_jobs, epochs, args):
         loss, best_loss = valid_loss(train_job_id, epochs, cluster, vc)
 
         for epoch in epochs:
-            if args.dryrun:
-                job_id = '---'
-            else:
-                print(f'\n++++ Epoch {epoch}')
-                config_file = create_config(train_job_id, epoch, cluster, vc, queue)
-                job_id = submit_job(config_file)
+            for min_len in min_lens:
+                if args.dryrun:
+                    job_id = '---'
+                else:
+                    print(f'\n++++ Epoch {epoch}')
+                    config_file = create_config(train_job_id, epoch, min_len, cluster, vc, queue)
+                    job_id = submit_job(config_file)
 
-            md_table += f'\n|'
-            md_table += f' [{train_job_id}](https://philly/#/job/{cluster}/{vc}/{train_job_id}) |'
-            md_table += f' {epoch} |'
-            if epoch == '_best':
-                md_table += f' {best_loss} |'
-            else:
-                md_table += f' {loss[epoch]} |'
-            md_table += f' [{job_id}](https://philly/#/job/{cluster}/{vc}/{job_id}) |'
-            md_table += f' --- |'
-            md_table += f' --- |'
-            md_table += f' --- |'
+                md_table += f'\n|'
+                md_table += f' [{train_job_id}](https://philly/#/job/{cluster}/{vc}/{train_job_id}) |'
+                md_table += f' {epoch} |'
+                if epoch == '_best':
+                    md_table += f' {best_loss} |'
+                else:
+                    md_table += f' {loss[epoch]} |'
+                md_table += f' [{job_id}](https://philly/#/job/{cluster}/{vc}/{job_id}) |'
+                md_table += f' {min_len} |'
+                md_table += f' --- |'
+                md_table += f' --- |'
+                md_table += f' --- |'
 
     print(f'\n\n==== Markdown Table ====\n\n{md_table}')
 
@@ -227,18 +231,19 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--epoch', default='_best', type=str,
                         help='epoch to test')
+    parser.add_argument('--min_len', default='60', type=str,
+                        help='minimum length')
     parser.add_argument('--dryrun', action='store_true',
                         help='do everything except submit philly jobs')
-    # parser.add_argument(dest='train_jobs',
-    #                     help='train job ids or exp status file')
     args, train_jobs = parser.parse_known_args()
 
     epochs = args.epoch.split()
+    min_lens = args.min_len.split()
 
     if len(train_jobs) == 1 and os.path.isfile(train_jobs[0]):
-        test_exp(train_jobs[0], epochs, args)
+        test_exp(train_jobs[0], epochs, min_lens, args)
     else:
-        test_jobs(train_jobs, epochs, args)
+        test_jobs(train_jobs, epochs, min_lens, args)
 
 
 if __name__ == '__main__':
