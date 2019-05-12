@@ -194,18 +194,18 @@ def val_loss(job_id, cluster, vc):
                         # print(f"** job {job_id} epoch {best_epoch} best loss {best_loss}")
                     else:
                         diverged_steps += 1
-                        if diverged_steps >= 5:
+                        if diverged_steps >= 4:
                             break
             if best_loss is not None:
                 print("")
-            if diverged_steps >=5:
+            if diverged_steps >= 4:
                 break
         else:
             retry += 1
             if retry >= 3:
                 break
         stdout_num += 1
-    return best_loss, diverged_steps >= 5
+    return best_loss, diverged_steps >= 4
 
 
 def update_job(job_id, cluster, vc, trial_id, **kwargs):
@@ -219,36 +219,35 @@ def update_job(job_id, cluster, vc, trial_id, **kwargs):
                 "status": "running",
                 "target": None}
 
-    if args.num_rounds > 1:
-        while True:
-            status = job_status(job_id, cluster, vc)
-            if status == "finished":
-                loss, diverged = val_loss(job_id, cluster, vc)
-                if loss is not None:
-                    job_info["target"] = -loss
-                    job_info["status"] = "finished"
-                else:
-                    job_info["status"] = "failed"
-                json.dump(job_info, open(info_file, "w"), indent=4)
-                break
-            elif status == "running":
-                loss, diverged = val_loss(job_id, cluster, vc)
-                if loss is not None:
-                    job_info["target"] = -loss
-                if diverged and kill_job(job_id, cluster):
-                        job_info["status"] = "finished" if loss is not None else "failed"
-                json.dump(job_info, open(info_file, "w"), indent=4)
-                if diverged:
-                    break
-                else:
-                    time.sleep(random.randint(900, 18000))
+    while True:
+        status = job_status(job_id, cluster, vc)
+        if status == "finished":
+            loss, diverged = val_loss(job_id, cluster, vc)
+            if loss is not None:
+                job_info["target"] = -loss
+                job_info["status"] = "finished"
             else:
                 job_info["status"] = "failed"
-                json.dump(job_info, open(info_file, "w"), indent=4)
+            json.dump(job_info, open(info_file, "w"), indent=4)
+            break
+        elif status == "running":
+            loss, diverged = val_loss(job_id, cluster, vc)
+            if loss is not None:
+                job_info["target"] = -loss
+            if diverged and kill_job(job_id, cluster):
+                    job_info["status"] = "finished" if loss is not None else "failed"
+            json.dump(job_info, open(info_file, "w"), indent=4)
+            if not diverged and args.num_rounds > 1:
+                time.sleep(random.randint(900, 18000))
+            else:
                 break
-            print(f"job {job_id} status: {job_info['status']}")
+        else:
+            job_info["status"] = "failed"
+            json.dump(job_info, open(info_file, "w"), indent=4)
+            break
+        print(f"job {job_id} status: {job_info['status']}")
 
-    return job_info["target"]
+    return job_info
 
 
 def philly_job(philly_config, **kwargs):
@@ -283,7 +282,11 @@ class BayesianOptimizationHandler(RequestHandler):
                 params=body["params"],
                 target=body["target"],
             )
-            print(f"BO has registered: {len(self._bo.space)} points.\n\n")
+            status = f"BO registered: {body}.\n"
+            status += f"BO has registered: {len(self._bo.space)} points.\n"
+            print(status)
+            # print(f"{name} registered: {register_data}.\n")
+            # print(f"BO has registered: {len(self._bo.space)} points.")
         except KeyError:
             pass
         finally:
@@ -303,7 +306,6 @@ def run_optimization_app():
     server.listen(9009)
     tornado.ioloop.IOLoop.instance().start()
 
-
 def run_optimizer():
     global optimizers_config
     opt_config = optimizers_config.pop()
@@ -312,52 +314,44 @@ def run_optimizer():
     register_data = {}
     max_target = None
     if "philly_config" in opt_config:
+        while len(results) < num_jobs_to_resume:
+            time.sleep(random.randint(0, 10))
+
         philly_config = opt_config["philly_config"]
 
-        time.sleep(random.randint(59, 60 * args.num_new_jobs))
+        resp = requests.post(
+            url=f"http://localhost:9009/bayesian_optimization",
+            json=register_data,
+        ).json()
+        # print(f"{name} registered: {register_data}.\n")
 
         for _ in range(args.num_rounds):
-            status = name + " wants to register: {}.\n".format(register_data)
-
-            resp = requests.post(
-                url=f"http://localhost:{9009}/bayesian_optimization",
-                json=register_data,
-            ).json()
             if "--max-lr" in resp and "--lr" in resp:
                 if resp["--max-lr"] < resp["--lr"]:
                     resp["--max-lr"], resp["--lr"] = resp["--lr"], resp["--max-lr"]
             print(f"{name} is trying {resp}")
-            target = philly_job(philly_config, **resp)
 
-            if target is None:
-                register_data = {}
+            job_info = philly_job(philly_config, **resp)
+            # job_info = {"status": "running", "target": None}
 
-                status += name + " haven't got target.\n"
-            else:
-                register_data = {
-                    "params": resp,
-                    "target": target,
-                }
+            target = None if job_info["status"] == "running" else job_info["target"]
+            register_data = {} if target is None else {"params": resp,
+                                                       "target": target}
 
+            if target is not None:
                 if max_target is None or target > max_target:
                     max_target = target
 
-                status += f"{name} got {target} as target.\n"
-
-            status += f"{name} will to register next: {register_data}.\n"
-            print(status)
+            if len(register_data) > 0:
+                resp = requests.post(
+                    url=f"http://localhost:9009/bayesian_optimization",
+                    json=register_data,
+                ).json()
+                print(f"{name} registered: {register_data}.\n")
     elif "job_info" in opt_config:
+        time.sleep(random.randint(0, 10 * num_jobs_to_resume))
+
         job_info = opt_config["job_info"]
-
-        time.sleep(random.randint(1, 45))
-
-        status = name + " wants to register: {}.\n".format(register_data)
-
-        requests.post(
-            url=f"http://localhost:{9009}/bayesian_optimization",
-            json=register_data,
-        )
-
         target = job_info["target"]
         if job_info["status"] != "running" and target is not None:
             register_data = {
@@ -365,47 +359,44 @@ def run_optimizer():
                 "target": target,
             }
         elif job_info["status"] != "failed":
-            target = update_job(job_info["philly_id"],
-                                job_info["cluster"],
-                                job_info["vc"],
-                                job_info["trial_id"],
-                                **job_info["params"])
+            job_info = update_job(job_info["philly_id"],
+                                  job_info["cluster"],
+                                  job_info["vc"],
+                                  job_info["trial_id"],
+                                  **job_info["params"])
 
-            if target is None:
-                register_data = {}
-                status += name + " haven't got target.\n"
-            else:
-                register_data = {
-                    "params": job_info["params"],
-                    "target": target,
-                }
+            target = None if job_info["status"] == "running" else job_info["target"]
+            register_data = {} if target is None else {"params": job_info["params"],
+                                                       "target": target}
 
         if target is not None:
             if max_target is None or target > max_target:
                 max_target = target
 
-        status += f"{name} got {target} as target.\n"
-        status += f"{name} will to register next: {register_data}.\n"
-        print(status)
+        if len(register_data) > 0:
+            requests.post(
+                url=f"http://localhost:9009/bayesian_optimization",
+                json=register_data,
+            )
+            print(f"{name} registered: {register_data}.")
     else:
         raise ValueError("Optimizers config should contain 'philly_config' or 'job_info'")
-
 
     # global results
     results.append((name, max_target))
     print(f"{name} is done!\n")
 
-
 def resume_job_info(config_file):
-    job_info = []
+    existing_jobs = []
     if os.path.isdir(config_file):
         dir = config_file
         info_files = glob.glob(f"{dir}/*_info.json")
         for info_file in info_files:
-            job_info.append(json.load(open(info_file)))
-    return job_info
+            existing_jobs.append(json.load(open(info_file)))
+    return existing_jobs
 
 results = []
+num_jobs_to_resume = 0
 
 if __name__ == "__main__":
     ioloop = tornado.ioloop.IOLoop.instance()
@@ -413,12 +404,12 @@ if __name__ == "__main__":
     optimizers_config = []
 
     existing_jobs = resume_job_info(input_config_file)
+    # existing_jobs = existing_jobs[0:2]
     for i, job_info in enumerate(existing_jobs):
-        # if "3312" not in job_info["philly_id"]:
-        #     continue
         if job_info["status"] != "failed":
             optimizers_config.append({"job_info": job_info,
                                       "name": f"optimizer {job_info['trial_id']}"})
+            num_jobs_to_resume += 1
 
     for i in range(args.num_new_jobs):
         optimizers_config.append({"philly_config": philly_config,
