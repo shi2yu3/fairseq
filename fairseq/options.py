@@ -307,10 +307,6 @@ def add_optimization_args(parser):
                        help='momentum factor')
     group.add_argument('--weight-decay', '--wd', default=0.0, type=float, metavar='WD',
                        help='weight decay')
-    group.add_argument('--adagrad_accumulator_init', default=0, type=float,
-                       help="Initializes the accumulator values in adagrad. "
-                            "Mirrors the initial_accumulator_value option "
-                            "in the tensorflow adagrad (use 0.1 for their default).")
 
     # Learning rate schedulers can be found under fairseq/optim/lr_scheduler/
     group.add_argument('--lr-scheduler', default='reduce_lr_on_plateau',

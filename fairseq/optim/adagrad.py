@@ -16,6 +16,14 @@ class Adagrad(FairseqOptimizer):
         super().__init__(args, params)
         self._optimizer = torch.optim.Adagrad(params, **self.optimizer_config)
 
+    @staticmethod
+    def add_args(parser):
+        """Add optimizer-specific arguments to the parser."""
+        parser.add_argument('--adagrad_accumulator_init', type=float, default=0,
+                            help="Initializes the accumulator values in adagrad. "
+                                 "Mirrors the initial_accumulator_value option "
+                                 "in the tensorflow adagrad (use 0.1 for their default).")
+
     @property
     def optimizer_config(self):
         """
