@@ -1,0 +1,16 @@
+{
+    "params": {
+        "--clip-norm": 0.45860828709282603,
+        "--dropout": 0.1955015726145145,
+        "--label-smoothing": 0.007484504525407632,
+        "--lr-period-updates": 121700.13709366825,
+        "--max-lr": 0.000251244157413571,
+        "--weight-decay": 0.0005407366052425277
+    },
+    "trial_id": "bead44dd",
+    "philly_id": "1553675282044_3711",
+    "cluster": "wu3",
+    "vc": "msrmt",
+    "status": "finished",
+    "target": -7.515
+}

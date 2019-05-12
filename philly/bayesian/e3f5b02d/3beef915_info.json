@@ -1,0 +1,16 @@
+{
+    "params": {
+        "--clip-norm": 0.18412975509985274,
+        "--dropout": 0.38930161880780595,
+        "--label-smoothing": 0.02743993473145039,
+        "--lr-period-updates": 91668.10439219575,
+        "--max-lr": 0.0009725365954622617,
+        "--weight-decay": 0.0008365382698384539
+    },
+    "trial_id": "3beef915",
+    "philly_id": "1553675282044_3561",
+    "cluster": "wu3",
+    "vc": "msrmt",
+    "status": "finished",
+    "target": -11.304
+}
