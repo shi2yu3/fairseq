@@ -349,7 +349,7 @@ def run_optimizer():
                 ).json()
                 print(f"{name} registered: {register_data}.\n")
     elif "job_info" in opt_config:
-        time.sleep(random.randint(0, 10 * num_jobs_to_resume))
+        time.sleep(random.randint(0, 5 * num_jobs_to_resume))
 
         job_info = opt_config["job_info"]
         target = job_info["target"]
