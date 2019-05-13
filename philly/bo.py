@@ -32,6 +32,8 @@ parser.add_argument("--num_new_jobs", default=0, type=int,
                     help="number of parallel threads")
 parser.add_argument("--num_rounds", default=1, type=int,
                     help="number of round")
+parser.add_argument("--port", default=9009, type=int,
+                    help="the localhost port number")
 args, input_config_file = parser.parse_known_args()
 assert len(input_config_file) == 1
 input_config_file = input_config_file[0]
@@ -208,7 +210,7 @@ def val_loss(job_id, cluster, vc):
     return best_loss, diverged_steps >= 4
 
 
-def update_job(job_id, cluster, vc, trial_id, **kwargs):
+def update_job(job_id, cluster, vc, trial_id, wait, **kwargs):
     info_file = os.path.join(root_dir, f"{trial_id}_info.json")
 
     job_info = {"params": kwargs,
@@ -237,7 +239,7 @@ def update_job(job_id, cluster, vc, trial_id, **kwargs):
             if diverged and kill_job(job_id, cluster):
                     job_info["status"] = "finished" if loss is not None else "failed"
             json.dump(job_info, open(info_file, "w"), indent=4)
-            if not diverged and args.num_rounds > 1:
+            if not diverged and wait and args.num_rounds > 1:
                 time.sleep(random.randint(900, 18000))
             else:
                 break
@@ -261,7 +263,7 @@ def philly_job(philly_config, **kwargs):
 
     job_id = submit_job(config_file)
 
-    return update_job(job_id, cluster, vc, trial_id, **kwargs)
+    return update_job(job_id, cluster, vc, trial_id, True, **kwargs)
 
 
 class BayesianOptimizationHandler(RequestHandler):
@@ -303,7 +305,7 @@ def run_optimization_app():
     server = tornado.httpserver.HTTPServer(
         tornado.web.Application(handlers)
     )
-    server.listen(9009)
+    server.listen(args.port)
     tornado.ioloop.IOLoop.instance().start()
 
 def run_optimizer():
@@ -314,16 +316,15 @@ def run_optimizer():
     register_data = {}
     max_target = None
     if "philly_config" in opt_config:
-        while len(results) < num_jobs_to_resume:
-            time.sleep(random.randint(0, 10))
+        while len(jobs_to_resume) > 0:
+            time.sleep(random.randint(1, 10))
 
         philly_config = opt_config["philly_config"]
 
         resp = requests.post(
-            url=f"http://localhost:9009/bayesian_optimization",
+            url=f"http://localhost:{args.port}/bayesian_optimization",
             json=register_data,
         ).json()
-        # print(f"{name} registered: {register_data}.\n")
 
         for _ in range(args.num_rounds):
             if "--max-lr" in resp and "--lr" in resp:
@@ -344,13 +345,11 @@ def run_optimizer():
 
             if len(register_data) > 0:
                 resp = requests.post(
-                    url=f"http://localhost:9009/bayesian_optimization",
+                    url=f"http://localhost:{args.port}/bayesian_optimization",
                     json=register_data,
                 ).json()
                 print(f"{name} registered: {register_data}.\n")
     elif "job_info" in opt_config:
-        time.sleep(random.randint(0, 5 * num_jobs_to_resume))
-
         job_info = opt_config["job_info"]
         target = job_info["target"]
         if job_info["status"] != "running" and target is not None:
@@ -363,6 +362,7 @@ def run_optimizer():
                                   job_info["cluster"],
                                   job_info["vc"],
                                   job_info["trial_id"],
+                                  False,
                                   **job_info["params"])
 
             target = None if job_info["status"] == "running" else job_info["target"]
@@ -373,9 +373,9 @@ def run_optimizer():
             if max_target is None or target > max_target:
                 max_target = target
 
-        if len(register_data) > 0:
+        if args.num_new_jobs > 0 and len(register_data) > 0:
             requests.post(
-                url=f"http://localhost:9009/bayesian_optimization",
+                url=f"http://localhost:{args.port}/bayesian_optimization",
                 json=register_data,
             )
             print(f"{name} registered: {register_data}.")
@@ -384,7 +384,12 @@ def run_optimizer():
 
     # global results
     results.append((name, max_target))
-    print(f"{name} is done!\n")
+    status = f"{name} is done!"
+    if "job_info" in opt_config:
+        jobs_to_resume.remove(name)
+        status += f" ({len(jobs_to_resume)} jobs left to register)"
+    status += "\n"
+    print(status)
 
 def resume_job_info(config_file):
     existing_jobs = []
@@ -396,7 +401,7 @@ def resume_job_info(config_file):
     return existing_jobs
 
 results = []
-num_jobs_to_resume = 0
+jobs_to_resume = []
 
 if __name__ == "__main__":
     ioloop = tornado.ioloop.IOLoop.instance()
@@ -406,10 +411,13 @@ if __name__ == "__main__":
     existing_jobs = resume_job_info(input_config_file)
     # existing_jobs = existing_jobs[0:2]
     for i, job_info in enumerate(existing_jobs):
+        # if job_info["trial_id"] != "21b49dc6":
+        #     continue
         if job_info["status"] != "failed":
             optimizers_config.append({"job_info": job_info,
                                       "name": f"optimizer {job_info['trial_id']}"})
-            num_jobs_to_resume += 1
+            jobs_to_resume.append(f"optimizer {job_info['trial_id']}")
+    print(f"\nResuming {len(jobs_to_resume)} targets for registering\n")
 
     for i in range(args.num_new_jobs):
         optimizers_config.append({"philly_config": philly_config,
