@@ -13,7 +13,7 @@ import torch
 
 from fairseq.tokenizer import tokenize_line
 from fairseq.binarizer import safe_readline
-from fairseq.data import data_utils
+from fairseq.data import data_utils, onmt
 
 
 class Dictionary(object):
@@ -312,3 +312,33 @@ class BertDictionary(Dictionary):
 
     def cls(self):
         return self.cls_index
+
+
+class OpenNMTDictionary(object):
+    def __init__(self):
+        pass
+
+    @classmethod
+    def load(cls, path, args):
+        vocab = torch.load(path)
+
+        # check for code where vocab is saved instead of fields
+        # (in the future this will be done in a smarter way)
+        if onmt.inputter.old_style_vocab(vocab):
+            fields = onmt.inputter.load_old_vocab(
+                vocab, args.model_type, dynamic_dict=args.copy_attn)
+        else:
+            fields = vocab
+
+        # Report src and tgt vocab sizes, including for features
+        for side in ['src', 'tgt']:
+            f = fields[side]
+            try:
+                f_iter = iter(f)
+            except TypeError:
+                f_iter = [(side, f)]
+            for sn, sf in f_iter:
+                if sf.use_vocab:
+                    print(f'| [{sn}] dictionary: {len(sf.vocab)} types')
+
+        return fields

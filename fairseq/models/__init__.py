@@ -24,28 +24,11 @@ from .fairseq_model import (
 from .composite_encoder import CompositeEncoder  # noqa: F401
 from .distributed_fairseq_model import DistributedFairseqModel  # noqa: F401
 
-from .opennmt import (
-    EncoderBase,
-    TransformerEncoder,  # noqa: F401
-    RNNEncoder,  # noqa: F401
-    CNNEncoder,  # noqa: F401
-    MeanEncoder,  # noqa: F401
-    AudioEncoder,  # noqa: F401
-    ImageEncoder,  # noqa: F401
-)
-
-from .sru import SRU
-
 
 MODEL_REGISTRY = {}
 ARCH_MODEL_REGISTRY = {}
 ARCH_MODEL_INV_REGISTRY = {}
 ARCH_CONFIG_REGISTRY = {}
-
-
-str2enc = {"rnn": RNNEncoder, "brnn": RNNEncoder, "cnn": CNNEncoder,
-           "transformer": TransformerEncoder, "img": ImageEncoder,
-           "audio": AudioEncoder, "mean": MeanEncoder}
 
 
 def build_model(args, task):
