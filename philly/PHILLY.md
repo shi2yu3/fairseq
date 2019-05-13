@@ -27,3 +27,32 @@ curl -k --ntlm --user : "https://philly/api/list?clusterId=eu2&vcId=ipgsrch"
 ```
 curl -k --ntlm --user : "https://philly/api/metadata?clusterId=eu2&vcId=ipgsrch&jobId=application_1555486458178_13653"
 ```
+
+# encryption (not work yet)
+
+**create .netrc with the following format**
+```
+machine philly
+login yushi
+password <your password>
+```
+
+**create a key**
+```
+gpg --gen-key
+```
+
+**encrypt .netrc**
+```
+gpg -r yushi -e .netrc
+```
+
+**remove .netrc**
+```
+rm .netrc
+```
+
+**add decryption in curl command**
+```
+gpg --batch -q -d .netrc.gpg | curl --netrc-file /dev/stdin -n <url>
+```
