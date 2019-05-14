@@ -439,7 +439,11 @@ if __name__ == "__main__":
     for optimizer_thread in optimizer_threads:
         optimizer_thread.join()
 
+    max_target = -1e10
     for result in results:
         print(f"{result[0]} found a maximum value of: {result[1]}")
+        if result[1] is not None and max_target < result[1]:
+            max_target = result[1]
+    print(f"\nMaximum value: {max_target}")
 
     ioloop.stop()
