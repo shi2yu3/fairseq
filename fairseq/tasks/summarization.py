@@ -9,7 +9,7 @@ import itertools
 import os
 import glob
 
-from fairseq import options, utils, opennmt_parse
+from fairseq import options, utils
 from fairseq.data import (
     ConcatDataset,
     data_utils,
@@ -19,6 +19,8 @@ from fairseq.data import (
     IndexedRawTextDataset,
     LanguagePairDataset,
 )
+from fairseq.onmt_utils import parse
+
 
 from . import FairseqTask, register_task
 
@@ -30,12 +32,25 @@ class SummarizationTask(FairseqTask):
     def add_args(parser):
         """Add task-specific arguments to the parser."""
         # fmt: off
-        parser.add_argument('data', help='Path prefix to the ".train.pt" and '
-                       '".valid.pt" file path from preprocess.py')
+        parser.add_argument('data', nargs='+', help='path(s) to data directorie(s)')
+        parser.add_argument('-s', '--source-lang', default=None, metavar='SRC',
+                            help='source language')
+        parser.add_argument('-t', '--target-lang', default=None, metavar='TARGET',
+                            help='target language')
         parser.add_argument('--lazy-load', action='store_true',
                             help='load the dataset lazily')
         parser.add_argument('--raw-text', action='store_true',
                             help='load raw text dataset')
+        parser.add_argument('--left-pad-source', default='True', type=str, metavar='BOOL',
+                            help='pad the source on the left')
+        parser.add_argument('--left-pad-target', default='False', type=str, metavar='BOOL',
+                            help='pad the target on the left')
+        parser.add_argument('--max-source-positions', default=1024, type=int, metavar='N',
+                            help='max number of tokens in the source sequence')
+        parser.add_argument('--max-target-positions', default=1024, type=int, metavar='N',
+                            help='max number of tokens in the target sequence')
+        parser.add_argument('--upsample-primary', default=1, type=int,
+                            help='amount to upsample primary dataset')
 
         # Init options
         parser.add_argument('--param_init', '-param_init', type=float, default=0.1,
@@ -56,21 +71,21 @@ class SummarizationTask(FairseqTask):
         #           help="Optimization resetter when train_from.")
 
         # Pretrained word vectors
-        parser.add_argument('--pre_word_vecs_enc', '-pre_word_vecs_enc',
-                  help="If a valid path is specified, then this will load "
-                       "pretrained word embeddings on the encoder side. "
-                       "See README for specific formatting instructions.")
-        parser.add_argument('--pre_word_vecs_dec', '-pre_word_vecs_dec',
-                  help="If a valid path is specified, then this will load "
-                       "pretrained word embeddings on the decoder side. "
-                       "See README for specific formatting instructions.")
-        # Fixed word vectors
-        parser.add_argument('--fix_word_vecs_enc', '-fix_word_vecs_enc',
-                  action='store_true',
-                  help="Fix word embeddings on the encoder side.")
-        parser.add_argument('--fix_word_vecs_dec', '-fix_word_vecs_dec',
-                  action='store_true',
-                  help="Fix word embeddings on the decoder side.")
+        # parser.add_argument('--pre_word_vecs_enc', '-pre_word_vecs_enc',
+        #           help="If a valid path is specified, then this will load "
+        #                "pretrained word embeddings on the encoder side. "
+        #                "See README for specific formatting instructions.")
+        # parser.add_argument('--pre_word_vecs_dec', '-pre_word_vecs_dec',
+        #           help="If a valid path is specified, then this will load "
+        #                "pretrained word embeddings on the decoder side. "
+        #                "See README for specific formatting instructions.")
+        # # Fixed word vectors
+        # parser.add_argument('--fix_word_vecs_enc', '-fix_word_vecs_enc',
+        #           action='store_true',
+        #           help="Fix word embeddings on the encoder side.")
+        # parser.add_argument('--fix_word_vecs_dec', '-fix_word_vecs_dec',
+        #           action='store_true',
+        #           help="Fix word embeddings on the decoder side.")
 
         # Optimization options
         # = '--max-sentences' or '--batch-size'
@@ -134,10 +149,10 @@ class SummarizationTask(FairseqTask):
         #           help="If the norm of the gradient vector exceeds this, "
         #                "renormalize it to have the norm equal to "
         #                "max_grad_norm")
-        parser.add_argument('--dropout', '-dropout', type=float, default=0.3,
-                            help="Dropout probability; applied in LSTM stacks.")
+        # parser.add_argument('--dropout', '-dropout', type=float, default=0.3,
+        #                     help="Dropout probability; applied in LSTM stacks.")
         parser.add_argument('--truncated_decoder', '-truncated_decoder', type=int, default=0,
-                  help="""Truncated bptt.""")
+                  help="Truncated bptt.")
         # = '--adam-betas' (optim/adam.py)
         # parser.add_argument('--adam_beta1', '-adam_beta1', type=float, default=0.9,
         #           help="The beta1 parameter used by Adam. "
@@ -244,36 +259,70 @@ class SummarizationTask(FairseqTask):
         # fmt: on
 
     @staticmethod
-    def load_pretrained_model(path, dict_path, arg_overrides=None):
+    def load_pretrained_model(path, src_dict_path, tgt_dict_path, arg_overrides=None):
         model = utils.load_checkpoint_to_cpu(path)
         args = model['args']
-        args = opennmt_parse.ArgumentParser.ckpt_model_opts(args)
-        opennmt_parse.ArgumentParser.update_model_opts(args)
-        opennmt_parse.ArgumentParser.validate_model_opts(args)
         state_dict = model['model']
         args = utils.override_model_args(args, arg_overrides)
-        fields = OpenNMTDictionary.load(dict_path, args)
-        task = SummarizationTask(args, fields)
+        src_dict = Dictionary.load(src_dict_path)
+        tgt_dict = Dictionary.load(tgt_dict_path)
+        assert src_dict.pad() == tgt_dict.pad()
+        assert src_dict.eos() == tgt_dict.eos()
+        assert src_dict.unk() == tgt_dict.unk()
+
+        task = TranslationTask(args, src_dict, tgt_dict)
         model = task.build_model(args)
         model.upgrade_state_dict(state_dict)
         model.load_state_dict(state_dict, strict=True)
         return model
 
-    def __init__(self, args, fields):
+    def __init__(self, args, src_dict, tgt_dict):
         super().__init__(args)
-        self.fields = fields
+        self.src_dict = src_dict
+        self.tgt_dict = tgt_dict
 
     @classmethod
     def setup_task(cls, args, **kwargs):
-        # load dictionaries
-        fields = OpenNMTDictionary.load(f'{args.data}.vocab.pt', args)
-        return cls(args, fields)
+        """Setup the task (e.g., load dictionaries).
 
-    def load_dataset(self, corpus_type, combine=False, **kwargs):
+        Args:
+            args (argparse.Namespace): parsed command-line arguments
+        """
+
+        def opennmt_compatible(args):
+            args.epochs = 0
+            return args
+        args = opennmt_compatible(args)
+
+        parse.ArgumentParser.validate_train_opts(args)
+        parse.ArgumentParser.update_model_opts(args)
+        parse.ArgumentParser.validate_model_opts(args)
+
+        args.left_pad_source = options.eval_bool(args.left_pad_source)
+        args.left_pad_target = options.eval_bool(args.left_pad_target)
+
+        # find language pair automatically
+        if args.source_lang is None or args.target_lang is None:
+            args.source_lang, args.target_lang = data_utils.infer_language_pair(args.data[0])
+        if args.source_lang is None or args.target_lang is None:
+            raise Exception('Could not infer language pair, please provide it explicitly')
+
+        # load dictionaries
+        src_dict = cls.load_dictionary(os.path.join(args.data[0], 'dict.{}.txt'.format(args.source_lang)))
+        tgt_dict = cls.load_dictionary(os.path.join(args.data[0], 'dict.{}.txt'.format(args.target_lang)))
+        assert src_dict.pad() == tgt_dict.pad()
+        assert src_dict.eos() == tgt_dict.eos()
+        assert src_dict.unk() == tgt_dict.unk()
+        print('| [{}] dictionary: {} types'.format(args.source_lang, len(src_dict)))
+        print('| [{}] dictionary: {} types'.format(args.target_lang, len(tgt_dict)))
+
+        return cls(args, src_dict, tgt_dict)
+
+    def load_dataset(self, split, combine=False, **kwargs):
         """Load a given dataset split.
 
         Args:
-            corpus_type (str): name of the split (e.g., train, valid, test)
+            split (str): name of the split (e.g., train, valid, test)
         """
 
         def split_exists(split, src, tgt, lang, data_path):
@@ -297,14 +346,11 @@ class SummarizationTask(FairseqTask):
         src_datasets = []
         tgt_datasets = []
 
-        dataset_paths = list(sorted(
-            glob.glob(self.args.data + '.' + corpus_type + '*.pt')))
-        if not dataset_paths:
-            return None
+        data_paths = self.args.data
 
-        for dk, data_path in enumerate(dataset_paths):
+        for dk, data_path in enumerate(data_paths):
             for k in itertools.count():
-                split_k = corpus_type + (str(k) if k > 0 else '')
+                split_k = split + (str(k) if k > 0 else '')
 
                 # infer langcode
                 src, tgt = self.args.source_lang, self.args.target_lang
@@ -316,7 +362,7 @@ class SummarizationTask(FairseqTask):
                     if k > 0 or dk > 0:
                         break
                     else:
-                        raise FileNotFoundError('Dataset not found: {} ({})'.format(corpus_type, data_path))
+                        raise FileNotFoundError('Dataset not found: {} ({})'.format(split, data_path))
 
                 src_datasets.append(indexed_dataset(prefix + src, self.src_dict))
                 tgt_datasets.append(indexed_dataset(prefix + tgt, self.tgt_dict))
@@ -336,7 +382,7 @@ class SummarizationTask(FairseqTask):
             src_dataset = ConcatDataset(src_datasets, sample_ratios)
             tgt_dataset = ConcatDataset(tgt_datasets, sample_ratios)
 
-        self.datasets[corpus_type] = LanguagePairDataset(
+        self.datasets[split] = LanguagePairDataset(
             src_dataset, src_dataset.sizes, self.src_dict,
             tgt_dataset, tgt_dataset.sizes, self.tgt_dict,
             left_pad_source=self.args.left_pad_source,
@@ -354,8 +400,11 @@ class SummarizationTask(FairseqTask):
 
     @property
     def source_dictionary(self):
-        return self.fields['src'].base_field.vocab
+        """Return the source :class:`~fairseq.data.Dictionary`."""
+        return self.src_dict
 
     @property
     def target_dictionary(self):
-        return self.fields['tgt'].base_field.vocab
+        """Return the target :class:`~fairseq.data.Dictionary`."""
+        return self.tgt_dict
+
