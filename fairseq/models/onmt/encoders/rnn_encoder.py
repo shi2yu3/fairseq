@@ -22,10 +22,10 @@ class RNNEncoder(EncoderBase):
        embeddings (onmt.modules.Embeddings): embedding module to use
     """
 
-    def __init__(self, rnn_type, bidirectional, num_layers,
+    def __init__(self, dictionary, rnn_type, bidirectional, num_layers,
                  hidden_size, dropout=0.0, embeddings=None,
                  use_bridge=False):
-        super(RNNEncoder, self).__init__()
+        super(RNNEncoder, self).__init__(dictionary)
         assert embeddings is not None
 
         num_directions = 2 if bidirectional else 1
@@ -49,9 +49,10 @@ class RNNEncoder(EncoderBase):
                                     num_layers)
 
     @classmethod
-    def from_opt(cls, opt, embeddings):
+    def from_opt(cls, dictionary, opt, embeddings):
         """Alternate constructor."""
         return cls(
+            dictionary,
             opt.rnn_type,
             opt.brnn,
             opt.enc_layers,

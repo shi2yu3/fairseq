@@ -12,15 +12,16 @@ class MeanEncoder(EncoderBase):
        embeddings (onmt.modules.Embeddings): embedding module to use
     """
 
-    def __init__(self, num_layers, embeddings):
-        super(MeanEncoder, self).__init__()
+    def __init__(self, dictionary, num_layers, embeddings):
+        super(MeanEncoder, self).__init__(dictionary)
         self.num_layers = num_layers
         self.embeddings = embeddings
 
     @classmethod
-    def from_opt(cls, opt, embeddings):
+    def from_opt(cls, dictionary, opt, embeddings):
         """Alternate constructor."""
         return cls(
+            dictionary,
             opt.enc_layers,
             embeddings)
 

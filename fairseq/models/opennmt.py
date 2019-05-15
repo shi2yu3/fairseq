@@ -234,10 +234,10 @@ class OpenNMTModel(FairseqModel):
         base_architecture(args)
 
         # Build embeddings.
-        if not hasattr(args, 'max_source_positions'):
-            args.max_source_positions = 1024
-        if not hasattr(args, 'max_target_positions'):
-            args.max_target_positions = 1024
+        # if not hasattr(args, 'max_source_positions'):
+        #     args.max_source_positions = 1024
+        # if not hasattr(args, 'max_target_positions'):
+        #     args.max_target_positions = 1024
 
         src_dict, tgt_dict = task.source_dictionary, task.target_dictionary
 
@@ -304,10 +304,10 @@ class OpenNMTModel(FairseqModel):
         )
 
         # Build encoder.
-        encoder = build_encoder(args, src_emb)
+        encoder = build_encoder(args, src_emb, src_dict)
 
         # Build decoder.
-        decoder = build_decoder(args, tgt_emb)
+        decoder = build_decoder(args, tgt_emb, src_dict)
 
         # Build NMTModel(= encoder + decoder).
         model = NMTModel(encoder, decoder)
