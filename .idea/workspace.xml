@@ -2,11 +2,102 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="95049cb5-13be-483d-af86-4581b41865a0" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fairseq/models/onmt/decoders/decoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/fairseq/models/onmt/decoders/decoder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fairseq/models/onmt/decoders/transformer.py" beforeDir="false" afterPath="$PROJECT_DIR$/fairseq/models/onmt/decoders/transformer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fairseq/models/onmt/encoders/cnn_encoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/fairseq/models/onmt/encoders/cnn_encoder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fairseq/models/onmt/encoders/encoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/fairseq/models/onmt/encoders/encoder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fairseq/models/onmt/encoders/mean_encoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/fairseq/models/onmt/encoders/mean_encoder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fairseq/models/onmt/encoders/rnn_encoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/fairseq/models/onmt/encoders/rnn_encoder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fairseq/models/onmt/model_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/fairseq/models/onmt/model_builder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fairseq/models/onmt/models/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/fairseq/models/onmt/models/model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fairseq/models/opennmt.py" beforeDir="false" afterPath="$PROJECT_DIR$/fairseq/models/opennmt.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fairseq/onmt_utils/parse.py" beforeDir="false" afterPath="$PROJECT_DIR$/fairseq/onmt_utils/parse.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fairseq/optim/adagrad.py" beforeDir="false" afterPath="$PROJECT_DIR$/fairseq/optim/adagrad.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fairseq/tasks/summarization.py" beforeDir="false" afterPath="$PROJECT_DIR$/fairseq/tasks/summarization.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/PHILLY.md" beforeDir="false" afterPath="$PROJECT_DIR$/philly/PHILLY.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/00fb70fb_info.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/00fb70fb_job.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/1d0ed4fb_info.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/1d0ed4fb_job.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/1feb5ce7_info.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/1feb5ce7_job.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/21b49dc6_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/07e509b8/21b49dc6_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/242707b9_info.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/242707b9_job.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/26a57c7a_info.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/26a57c7a_job.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/26bba23f_info.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/26bba23f_job.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/3b88eb66_info.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/3b88eb66_job.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/3c7fc595_info.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/3c7fc595_job.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/3dc8c8e8_info.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/3dc8c8e8_job.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/491ea382_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/07e509b8/491ea382_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/4c092209_info.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/4c092209_job.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/55958d4e_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/07e509b8/55958d4e_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/5bc89916_info.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/5bc89916_job.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/6579cad1_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/07e509b8/6579cad1_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/6842bede_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/07e509b8/6842bede_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/68f2dcf0_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/07e509b8/68f2dcf0_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/695a294e_info.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/695a294e_job.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/6aa759fa_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/07e509b8/6aa759fa_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/8de99512_info.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/8de99512_job.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/c097f3ed_info.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/c097f3ed_job.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/cf290bba_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/07e509b8/cf290bba_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/d4ee91ea_info.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/d4ee91ea_job.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/de64b190_info.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/de64b190_job.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/e585c6ad_info.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/e585c6ad_job.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/f6a6a178_info.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/07e509b8/f6a6a178_job.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/11853456/08b16af9_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/11853456/08b16af9_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/11853456/2775dafd_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/11853456/2775dafd_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/11853456/49888080_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/11853456/49888080_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/11853456/4a2462fb_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/11853456/4a2462fb_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/11853456/8a22f889_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/11853456/8a22f889_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/11853456/c9c19a3d_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/11853456/c9c19a3d_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/11853456/dcc6a844_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/11853456/dcc6a844_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/11853456/f1cf877d_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/11853456/f1cf877d_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/11853456/f63d970f_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/11853456/f63d970f_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/9394bf00/0b1a0d74_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/9394bf00/0b1a0d74_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/9394bf00/3e4b2b18_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/9394bf00/3e4b2b18_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/9394bf00/47f91fcc_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/9394bf00/47f91fcc_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/9394bf00/6c524fed_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/9394bf00/6c524fed_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/9394bf00/91437482_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/9394bf00/91437482_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/9394bf00/a9bfebac_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/9394bf00/a9bfebac_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/9394bf00/ae4fe366_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/9394bf00/ae4fe366_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/9394bf00/bacbcdb7_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/9394bf00/bacbcdb7_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/9394bf00/ce2830f5_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/9394bf00/ce2830f5_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/9394bf00/d47ccd03_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/9394bf00/d47ccd03_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/9394bf00/f58790b4_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/9394bf00/f58790b4_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/e3f5b02d/32c0cf7c_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/e3f5b02d/32c0cf7c_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/e3f5b02d/4168bb08_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/e3f5b02d/4168bb08_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/e3f5b02d/50a11a48_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/e3f5b02d/50a11a48_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/e3f5b02d/743a6d84_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/e3f5b02d/743a6d84_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/e3f5b02d/7d735a18_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/e3f5b02d/7d735a18_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/e3f5b02d/7e7ab00d_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/e3f5b02d/7e7ab00d_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/e3f5b02d/baa6a8b3_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/e3f5b02d/baa6a8b3_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/e3f5b02d/baa76428_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/e3f5b02d/baa76428_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/e3f5b02d/bc11aea6_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/e3f5b02d/bc11aea6_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/e3f5b02d/f6699579_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/e3f5b02d/f6699579_info.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bayesian/e3f5b02d/faac7636_info.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bayesian/e3f5b02d/faac7636_info.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/philly/bo.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bo.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/philly/bo.py" beforeDir="false" afterPath="$PROJECT_DIR$/philly/bo.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/philly/exp2.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/exp2.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/philly/hyper_param_generate.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/hyper_param_generate.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/philly/hyper_param_train.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/hyper_param_train.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/philly/job.json" beforeDir="false" afterPath="$PROJECT_DIR$/philly/job.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -19,8 +110,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/fairseq/tasks/summarization.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="111">
-              <caret line="293" selection-start-line="293" selection-end-line="293" />
+            <state relative-caret-position="239">
+              <caret line="384" column="38" lean-forward="true" selection-start-line="384" selection-start-column="38" selection-end-line="384" selection-end-column="38" />
               <folding>
                 <element signature="e#286#302#0" expanded="true" />
               </folding>
@@ -29,53 +120,28 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fairseq/data/language_pair_dataset.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="155">
+              <caret line="207" selection-start-line="207" selection-end-line="207" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/fairseq/tasks/fairseq_task.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-372">
-              <caret line="28" column="4" selection-start-line="28" selection-start-column="4" selection-end-line="28" selection-end-column="4" />
+            <state relative-caret-position="167">
+              <caret line="26" column="21" selection-start-line="26" selection-start-column="13" selection-end-line="26" selection-end-column="21" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fairseq/onmt_utils/parse.py">
+        <entry file="file://$PROJECT_DIR$/fairseq/data/data_utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="474">
-              <caret line="101" selection-start-line="86" selection-end-line="101" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fairseq/onmt_utils/__init__.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="126">
-              <caret line="7" selection-start-line="7" selection-end-line="7" />
-              <folding>
-                <element signature="e#41#102#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/fairseq/models/opennmt.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-390">
-              <caret line="329" selection-start-line="329" selection-end-line="329" />
-              <folding>
-                <element signature="n#!!doc" />
-                <element signature="e#286#297#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fairseq/models/onmt/decoders/decoder.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="186">
-              <caret line="145" selection-start-line="145" selection-end-line="145" />
+            <state relative-caret-position="285">
+              <caret line="37" selection-start-line="37" selection-end-line="37" />
             </state>
           </provider>
         </entry>
@@ -83,8 +149,29 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/torch/nn/modules/module.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="177">
-              <caret line="534" selection-start-line="534" selection-end-line="534" />
+            <state relative-caret-position="301">
+              <caret line="488" selection-start-line="488" selection-end-line="488" />
+              <folding>
+                <element signature="e#0#35#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fairseq/criterions/cross_entropy.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="229">
+              <caret line="29" selection-start-line="29" selection-end-line="29" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/fairseq/trainer.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="167">
+              <caret line="360" selection-start-line="360" selection-end-line="360" />
             </state>
           </provider>
         </entry>
@@ -92,8 +179,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/train.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="159">
-              <caret line="38" selection-start-line="38" selection-end-line="38" />
+            <state relative-caret-position="347">
+              <caret line="62" selection-start-line="62" selection-end-line="62" />
               <folding>
                 <element signature="e#370#388#0" expanded="true" />
               </folding>
@@ -101,20 +188,23 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fairseq/models/onmt/model_builder.py">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/fairseq/models/onmt/models/model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="169">
-              <caret line="65" selection-start-line="65" selection-end-line="65" />
+            <state relative-caret-position="232">
+              <caret line="21" column="39" lean-forward="true" selection-start-line="21" selection-start-column="39" selection-end-line="21" selection-end-column="39" />
+              <folding>
+                <element signature="e#45#66#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fairseq/models/onmt/encoders/rnn_encoder.py">
+        <entry file="file://$PROJECT_DIR$/fairseq/models/fairseq_model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="621">
-              <caret line="55" column="16" selection-start-line="55" selection-start-column="16" selection-end-line="55" selection-end-column="16" />
+            <state relative-caret-position="102">
+              <caret line="156" column="65" lean-forward="true" selection-start-line="156" selection-start-column="22" selection-end-line="156" selection-end-column="65" />
             </state>
           </provider>
         </entry>
@@ -130,36 +220,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>base_a</find>
-      <find>base_architecture</find>
-      <find>share</find>
-      <find>encoder_embed_dim</find>
-      <find>encoder_embed_path</find>
-      <find>src_word_vec_size</find>
-      <find>share_all_embeddings</find>
-      <find>pre_word_vecs_enc</find>
-      <find>decoder_embed_path</find>
-      <find>pre_word_vecs_dec</find>
-      <find>decoder_embed_dim</find>
-      <find>tgt_word_vec_size</find>
-      <find>embeddings</find>
-      <find>encoder_embed_tokens</find>
-      <find>embed_tokens</find>
-      <find>rnn_type</find>
-      <find>Embeddings</find>
-      <find>src_dict</find>
-      <find>enc</find>
-      <find>fix_word_vecs_enc</find>
-      <find>brnn</find>
-      <find>parse</find>
-      <find>args</find>
-      <find>self.args</find>
-      <find>max_positions</find>
-      <find>build_dataset_for_inference</find>
-      <find>load_dataset</find>
-      <find>add_onmt_deprecated</find>
-      <find>epochs</find>
-      <find>gpuid</find>
+      <find>global</find>
+      <find>num_registered</find>
+      <find>sleep</find>
+      <find>submit</find>
+      <find>root</find>
+      <find>curl</find>
+      <find>args.password</find>
+      <find>max_position</find>
+      <find>max_source_positions</find>
+      <find>max_posi</find>
+      <find>LSTMEncoder</find>
+      <find>source_dictionary</find>
+      <find>RNNDecoderBase</find>
+      <find>dictionary</find>
+      <find>post</find>
+      <find>register_data</find>
+      <find>combine</find>
+      <find>max_sen</find>
+      <find>batch</find>
+      <find>max_sentences</find>
+      <find>max-sen</find>
+      <find>max-sentence</find>
+      <find>max-sentences</find>
+      <find>max_s</find>
+      <find>max</find>
+      <find>mult</find>
+      <find>multiple</find>
+      <find>datasets</find>
+      <find>move_eos_to_beginning</find>
+      <find>net_input</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -168,6 +258,9 @@
       <replace>msrmt</replace>
       <replace>&quot;</replace>
       <replace>parser.add_argument</replace>
+      <replace>&quot;{args.user}&quot;:&quot;{args.password}&quot;</replace>
+      <replace>password</replace>
+      <replace>pswd</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -191,21 +284,32 @@
         <option value="$PROJECT_DIR$/philly/pbounds.json" />
         <option value="$PROJECT_DIR$/philly/bo.json" />
         <option value="$PROJECT_DIR$/fairseq/options.py" />
-        <option value="$PROJECT_DIR$/fairseq/optim/adagrad.py" />
         <option value="$PROJECT_DIR$/fairseq/tasks/summarization_opennmt.py" />
         <option value="$PROJECT_DIR$/build/lib.win-amd64-3.6/fairseq/optim/fp16_optimizer.py" />
         <option value="$PROJECT_DIR$/fairseq/models/transformer.py" />
         <option value="$PROJECT_DIR$/fairseq/models/__init__.py" />
-        <option value="$PROJECT_DIR$/philly/bo.py" />
         <option value="$PROJECT_DIR$/examples/summarization/RESULT.md" />
         <option value="$PROJECT_DIR$/fairseq/data/data_utils.py" />
         <option value="$PROJECT_DIR$/truncate.py" />
         <option value="$PROJECT_DIR$/examples/summarization/PREPROCESS.md" />
-        <option value="$PROJECT_DIR$/fairseq/models/onmt/encoders/rnn_encoder.py" />
         <option value="$PROJECT_DIR$/fairseq/onmt_utils/__init__.py" />
-        <option value="$PROJECT_DIR$/fairseq/onmt_utils/parse.py" />
-        <option value="$PROJECT_DIR$/fairseq/tasks/summarization.py" />
+        <option value="$PROJECT_DIR$/philly/PHILLY.md" />
+        <option value="$PROJECT_DIR$/train.py" />
         <option value="$PROJECT_DIR$/fairseq/models/opennmt.py" />
+        <option value="$PROJECT_DIR$/fairseq/models/onmt/encoders/encoder.py" />
+        <option value="$PROJECT_DIR$/fairseq/models/onmt/encoders/cnn_encoder.py" />
+        <option value="$PROJECT_DIR$/fairseq/models/onmt/encoders/mean_encoder.py" />
+        <option value="$PROJECT_DIR$/fairseq/models/onmt/encoders/rnn_encoder.py" />
+        <option value="$PROJECT_DIR$/fairseq/models/onmt/decoders/decoder.py" />
+        <option value="$PROJECT_DIR$/fairseq/models/onmt/decoders/ensemble.py" />
+        <option value="$PROJECT_DIR$/fairseq/models/onmt/decoders/transformer.py" />
+        <option value="$PROJECT_DIR$/fairseq/models/onmt/model_builder.py" />
+        <option value="$PROJECT_DIR$/fairseq/models/onmt/models/model.py" />
+        <option value="$PROJECT_DIR$/fairseq/optim/adagrad.py" />
+        <option value="D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/sklearn/gaussian_process/kernels.py" />
+        <option value="$PROJECT_DIR$/philly/bo.py" />
+        <option value="$PROJECT_DIR$/fairseq/tasks/summarization.py" />
+        <option value="$PROJECT_DIR$/fairseq/onmt_utils/parse.py" />
       </list>
     </option>
   </component>
@@ -260,6 +364,37 @@
               <item name="fairseq" type="b2602c69:ProjectViewProjectNode" />
               <item name="fairseq" type="462c0819:PsiDirectoryNode" />
               <item name="fairseq" type="462c0819:PsiDirectoryNode" />
+              <item name="models" type="462c0819:PsiDirectoryNode" />
+              <item name="onmt" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="fairseq" type="b2602c69:ProjectViewProjectNode" />
+              <item name="fairseq" type="462c0819:PsiDirectoryNode" />
+              <item name="fairseq" type="462c0819:PsiDirectoryNode" />
+              <item name="models" type="462c0819:PsiDirectoryNode" />
+              <item name="onmt" type="462c0819:PsiDirectoryNode" />
+              <item name="decoders" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="fairseq" type="b2602c69:ProjectViewProjectNode" />
+              <item name="fairseq" type="462c0819:PsiDirectoryNode" />
+              <item name="fairseq" type="462c0819:PsiDirectoryNode" />
+              <item name="models" type="462c0819:PsiDirectoryNode" />
+              <item name="onmt" type="462c0819:PsiDirectoryNode" />
+              <item name="encoders" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="fairseq" type="b2602c69:ProjectViewProjectNode" />
+              <item name="fairseq" type="462c0819:PsiDirectoryNode" />
+              <item name="fairseq" type="462c0819:PsiDirectoryNode" />
+              <item name="models" type="462c0819:PsiDirectoryNode" />
+              <item name="onmt" type="462c0819:PsiDirectoryNode" />
+              <item name="models" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="fairseq" type="b2602c69:ProjectViewProjectNode" />
+              <item name="fairseq" type="462c0819:PsiDirectoryNode" />
+              <item name="fairseq" type="462c0819:PsiDirectoryNode" />
               <item name="modules" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -282,7 +417,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/truncate.py" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../opennmt" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -315,7 +450,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/philly/bo.py" />
-      <option name="PARAMETERS" value="--num_new_jobs 1 bayesian\07e509b8" />
+      <option name="PARAMETERS" value="--num_new_jobs 1 bayesian\07e509b8\" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -430,14 +565,15 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17544784" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.15173867" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.2635575" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.4262473" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.2527115" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.5195228" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.37744033" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -520,23 +656,8 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/philly/bo.py</url>
-          <line>126</line>
-          <option name="timeStamp" value="67" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/philly/bo.py</url>
-          <line>69</line>
+          <line>61</line>
           <option name="timeStamp" value="72" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/philly/bo.py</url>
-          <line>96</line>
-          <option name="timeStamp" value="83" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/philly/bo.py</url>
-          <line>122</line>
-          <option name="timeStamp" value="86" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/multiprocess/spawn.py</url>
@@ -575,476 +696,509 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/philly/bo.py</url>
-          <line>321</line>
-          <option name="timeStamp" value="128" />
+          <line>376</line>
+          <option name="timeStamp" value="151" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/philly/bo.py</url>
-          <line>332</line>
-          <option name="timeStamp" value="134" />
+          <url>file://$PROJECT_DIR$/train.py</url>
+          <line>27</line>
+          <option name="timeStamp" value="175" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/fairseq/models/opennmt.py</url>
-          <line>306</line>
-          <option name="timeStamp" value="137" />
+          <url>file://$PROJECT_DIR$/train.py</url>
+          <line>46</line>
+          <option name="timeStamp" value="177" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/fairseq/tasks/fairseq_task.py</url>
+          <line>227</line>
+          <option name="timeStamp" value="189" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/fairseq/criterions/cross_entropy.py</url>
+          <line>29</line>
+          <option name="timeStamp" value="190" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/fairseq/trainer.py</url>
+          <line>172</line>
+          <option name="timeStamp" value="191" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/fairseq/tasks/summarization.py</url>
+          <line>345</line>
+          <option name="timeStamp" value="194" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/train.py</url>
+          <line>62</line>
+          <option name="timeStamp" value="195" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/fairseq/data/language_pair_dataset.py</url>
+          <line>19</line>
+          <option name="timeStamp" value="196" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/fairseq/data/data_utils.py</url>
+          <line>24</line>
+          <option name="timeStamp" value="197" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
-        <watch expression="len(results)" language="Python" />
-        <watch expression="len(existing_jobs)" language="Python" />
-        <watch expression="existing_jobs" language="Python" />
-        <watch expression="results" language="Python" />
-        <watch expression="len(self._space)" language="Python" />
-        <watch expression="filters" language="Python" />
-        <watch expression="len(register_data)" language="Python" />
+        <watch expression="sample['net_input']" language="Python" />
       </configuration>
     </watches-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="watch">
       <expression>
-        <expression-string>len(register_data)</expression-string>
+        <expression-string>sample['net_input']</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>register_data is {}</expression-string>
+        <expression-string>f&quot;{info_file.replace('_info.json', '_job.json')}.bad&quot;</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>register_data is None</expression-string>
+        <expression-string>f&quot;{info_file}.bad&quot;</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>filters</expression-string>
+        <expression-string>config[&quot;metadata&quot;][&quot;name&quot;]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>len(self._space)</expression-string>
+        <expression-string>num_registered</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>results</expression-string>
+        <expression-string>requests._bo</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>existing_jobs</expression-string>
+        <expression-string>requests</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>len(existing_jobs)</expression-string>
+        <expression-string>np.log(np.vstack(bounds))</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>len(results)</expression-string>
+        <expression-string>np.vstack(bounds)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>args.share_all_embeddings</expression-string>
+        <expression-string>body</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/multiprocess/spawn.py">
+    <entry file="file://D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/tornado/gen.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="73" column="18" selection-start-line="73" selection-start-column="8" selection-end-line="73" selection-end-column="18" />
+        <state relative-caret-position="165">
+          <caret line="314" selection-start-line="314" selection-end-line="314" />
         </state>
       </provider>
     </entry>
-    <entry file="file://D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/torch/multiprocessing/spawn.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="364">
-          <caret line="113" selection-start-line="113" selection-end-line="113" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/torch/optim/sgd.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="173">
-          <caret line="50" column="8" selection-start-line="50" selection-start-column="8" selection-end-line="50" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/optim/sgd.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="16" column="39" lean-forward="true" selection-start-line="16" selection-start-column="39" selection-end-line="16" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/optim/adagrad.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="271">
-          <caret line="25" lean-forward="true" selection-start-line="25" selection-end-line="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/optim/adadelta.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="504">
-          <caret line="39" column="42" selection-start-line="39" selection-start-column="42" selection-end-line="39" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/optim/adafactor.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1043">
-          <caret line="58" column="34" lean-forward="true" selection-start-line="58" selection-start-column="34" selection-end-line="58" selection-end-column="34" />
-          <folding>
-            <element signature="e#286#297#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/tasks/multilingual_translation.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/tasks/translation_moe.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="33" column="27" lean-forward="true" selection-start-line="33" selection-start-column="27" selection-end-line="33" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/tasks/semisupervised_translation.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/tasks/language_modeling.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-108">
-          <folding>
-            <element signature="e#286#302#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/tasks/summarization_opennmt.py" />
-    <entry file="file://$PROJECT_DIR$/fairseq/optim/fp16_optimizer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1979">
-          <caret line="365" column="43" selection-start-line="365" selection-start-column="43" selection-end-line="365" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/build/lib.win-amd64-3.6/fairseq/optim/fairseq_optimizer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="197">
-          <caret line="81" column="8" selection-start-line="81" selection-start-column="8" selection-end-line="81" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/build/lib.win-amd64-3.6/fairseq/optim/fp16_optimizer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="171" column="37" selection-start-line="171" selection-start-column="37" selection-end-line="171" selection-end-column="37" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/optim/fairseq_optimizer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="81" column="22" selection-start-line="81" selection-start-column="8" selection-end-line="81" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/optim/adam.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="161">
-          <caret line="129" column="71" selection-start-line="129" selection-start-column="70" selection-end-line="129" selection-end-column="71" />
-          <folding>
-            <element signature="e#286#297#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="200">
-          <caret line="455" column="4" selection-start-line="455" selection-start-column="4" selection-end-line="455" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/tasks/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="200">
-          <caret line="17" column="4" selection-start-line="17" selection-start-column="4" selection-end-line="17" selection-end-column="4" />
-          <folding>
-            <element signature="e#286#301#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="11" selection-start-line="11" selection-end-line="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/models/sru.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <folding>
-            <element signature="e#43#60#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/requests/api.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="142">
-          <caret line="100" column="4" selection-start-line="100" selection-start-column="4" selection-end-line="100" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/philly/bo.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="754">
-          <caret line="446" column="27" selection-start-line="446" selection-start-column="27" selection-end-line="446" selection-end-column="27" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/tornado/web.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="27108">
-          <caret line="1544" selection-start-line="1544" selection-end-line="1544" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/bayes_opt/bayesian_optimization.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2250">
-          <caret line="134" selection-start-line="134" selection-end-line="134" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/warnings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2808">
-          <caret line="156" selection-start-line="156" selection-end-line="156" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/threading.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15426">
-          <caret line="863" selection-start-line="863" selection-end-line="863" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/philly/gen.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="54">
-          <caret line="8" column="73" selection-start-line="8" selection-start-column="73" selection-end-line="8" selection-end-column="73" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/models/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="162">
-          <caret line="26" selection-start-line="26" selection-end-line="26" />
-          <folding>
-            <element signature="e#286#301#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/philly/exp.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="342" column="87" selection-start-line="342" selection-start-column="87" selection-end-line="342" selection-end-column="87" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/options.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="223">
-          <caret line="398" column="33" selection-start-line="398" selection-start-column="33" selection-end-line="398" selection-end-column="33" />
-          <folding>
-            <element signature="e#286#301#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/data/fairseq_dataset.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-486" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/data/language_pair_dataset.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-271" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/examples/summarization/RESULT.md">
+    <entry file="file://$PROJECT_DIR$/philly/PHILLY.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="329">
-            <caret line="276" column="22" selection-start-line="276" selection-start-column="22" selection-end-line="276" selection-end-column="22" />
+          <first_editor relative-caret-position="118">
+            <caret line="41" selection-start-line="41" selection-end-line="41" />
           </first_editor>
           <second_editor />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/data/data_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="500">
-          <caret line="182" selection-start-line="182" selection-end-line="182" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/preprocess.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="396">
-          <caret line="33" column="36" selection-start-line="33" selection-start-column="36" selection-end-line="33" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/truncate.py">
+    <entry file="file://D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/colorama/ansitowin32.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
-          <caret line="10" column="42" selection-start-line="10" selection-start-column="42" selection-end-line="10" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/examples/summarization/PREPROCESS.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="288">
-            <caret line="110" column="37" selection-start-line="110" selection-start-column="37" selection-end-line="110" selection-end-column="37" />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/tasks/translation.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="132">
-          <caret line="51" column="46" selection-start-line="51" selection-start-column="46" selection-end-line="51" selection-end-column="46" />
-          <folding>
-            <element signature="e#286#302#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/models/lstm.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="108">
-          <caret line="99" column="23" selection-start-line="99" selection-start-column="23" selection-end-line="99" selection-end-column="23" />
-          <folding>
-            <element signature="e#286#298#0" expanded="true" />
-          </folding>
+          <caret line="36" selection-start-line="36" selection-end-line="36" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/fairseq/models/transformer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="169">
-          <caret line="273" column="32" selection-start-line="273" selection-start-column="20" selection-end-line="273" selection-end-column="32" />
+        <state relative-caret-position="162">
+          <caret line="105" column="50" selection-start-line="105" selection-start-column="30" selection-end-line="105" selection-end-column="50" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/train.py">
+    <entry file="file://$PROJECT_DIR$/fairseq/models/onmt/encoders/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="159">
-          <caret line="38" selection-start-line="38" selection-end-line="38" />
+        <state relative-caret-position="72">
+          <caret line="10" column="23" selection-start-line="10" selection-start-column="23" selection-end-line="10" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/models/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="34" selection-start-line="34" selection-end-line="34" />
           <folding>
-            <element signature="e#370#388#0" expanded="true" />
+            <element signature="e#286#301#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/models/onmt/decoders/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="8" column="22" selection-start-line="8" selection-start-column="22" selection-end-line="8" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/models/onmt/decoders/cnn_decoder.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="144">
+          <caret line="13" column="6" selection-start-line="13" selection-start-column="6" selection-end-line="13" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/models/onmt/encoders/audio_encoder.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="216">
+          <caret line="32" column="43" lean-forward="true" selection-start-line="32" selection-start-column="43" selection-end-line="32" selection-end-column="43" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/models/onmt/encoders/encoder.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
+          <caret line="9" column="27" selection-start-line="9" selection-start-column="27" selection-end-line="9" selection-end-column="27" />
+          <folding>
+            <element signature="e#59#80#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/models/onmt/encoders/cnn_encoder.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="414">
+          <caret line="32" selection-start-line="32" selection-end-line="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/models/onmt/encoders/mean_encoder.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="378">
+          <caret line="23" column="23" selection-start-line="23" selection-start-column="23" selection-end-line="23" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/models/onmt/encoders/transformer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-216" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/models/onmt/decoders/decoder.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2989">
+          <caret line="238" column="34" selection-start-line="238" selection-start-column="20" selection-end-line="238" selection-end-column="34" />
+          <folding>
+            <element signature="e#0#12#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/models/onmt/decoders/ensemble.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1658">
+          <caret line="34" column="23" selection-start-line="34" selection-start-column="23" selection-end-line="34" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/models/onmt/decoders/transformer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1100">
+          <caret line="147" column="23" selection-start-line="147" selection-start-column="23" selection-end-line="147" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/models/fairseq_encoder.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="15" selection-start-line="15" selection-end-line="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/models/onmt/encoders/rnn_encoder.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="458">
+          <caret line="61" selection-start-line="61" selection-end-line="61" />
+          <folding>
+            <element signature="e#33#54#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/fairseq/models/onmt/model_builder.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="169">
+        <state relative-caret-position="180">
           <caret line="65" selection-start-line="65" selection-end-line="65" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/torch/nn/modules/module.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="177">
-          <caret line="534" selection-start-line="534" selection-end-line="534" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/models/onmt/decoders/decoder.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="186">
-          <caret line="145" selection-start-line="145" selection-end-line="145" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/models/onmt/encoders/rnn_encoder.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="621">
-          <caret line="55" column="16" selection-start-line="55" selection-start-column="16" selection-end-line="55" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/onmt_utils/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="7" selection-start-line="7" selection-end-line="7" />
           <folding>
-            <element signature="e#41#102#0" expanded="true" />
+            <element signature="e#115#124#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/tasks/fairseq_task.py">
+    <entry file="file://$PROJECT_DIR$/fairseq/optim/adagrad.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-372">
-          <caret line="28" column="4" selection-start-line="28" selection-start-column="4" selection-end-line="28" selection-end-column="4" />
+        <state relative-caret-position="630">
+          <caret line="37" column="51" selection-start-line="37" selection-start-column="51" selection-end-line="37" selection-end-column="51" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/scipy/spatial/distance.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="1863" selection-start-line="1863" selection-end-line="1863" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/sklearn/gaussian_process/gpr.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="327" selection-start-line="327" selection-end-line="327" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/scipy/optimize/lbfgsb.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="334" selection-start-line="334" selection-end-line="334" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/scipy/optimize/_minimize.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="602" selection-start-line="602" selection-end-line="602" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/bayes_opt/util.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="166">
+          <caret line="57" selection-start-line="57" selection-end-line="57" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/bayes_opt/bayesian_optimization.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="131" selection-start-line="131" selection-end-line="131" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/tornado/web.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="229">
+          <caret line="1544" selection-start-line="1544" selection-end-line="1544" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/sklearn/gaussian_process/kernels.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="256">
+          <caret line="1316" column="21" selection-start-line="1316" selection-start-column="21" selection-end-line="1316" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/philly/bo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="345" column="38" lean-forward="true" selection-start-line="345" selection-start-column="38" selection-end-line="345" selection-end-column="38" />
+          <folding>
+            <element signature="e#24#35#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/scipy/optimize/optimize.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="220">
+          <caret line="662" selection-start-line="662" selection-end-line="662" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/tasks/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="138">
+          <caret line="17" column="4" selection-start-line="17" selection-start-column="4" selection-end-line="17" selection-end-column="4" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/fairseq/onmt_utils/parse.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="474">
-          <caret line="101" selection-start-line="86" selection-end-line="101" />
+        <state relative-caret-position="163">
+          <caret line="83" selection-start-line="83" selection-end-line="83" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/data/indexed_dataset.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="175">
+          <caret line="103" selection-start-line="103" selection-end-line="103" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="427">
+          <caret line="446" column="4" lean-forward="true" selection-start-line="446" selection-start-column="4" selection-end-line="446" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/data/dictionary.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="211">
+          <caret line="151" selection-start-line="151" selection-end-line="151" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/tasks/translation.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="222">
+          <caret line="63" column="36" selection-start-line="63" selection-start-column="36" selection-end-line="63" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/models/opennmt.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="157">
+          <caret line="736" column="30" selection-start-line="736" selection-start-column="22" selection-end-line="736" selection-end-column="30" />
+          <folding>
+            <element signature="n#!!doc" />
+            <element signature="e#286#297#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/options.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="157">
+          <caret line="226" column="54" selection-start-line="226" selection-start-column="46" selection-end-line="226" selection-end-column="54" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/summarization/PREPROCESS.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SECOND">
+          <first_editor relative-caret-position="-2052" />
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/data/iterators.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="401">
+          <caret line="99" selection-start-line="99" selection-end-line="99" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/torch/nn/modules/module.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="301">
+          <caret line="488" selection-start-line="488" selection-end-line="488" />
+          <folding>
+            <element signature="e#0#35#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/criterions/cross_entropy.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="229">
+          <caret line="29" selection-start-line="29" selection-end-line="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/trainer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="167">
+          <caret line="360" selection-start-line="360" selection-end-line="360" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/tasks/fairseq_task.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="167">
+          <caret line="26" column="21" selection-start-line="26" selection-start-column="13" selection-end-line="26" selection-end-column="21" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/fairseq/tasks/summarization.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="111">
-          <caret line="293" selection-start-line="293" selection-end-line="293" />
+        <state relative-caret-position="239">
+          <caret line="384" column="38" lean-forward="true" selection-start-line="384" selection-start-column="38" selection-end-line="384" selection-end-column="38" />
           <folding>
             <element signature="e#286#302#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fairseq/models/opennmt.py">
+    <entry file="file://$PROJECT_DIR$/fairseq/data/data_utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-390">
-          <caret line="329" selection-start-line="329" selection-end-line="329" />
+        <state relative-caret-position="285">
+          <caret line="37" selection-start-line="37" selection-end-line="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/data/language_pair_dataset.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="155">
+          <caret line="207" selection-start-line="207" selection-end-line="207" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/train.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="347">
+          <caret line="62" selection-start-line="62" selection-end-line="62" />
           <folding>
-            <element signature="n#!!doc" />
-            <element signature="e#286#297#0" expanded="true" />
+            <element signature="e#370#388#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/models/lstm.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="720">
+          <caret line="96" column="63" selection-start-line="96" selection-start-column="46" selection-end-line="96" selection-end-column="63" />
+          <folding>
+            <element signature="e#286#298#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/models/fairseq_model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="156" column="65" lean-forward="true" selection-start-line="156" selection-start-column="22" selection-end-line="156" selection-end-column="65" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fairseq/models/onmt/models/model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="232">
+          <caret line="21" column="39" lean-forward="true" selection-start-line="21" selection-start-column="39" selection-end-line="21" selection-end-column="39" />
+          <folding>
+            <element signature="e#45#66#0" expanded="true" />
           </folding>
         </state>
       </provider>
