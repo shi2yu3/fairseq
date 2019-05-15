@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import time
 import random
 import argparse
@@ -8,23 +10,27 @@ import copy
 import subprocess
 import glob
 
-from bayes_opt import BayesianOptimization
-from bayes_opt.util import UtilityFunction
+try:
+    from bayes_opt import BayesianOptimization
+    from bayes_opt.util import UtilityFunction
+except ImportError:
+    os.system('pip install --user bayesian-optimization')
+    from bayes_opt import BayesianOptimization
+    from bayes_opt.util import UtilityFunction
 
 import asyncio
 import threading
 
+import json
+import requests
 try:
-    import json
     import tornado.ioloop
     import tornado.httpserver
     from tornado.web import RequestHandler
-    import requests
 except ImportError:
-    raise ImportError(
-        "In order to run this example you must have the libraries: " +
-        "`tornado` and `requests` installed."
-    )
+    os.system('pip install --user tornado')
+    import tornado.httpserver
+    from tornado.web import RequestHandler
 
 
 parser = argparse.ArgumentParser()
@@ -34,6 +40,8 @@ parser.add_argument("--num_rounds", default=1, type=int,
                     help="number of round")
 parser.add_argument("--port", default=9009, type=int,
                     help="the localhost port number")
+parser.add_argument("--new_philly_jobs", default="", type=str,
+                    help="Ids of new Philly jobs that have not been tracked")
 args, input_config_file = parser.parse_known_args()
 assert len(input_config_file) == 1
 input_config_file = input_config_file[0]
@@ -59,6 +67,11 @@ def load_config(config_file):
 
 
 root_dir, philly_config, pbounds = load_config(input_config_file)
+if os.path.basename(root_dir) is "":
+    root_dir = os.path.dirname(root_dir)
+
+
+user, pswd = json.load(open('.auth')).values()
 
 
 def black_box_function(x, y):
@@ -126,8 +139,8 @@ def create_config_file(config_file, philly_config, **kwargs):
 
 
 def submit_job(config_fn):
-    cmd = f'curl --silent --ntlm --user : -X POST -H "Content-Type: application/json" --data @{config_fn} https://philly/api/jobs'
-    job_id = subprocess.check_output(cmd)
+    cmd = f'curl -k --silent --ntlm --user "{user}":"{pswd}" -X POST -H "Content-Type: application/json" --data @{config_fn} https://philly/api/jobs'
+    job_id = subprocess.check_output(cmd, shell=True)
     # job_id = b'{"jobId":"application_1553675282044_3023"}'
     print(job_id)
     job_id = job_id.decode("utf-8").replace("true", "True").replace("false", "False").replace("null", "None")
@@ -141,8 +154,8 @@ def submit_job(config_fn):
 
 
 def kill_job(job_id, cluster):
-    cmd = f'curl --silent -k --ntlm --user : "https://philly/api/abort?clusterId={cluster}&jobId=application_{job_id}"'
-    killed = subprocess.check_output(cmd)
+    cmd = f'curl -k --silent --ntlm --user "{user}":"{pswd}" "https://philly/api/abort?clusterId={cluster}&jobId=application_{job_id}"'
+    killed = subprocess.check_output(cmd, shell=True)
     # killed = b'{"phillyversion": 116, "jobkilled": "application_1553675282044_3310"}'
     print(killed)
     killed = killed.decode("utf-8").replace("true", "True").replace("false", "False").replace("null", "None")
@@ -156,9 +169,9 @@ def kill_job(job_id, cluster):
 
 
 def job_status(job_id, cluster, vc):
-    cmd = f'curl -k --silent --ntlm --user : "https://philly/api/status?clusterId={cluster}&vcId={vc}&jobId=application_{job_id}&jobType=cust&content=full"'
+    cmd = f'curl -k --silent --ntlm --user "{user}":"{pswd}" "https://philly/api/status?clusterId={cluster}&vcId={vc}&jobId=application_{job_id}&jobType=cust&content=full"'
     while True:
-        status = subprocess.check_output(cmd)
+        status = subprocess.check_output(cmd, shell=True)
         status = status.decode("utf-8").replace("true", "True").replace("false", "False").replace("null", "None")
         try:
             status = eval(status)
@@ -171,6 +184,20 @@ def job_status(job_id, cluster, vc):
     if status["status"] == "Running" or status["status"] == "Queued":
         return "running"
     return "failed"
+
+
+def job_metadata(job_id, cluster, vc):
+    cmd = f'curl -k --silent --ntlm --user "{user}":"{pswd}" "https://philly/api/metadata?clusterId={cluster}&vcId={vc}&jobId=application_{job_id}"'
+    while True:
+        metadata = subprocess.check_output(cmd, shell=True)
+        metadata = metadata.decode("utf-8").replace("true", "True").replace("false", "False").replace("null", "None")
+        try:
+            metadata = eval(metadata)
+            break
+        except:
+            print(metadata)
+            time.sleep(60)
+    return metadata
 
 
 def val_loss(job_id, cluster, vc):
@@ -193,7 +220,6 @@ def val_loss(job_id, cluster, vc):
                         best_loss = float(loss)
                         best_epoch = epoch
                         diverged_steps = 0
-                        # print(f"** job {job_id} epoch {best_epoch} best loss {best_loss}")
                     else:
                         diverged_steps += 1
                         if diverged_steps >= 4:
@@ -278,6 +304,7 @@ class BayesianOptimizationHandler(RequestHandler):
     def post(self):
         """Deal with incoming requests."""
         body = tornado.escape.json_decode(self.request.body)
+        suggest = body.pop("suggest")
 
         try:
             self._bo.register(
@@ -287,12 +314,12 @@ class BayesianOptimizationHandler(RequestHandler):
             status = f"BO registered: {body}.\n"
             status += f"BO has registered: {len(self._bo.space)} points.\n"
             print(status)
-            # print(f"{name} registered: {register_data}.\n")
-            # print(f"BO has registered: {len(self._bo.space)} points.")
         except KeyError:
             pass
         finally:
-            suggested_params = self._bo.suggest(self._uf)
+            suggested_params = {}
+            if suggest:
+                suggested_params = self._bo.suggest(self._uf)
 
         self.write(json.dumps(suggested_params))
 
@@ -313,7 +340,7 @@ def run_optimizer():
     opt_config = optimizers_config.pop()
     name = opt_config["name"]
 
-    register_data = {}
+    register_data = {"suggest": True}
     max_target = None
     if "philly_config" in opt_config:
         while len(jobs_to_resume) > 0:
@@ -337,7 +364,8 @@ def run_optimizer():
 
             target = None if job_info["status"] == "running" else job_info["target"]
             register_data = {} if target is None else {"params": resp,
-                                                       "target": target}
+                                                       "target": target,
+                                                       "suggest": True}
 
             if target is not None:
                 if max_target is None or target > max_target:
@@ -356,7 +384,7 @@ def run_optimizer():
             register_data = {
                 "params": job_info["params"],
                 "target": target,
-            }
+                "suggest": False}
         elif job_info["status"] != "failed":
             job_info = update_job(job_info["philly_id"],
                                   job_info["cluster"],
@@ -367,7 +395,8 @@ def run_optimizer():
 
             target = None if job_info["status"] == "running" else job_info["target"]
             register_data = {} if target is None else {"params": job_info["params"],
-                                                       "target": target}
+                                                       "target": target,
+                                                       "suggest": False}
 
         if target is not None:
             if max_target is None or target > max_target:
@@ -382,7 +411,6 @@ def run_optimizer():
     else:
         raise ValueError("Optimizers config should contain 'philly_config' or 'job_info'")
 
-    # global results
     results.append((name, max_target))
     status = f"{name} is done!"
     if "job_info" in opt_config:
@@ -391,13 +419,38 @@ def run_optimizer():
     status += "\n"
     print(status)
 
-def resume_job_info(config_file):
+
+def track_new_jobs(new_jobs):
+    if new_jobs is not []:
+        for job_id in new_jobs:
+            job_info = job_metadata(job_id, philly_config['metadata']['cluster'], philly_config['metadata']['vc'])
+            exp_id, trial_id = job_info['name'].split('!')[0].split('_')[-2:]
+            assert os.path.basename(root_dir) == exp_id
+
+            args_in_command = parse_command(job_info['cmd'])
+            param = {}
+            for p in pbounds:
+                param[p] = args_in_command[p]
+
+            config_file = os.path.join(root_dir, f"{trial_id}_job.json")
+            if not os.path.exists(config_file):
+                create_config_file(config_file, philly_config, **param)
+            update_job(job_id, philly_config['metadata']['cluster'], philly_config['metadata']['vc'], trial_id, False, **param)
+
+def resume_job_info(exp_dir):
     existing_jobs = []
-    if os.path.isdir(config_file):
-        dir = config_file
-        info_files = glob.glob(f"{dir}/*_info.json")
+    if os.path.isdir(exp_dir):
+        info_files = glob.glob(f"{exp_dir}/*_info.json")
         for info_file in info_files:
-            existing_jobs.append(json.load(open(info_file)))
+            info = json.load(open(info_file))
+            if info["status"] == "failed":
+                job_file = info_file.replace('_info.json', '_job.json')
+                os.rename(job_file, f"{job_file}.bad")
+                os.rename(info_file, f"{info_file}.bad")
+            else:
+                for p in info["params"]:
+                    info["params"][p] = float(info["params"][p])
+                existing_jobs.append(info)
     return existing_jobs
 
 results = []
@@ -408,6 +461,7 @@ if __name__ == "__main__":
 
     optimizers_config = []
 
+    track_new_jobs(args.new_philly_jobs.split())
     existing_jobs = resume_job_info(input_config_file)
     # existing_jobs = existing_jobs[0:2]
     for i, job_info in enumerate(existing_jobs):
@@ -439,7 +493,11 @@ if __name__ == "__main__":
     for optimizer_thread in optimizer_threads:
         optimizer_thread.join()
 
+    max_target = -1e10
     for result in results:
         print(f"{result[0]} found a maximum value of: {result[1]}")
+        if result[1] is not None and max_target < result[1]:
+            max_target = result[1]
+    print(f"\nMaximum value: {max_target}")
 
     ioloop.stop()

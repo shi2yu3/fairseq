@@ -22,7 +22,7 @@ from fairseq.modules import (
 )
 
 from fairseq.modules.onmt import (
-    sparse_activations, util_class, copy_generator,
+    sparse_activations, util_class, copy_generator, Embeddings
 )
 
 from .onmt.model_builder import build_embeddings, build_encoder, build_decoder
@@ -52,6 +52,10 @@ class OpenNMTModel(FairseqModel):
         """
 
         # fmt: off
+
+        # Optimization Options
+        parser.add_argument('--dropout', '-dropout', type=float, default=0.3,
+                            help="Dropout probability; applied in LSTM stacks.")
 
         # Embedding Options
         parser.add_argument('--src_word_vec_size', '-src_word_vec_size',
@@ -88,6 +92,22 @@ class OpenNMTModel(FairseqModel):
                             help="If -feat_merge_size is not set, feature "
                                  "embedding sizes will be set to N^feat_vec_exponent "
                                  "where N is the number of values the feature takes.")
+        # Pretrained word vectors
+        parser.add_argument('--pre_word_vecs_enc', '-pre_word_vecs_enc',
+                  help="If a valid path is specified, then this will load "
+                       "pretrained word embeddings on the encoder side. "
+                       "See README for specific formatting instructions.")
+        parser.add_argument('--pre_word_vecs_dec', '-pre_word_vecs_dec',
+                  help="If a valid path is specified, then this will load "
+                       "pretrained word embeddings on the decoder side. "
+                       "See README for specific formatting instructions.")
+        # Fixed word vectors
+        parser.add_argument('--fix_word_vecs_enc', '-fix_word_vecs_enc',
+                  action='store_true',
+                  help="Fix word embeddings on the encoder side.")
+        parser.add_argument('--fix_word_vecs_dec', '-fix_word_vecs_dec',
+                  action='store_true',
+                  help="Fix word embeddings on the decoder side.")
 
         # Encoder-Decoder Options
         parser.add_argument('--model_type', '-model_type', default='text',
@@ -214,29 +234,80 @@ class OpenNMTModel(FairseqModel):
         base_architecture(args)
 
         # Build embeddings.
-        if args.model_type == "text":
-            src_field = task.fields["src"]
-            src_emb = build_embeddings(args, src_field)
+        # if not hasattr(args, 'max_source_positions'):
+        #     args.max_source_positions = 1024
+        # if not hasattr(args, 'max_target_positions'):
+        #     args.max_target_positions = 1024
+
+        src_dict, tgt_dict = task.source_dictionary, task.target_dictionary
+
+        def build_embedding(dictionary, embed_dim, path=None):
+            num_embeddings = len(dictionary)
+            padding_idx = dictionary.pad()
+            emb = Embedding(num_embeddings, embed_dim, padding_idx)
+            # if provided, load from preloaded dictionaries
+            if path:
+                embed_dict = utils.parse_embedding(path)
+                utils.load_embedding(embed_dict, dictionary, emb)
+            return emb
+
+        if args.share_embeddings:
+            if src_dict != tgt_dict:
+                raise ValueError('--share-all-embeddings requires a joined dictionary')
+            if args.src_word_vec_size != args.tgt_word_vec_size:
+                raise ValueError(
+                    '--share-all-embeddings requires --encoder-embed-dim to match --decoder-embed-dim')
+            if args.pre_word_vecs_dec and (
+                    args.pre_word_vecs_dec != args.pre_word_vecs_enc):
+                raise ValueError('--share-all-embeddings not compatible with --decoder-embed-path')
+            encoder_embed_tokens = build_embedding(
+                src_dict, args.src_word_vec_size, args.pre_word_vecs_enc
+            )
+            decoder_embed_tokens = encoder_embed_tokens
+            args.share_decoder_input_output_embed = True
         else:
-            src_field = None
-            src_emb = None
+            encoder_embed_tokens = build_embedding(
+                src_dict, args.src_word_vec_size, args.pre_word_vecs_enc
+            )
+            decoder_embed_tokens = build_embedding(
+                tgt_dict, args.tgt_word_vec_size, args.pre_word_vecs_dec
+            )
+
+        # convert to OpenNMT Embeddings class
+        src_emb = Embeddings(
+            word_vec_size=args.src_word_vec_size,
+            position_encoding=args.position_encoding,
+            feat_merge=args.feat_merge,
+            feat_vec_exponent=args.feat_vec_exponent,
+            feat_vec_size=args.feat_vec_size,
+            dropout=args.dropout,
+            word_padding_idx=src_dict.pad(),
+            feat_padding_idx=[],
+            word_vocab_size=len(src_dict),
+            feat_vocab_sizes=[],
+            sparse=args.optimizer == "sparseadam",
+            fix_word_vecs=args.fix_word_vecs_enc
+        )
+        tgt_emb = Embeddings(
+            word_vec_size=args.tgt_word_vec_size,
+            position_encoding=args.position_encoding,
+            feat_merge=args.feat_merge,
+            feat_vec_exponent=args.feat_vec_exponent,
+            feat_vec_size=args.feat_vec_size,
+            dropout=args.dropout,
+            word_padding_idx=tgt_dict.pad(),
+            feat_padding_idx=[],
+            word_vocab_size=len(tgt_dict),
+            feat_vocab_sizes=[],
+            sparse=args.optimizer == "sparseadam",
+            fix_word_vecs=args.fix_word_vecs_dec
+        )
 
         # Build encoder.
-        encoder = build_encoder(args, src_emb)
+        encoder = build_encoder(args, src_emb, src_dict)
 
         # Build decoder.
-        tgt_field = task.fields["tgt"]
-        tgt_emb = build_embeddings(args, tgt_field, for_encoder=False)
-
-        # Share the embedding matrix - preprocess with share_vocab required.
-        if args.share_embeddings:
-            # src/tgt vocab should be the same if `-share_vocab` is specified.
-            assert src_field.base_field.vocab == tgt_field.base_field.vocab, \
-                "preprocess with -share_vocab if you use share_embeddings"
-
-            tgt_emb.word_lut.weight = src_emb.word_lut.weight
-
-        decoder = build_decoder(args, tgt_emb)
+        decoder = build_decoder(args, tgt_emb, src_dict)
 
         # Build NMTModel(= encoder + decoder).
         model = NMTModel(encoder, decoder)
@@ -244,22 +315,21 @@ class OpenNMTModel(FairseqModel):
         # Build Generator.
         if not args.copy_attn:
             if args.generator_function == "sparsemax":
-                gen_func = opennmt_sparse_activations.LogSparsemax(dim=-1)
+                gen_func = sparse_activations.LogSparsemax(dim=-1)
             else:
                 gen_func = nn.LogSoftmax(dim=-1)
             generator = nn.Sequential(
                 nn.Linear(args.dec_rnn_size,
                           len(task.fields["tgt"].base_field.vocab)),
-                opennmt_util_class.Cast(torch.float32),
+                util_class.Cast(torch.float32),
                 gen_func
             )
             if args.share_decoder_embeddings:
                 generator[0].weight = decoder.embeddings.word_lut.weight
         else:
-            tgt_base_field = task.fields["tgt"].base_field
-            vocab_size = len(tgt_base_field.vocab)
-            pad_idx = tgt_base_field.vocab.stoi[tgt_base_field.pad_token]
-            generator = opennmt_copy_generator.CopyGenerator(args.dec_rnn_size, vocab_size, pad_idx)
+            vocab_size = len(tgt_dict)
+            pad_idx = tgt_dict.pad()
+            generator = copy_generator.CopyGenerator(args.dec_rnn_size, vocab_size, pad_idx)
 
         # Load the model states from checkpoint or initialize them.
         if False: # checkpoint is not None:
@@ -819,8 +889,19 @@ class OpenNMTModel(FairseqModel):
 #                    "model faster and smaller")
 
 
+def Embedding(num_embeddings, embedding_dim, padding_idx):
+    m = nn.Embedding(num_embeddings, embedding_dim, padding_idx=padding_idx)
+    nn.init.normal_(m.weight, mean=0, std=embedding_dim ** -0.5)
+    nn.init.constant_(m.weight[padding_idx], 0)
+    return m
+
+
 @register_model_architecture('opennmt', 'opennmt')
 def base_architecture(args):
+    # Optimization Options
+    args.dropout = getattr(args, 'dropout', 0.3)
+
+    # Embedding Options
     args.src_word_vec_size = getattr(args, 'src_word_vec_size', 500)
     args.tgt_word_vec_size = getattr(args, 'tgt_word_vec_size', 500)
     args.word_vec_size = getattr(args, 'word_vec_size', -1)
@@ -832,6 +913,11 @@ def base_architecture(args):
     args.feat_merge = getattr(args, 'feat_merge', 'concat')
     args.feat_vec_size = getattr(args, 'feat_vec_size', -1)
     args.feat_vec_exponent = getattr(args, 'feat_vec_exponent', 0.7)
+
+    args.pre_word_vecs_enc = getattr(args, 'pre_word_vecs_enc', None)
+    args.pre_word_vecs_dec = getattr(args, 'pre_word_vecs_dec', None)
+    args.fix_word_vecs_enc = getattr(args, 'fix_word_vecs_enc', False)
+    args.fix_word_vecs_dec = getattr(args, 'fix_word_vecs_dec', False)
 
     # Encoder-Decoder Options
     args.model_type = getattr(args, 'model_type', 'text')
@@ -854,6 +940,7 @@ def base_architecture(args):
     args.rnn_type = getattr(args, 'rnn_type', 'LSTM')
 
     args.context_gate = getattr(args, 'context_gate', None)
+    args.pre_word_vecs_dec = getattr(args, 'pre_word_vecs_dec', None)
 
     # Attention options
     args.global_attention = getattr(args, 'global_attention', 'general')
@@ -890,7 +977,7 @@ def opennmt_cnndm(args):
                 -seed 777 \
                 -world_size 2
     '''
-    args.dropout = getattr(args, 'dropout', 0.)
+    args.dropout = getattr(args, 'dropout', 0.0)
     args.word_vec_size = getattr(args, 'word_vec_size', 128)
     args.encoder_type = getattr(args, 'encoder_type', 'brnn')
     args.layers = getattr(args, 'layers', 1)

@@ -1,8 +1,10 @@
 """ Onmt NMT Model base class definition """
 import torch.nn as nn
 
+from fairseq.models import FairseqModel
 
-class NMTModel(nn.Module):
+
+class NMTModel(FairseqModel):
     """
     Core trainable object in OpenNMT. Implements a trainable interface
     for a simple, generic encoder + decoder model.
@@ -13,9 +15,9 @@ class NMTModel(nn.Module):
     """
 
     def __init__(self, encoder, decoder):
-        super(NMTModel, self).__init__()
-        self.encoder = encoder
-        self.decoder = decoder
+        super(NMTModel, self).__init__(encoder, decoder)
+        # self.encoder = encoder
+        # self.decoder = decoder
 
     def forward(self, src, tgt, lengths, bptt=False):
         """Forward propagate a `src` and `tgt` pair for training.

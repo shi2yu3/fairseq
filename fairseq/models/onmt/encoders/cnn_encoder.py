@@ -14,9 +14,9 @@ class CNNEncoder(EncoderBase):
     :cite:`DBLP:journals/corr/GehringAGYD17`.
     """
 
-    def __init__(self, num_layers, hidden_size,
+    def __init__(self, dictionary, num_layers, hidden_size,
                  cnn_kernel_width, dropout, embeddings):
-        super(CNNEncoder, self).__init__()
+        super(CNNEncoder, self).__init__(dictionary)
 
         self.embeddings = embeddings
         input_size = embeddings.embedding_size
@@ -25,9 +25,10 @@ class CNNEncoder(EncoderBase):
                               cnn_kernel_width, dropout)
 
     @classmethod
-    def from_opt(cls, opt, embeddings):
+    def from_opt(cls, opt, dictionary, embeddings):
         """Alternate constructor."""
         return cls(
+            dictionary,
             opt.enc_layers,
             opt.enc_rnn_size,
             opt.cnn_kernel_width,

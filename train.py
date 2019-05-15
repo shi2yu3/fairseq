@@ -30,6 +30,8 @@ def main(args, init_distributed=False):
     if args.max_tokens is None:
         args.max_tokens = 6000
     print(args)
+    for key in sorted(args.__dict__):
+        print("  {}: {}".format(key, args.__dict__[key]))
 
     if torch.cuda.is_available() and not args.cpu:
         torch.cuda.set_device(args.device_id)
