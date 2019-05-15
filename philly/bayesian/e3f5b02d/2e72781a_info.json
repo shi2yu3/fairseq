@@ -1,0 +1,16 @@
+{
+    "params": {
+        "--clip-norm": 0.020865868777744434,
+        "--dropout": 0.2534039650653179,
+        "--label-smoothing": 0.1717894345243701,
+        "--lr-period-updates": 169127.06805065542,
+        "--max-lr": 5.298547962011843e-05,
+        "--weight-decay": 0.0007287777795809761
+    },
+    "trial_id": "2e72781a",
+    "philly_id": "1553675282044_4177",
+    "cluster": "wu3",
+    "vc": "msrmt",
+    "status": "failed",
+    "target": null
+}
