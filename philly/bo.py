@@ -106,17 +106,23 @@ def parse_arguments(arguments):
     return args
 
 
+def fix_int_params(params):
+    for p, v in params.items():
+        if p in ["--warmup-updates"] and not isinstance(v, int):
+            params[p] = int(v + 1 - 1e-10)
+            # print(f"{p} changed from {v} to {params[p]}")
+    return params
+
+
 def create_config_file(config_file, philly_config, **kwargs):
     trial_id = os.path.basename(config_file).replace("_job.json", "")
     config = copy.deepcopy(philly_config)
     config["metadata"]["name"] += f"_{os.path.basename(root_dir)}_{trial_id}"
     args_in_command = parse_command(config["resources"]["workers"]["commandLine"])
 
-    for arg in kwargs:
-        val = kwargs[arg]
-        if arg == "--warmup-updates":
-            val = int(val)
+    kwargs = fix_int_params(kwargs)
 
+    for arg, val in kwargs.items():
         if arg in config["environmentVariables"]:
             config["environmentVariables"][arg] = val
         elif arg in args_in_command:
@@ -335,6 +341,15 @@ def run_optimization_app():
     server.listen(args.port)
     tornado.ioloop.IOLoop.instance().start()
 
+
+def swap_params(params):
+    if "--max-lr" in params and "--lr" in params:
+        if params["--max-lr"] < params["--lr"]:
+            params["--max-lr"], params["--lr"] = params["--lr"], params["--max-lr"]
+            # print(f"--max-lr and --lr are swapped")
+    return params
+
+
 def run_optimizer():
     global optimizers_config
     opt_config = optimizers_config.pop()
@@ -354,9 +369,7 @@ def run_optimizer():
         ).json()
 
         for _ in range(args.num_rounds):
-            if "--max-lr" in resp and "--lr" in resp:
-                if resp["--max-lr"] < resp["--lr"]:
-                    resp["--max-lr"], resp["--lr"] = resp["--lr"], resp["--max-lr"]
+            resp = swap_params(resp)
             print(f"{name} is trying {resp}")
 
             job_info = philly_job(philly_config, **resp)
