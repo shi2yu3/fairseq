@@ -360,6 +360,7 @@ def run_optimizer():
     if "philly_config" in opt_config:
         while len(jobs_to_resume) > 0:
             time.sleep(random.randint(1, 10))
+        time.sleep(30)
 
         philly_config = opt_config["philly_config"]
 
@@ -393,6 +394,10 @@ def run_optimizer():
     elif "job_info" in opt_config:
         job_info = opt_config["job_info"]
         target = job_info["target"]
+
+        jobs_to_resume.remove(name)
+        print(f"({len(jobs_to_resume)} jobs left to resume)")
+
         if job_info["status"] != "running" and target is not None:
             register_data = {
                 "params": job_info["params"],
@@ -403,7 +408,7 @@ def run_optimizer():
                                   job_info["cluster"],
                                   job_info["vc"],
                                   job_info["trial_id"],
-                                  False,
+                                  False if args.num_new_jobs == 0 or args.num_rounds <= 1 else True,
                                   **job_info["params"])
 
             target = None if job_info["status"] == "running" else job_info["target"]
@@ -426,9 +431,9 @@ def run_optimizer():
 
     results.append((name, max_target))
     status = f"{name} is done!"
-    if "job_info" in opt_config:
-        jobs_to_resume.remove(name)
-        status += f" ({len(jobs_to_resume)} jobs left to register)"
+    # if "job_info" in opt_config:
+    #     jobs_to_resume.remove(name)
+    #     status += f" ({len(jobs_to_resume)} jobs left to register)"
     status += "\n"
     print(status)
 
