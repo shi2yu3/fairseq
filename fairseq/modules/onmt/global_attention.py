@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from .sparse_activations import sparsemax
-# from omt.utils.misc import aeq, sequence_mask
+from fairseq.onmt_utils.misc import aeq, sequence_mask
 
 # This class is mainly used by decoder.py for RNNs but also
 # by the CNN / transformer decoder when copy attention is used

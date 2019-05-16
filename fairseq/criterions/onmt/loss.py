@@ -7,9 +7,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-# import onmt
 from fairseq.modules.onmt.sparse_losses import SparsemaxLoss
 from fairseq.modules.onmt.sparse_activations import LogSparsemax
+from fairseq.criterions.fairseq_criterion import FairseqCriterion
+from fairseq import onmt_utils
+from fairseq.modules import onmt
 
 
 def build_loss_compute(model, tgt_field, opt, train=True):
@@ -21,12 +23,12 @@ def build_loss_compute(model, tgt_field, opt, train=True):
     Currently, the NMTLossCompute class handles all loss computation except
     for when using a copy mechanism.
     """
-    device = torch.device("cuda" if onmt.utils.misc.use_gpu(opt) else "cpu")
+    device = torch.device("cuda" if onmt_utils.misc.use_gpu(opt) else "cpu")
 
     padding_idx = tgt_field.vocab.stoi[tgt_field.pad_token]
     unk_idx = tgt_field.vocab.stoi[tgt_field.unk_token]
     if opt.copy_attn:
-        criterion = onmt.modules.CopyGeneratorLoss(
+        criterion = onmt.CopyGeneratorLoss(
             len(tgt_field.vocab), opt.copy_attn_force,
             unk_index=unk_idx, ignore_index=padding_idx
         )
@@ -46,7 +48,7 @@ def build_loss_compute(model, tgt_field, opt, train=True):
     use_raw_logits = isinstance(criterion, SparsemaxLoss)
     loss_gen = model.generator[0] if use_raw_logits else model.generator
     if opt.copy_attn:
-        compute = onmt.modules.CopyGeneratorLossCompute(
+        compute = onmt.CopyGeneratorLossCompute(
             criterion, loss_gen, tgt_field.vocab, opt.copy_loss_by_seqlength
         )
     else:
@@ -56,7 +58,7 @@ def build_loss_compute(model, tgt_field, opt, train=True):
     return compute
 
 
-class LossComputeBase(nn.Module):
+class LossComputeBase(FairseqCriterion):
     """
     Class for managing efficient loss computation. Handles
     sharding next step predictions and accumulating multiple

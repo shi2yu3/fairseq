@@ -375,14 +375,24 @@ class OpenNMTModel(FairseqModel):
 
 
     def forward(self, src_tokens, src_lengths, prev_output_tokens, bptt=False):
-        src_tokens = src_tokens.permute(1,0).unsqueeze(2)  # to meet OpenNMT requirement
-        prev_output_tokens = prev_output_tokens.permute(1,0).unsqueeze(2)  # to meet OpenNMT requirement
+        # convert to OpenNMT shape
+        src_tokens = src_tokens.transpose(1, 0).unsqueeze(2)
+        prev_output_tokens = prev_output_tokens.transpose(1, 0).unsqueeze(2)
+
+        from fairseq.onmt_utils.misc import aeq
+        aeq(prev_output_tokens[0])
+        prev_output_tokens = prev_output_tokens[1:]
+
         enc_state, memory_bank, lengths = self.encoder(src_tokens, src_lengths)
         if bptt is False:
             self.decoder.init_state(src_tokens, memory_bank, enc_state)
         dec_out, attns = self.decoder(prev_output_tokens, memory_bank, memory_lengths=lengths)
-        dec_out = dec_out.permute(1, 0)  # to meet FairSeq requirement before return
-        attns = attns.permute(1, 0)  # to meet FairSeq requirement before return
+
+        # convert to FairSeq shape
+        dec_out = dec_out.permute(1, 0, 2)
+        attns['std'] = attns['std'].permute(1, 0, 2)
+        attns['copy'] = attns['copy'].permute(1, 0, 2)
+
         return dec_out, attns
 
 
