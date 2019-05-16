@@ -1,16 +1,16 @@
 {
     "params": {
-        "--max-lr": "0.0009920379182416681",
-        "--dropout": "0.3693560652080727",
-        "--clip-norm": "0.4483255352956349",
-        "--weight-decay": "0.00022475208113456957",
-        "--label-smoothing": "0.012173152482798422",
-        "--lr-period-updates": "121700.1282101626"
+        "--max-lr": 0.0009920379182416681,
+        "--dropout": 0.3693560652080727,
+        "--clip-norm": 0.4483255352956349,
+        "--weight-decay": 0.00022475208113456957,
+        "--label-smoothing": 0.012173152482798422,
+        "--lr-period-updates": 121700.1282101626
     },
     "trial_id": "5bfbd999",
     "philly_id": "1553675282044_4057",
     "cluster": "wu3",
     "vc": "msrmt",
-    "status": "running",
+    "status": "finished",
     "target": -11.05
 }
