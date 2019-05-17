@@ -19,8 +19,8 @@ from fairseq.data import (
     IndexedRawTextDataset,
     LanguagePairDataset,
 )
-from fairseq.onmt_utils import parse
-
+from onmt.utils import parse
+from onmt.inputters.inputter import load_old_vocab, old_style_vocab
 
 from . import FairseqTask, register_task
 
@@ -32,25 +32,26 @@ class SummarizationTask(FairseqTask):
     def add_args(parser):
         """Add task-specific arguments to the parser."""
         # fmt: off
-        parser.add_argument('data', nargs='+', help='path(s) to data directorie(s)')
-        parser.add_argument('-s', '--source-lang', default=None, metavar='SRC',
-                            help='source language')
-        parser.add_argument('-t', '--target-lang', default=None, metavar='TARGET',
-                            help='target language')
-        parser.add_argument('--lazy-load', action='store_true',
-                            help='load the dataset lazily')
-        parser.add_argument('--raw-text', action='store_true',
-                            help='load raw text dataset')
-        parser.add_argument('--left-pad-source', default='True', type=str, metavar='BOOL',
-                            help='pad the source on the left')
-        parser.add_argument('--left-pad-target', default='False', type=str, metavar='BOOL',
-                            help='pad the target on the left')
-        parser.add_argument('--max-source-positions', default=1024, type=int, metavar='N',
-                            help='max number of tokens in the source sequence')
-        parser.add_argument('--max-target-positions', default=1024, type=int, metavar='N',
-                            help='max number of tokens in the target sequence')
-        parser.add_argument('--upsample-primary', default=1, type=int,
-                            help='amount to upsample primary dataset')
+        parser.add_argument('data', help='Path prefix to the ".train.pt" and '
+                   '".valid.pt" file path from preprocess.py')
+        # parser.add_argument('-s', '--source-lang', default=None, metavar='SRC',
+        #                     help='source language')
+        # parser.add_argument('-t', '--target-lang', default=None, metavar='TARGET',
+        #                     help='target language')
+        # parser.add_argument('--lazy-load', action='store_true',
+        #                     help='load the dataset lazily')
+        # parser.add_argument('--raw-text', action='store_true',
+        #                     help='load raw text dataset')
+        # parser.add_argument('--left-pad-source', default='True', type=str, metavar='BOOL',
+        #                     help='pad the source on the left')
+        # parser.add_argument('--left-pad-target', default='False', type=str, metavar='BOOL',
+        #                     help='pad the target on the left')
+        # parser.add_argument('--max-source-positions', default=1024, type=int, metavar='N',
+        #                     help='max number of tokens in the source sequence')
+        # parser.add_argument('--max-target-positions', default=1024, type=int, metavar='N',
+        #                     help='max number of tokens in the target sequence')
+        # parser.add_argument('--upsample-primary', default=1, type=int,
+        #                     help='amount to upsample primary dataset')
 
         # Init options
         parser.add_argument('--param_init', '-param_init', type=float, default=0.1,
@@ -71,21 +72,21 @@ class SummarizationTask(FairseqTask):
         #           help="Optimization resetter when train_from.")
 
         # Pretrained word vectors
-        # parser.add_argument('--pre_word_vecs_enc', '-pre_word_vecs_enc',
-        #           help="If a valid path is specified, then this will load "
-        #                "pretrained word embeddings on the encoder side. "
-        #                "See README for specific formatting instructions.")
-        # parser.add_argument('--pre_word_vecs_dec', '-pre_word_vecs_dec',
-        #           help="If a valid path is specified, then this will load "
-        #                "pretrained word embeddings on the decoder side. "
-        #                "See README for specific formatting instructions.")
-        # # Fixed word vectors
-        # parser.add_argument('--fix_word_vecs_enc', '-fix_word_vecs_enc',
-        #           action='store_true',
-        #           help="Fix word embeddings on the encoder side.")
-        # parser.add_argument('--fix_word_vecs_dec', '-fix_word_vecs_dec',
-        #           action='store_true',
-        #           help="Fix word embeddings on the decoder side.")
+        parser.add_argument('--pre_word_vecs_enc', '-pre_word_vecs_enc',
+                  help="If a valid path is specified, then this will load "
+                       "pretrained word embeddings on the encoder side. "
+                       "See README for specific formatting instructions.")
+        parser.add_argument('--pre_word_vecs_dec', '-pre_word_vecs_dec',
+                  help="If a valid path is specified, then this will load "
+                       "pretrained word embeddings on the decoder side. "
+                       "See README for specific formatting instructions.")
+        # Fixed word vectors
+        parser.add_argument('--fix_word_vecs_enc', '-fix_word_vecs_enc',
+                  action='store_true',
+                  help="Fix word embeddings on the encoder side.")
+        parser.add_argument('--fix_word_vecs_dec', '-fix_word_vecs_dec',
+                  action='store_true',
+                  help="Fix word embeddings on the decoder side.")
 
         # Optimization options
         # = '--max-sentences' or '--batch-size'
@@ -115,18 +116,16 @@ class SummarizationTask(FairseqTask):
         # = '--max-sentences-valid'
         # parser.add_argument('--valid_batch_size', '-valid_batch_size', type=int, default=32,
         #           help='Maximum batch size for validation')
-        parser.add_argument('--max_generator_batches', '-max_generator_batches',
-                  type=int, default=32,
-                  help="Maximum batches of words in a sequence to run "
-                       "the generator on in parallel. Higher is faster, but "
-                       "uses more memory. Set to 0 to disable.")
+        # parser.add_argument('--max_generator_batches', '-max_generator_batches',
+        #           type=int, default=32,
+        #           help="Maximum batches of words in a sequence to run "
+        #                "the generator on in parallel. Higher is faster, but "
+        #                "uses more memory. Set to 0 to disable.")
         # = '--max-epoch' and '--max-update'
         # parser.add_argument('--train_steps', '-train_steps', type=int, default=100000,
         #           help='Number of training steps')
         # parser.add_argument('--single_pass', '-single_pass', action='store_true',
         #           help="Make a single pass over the training dataset.")
-        # parser.add_argument('--epochs', '-epochs', type=int, default=0,
-        #           help='Deprecated epochs see train_steps')
         # = '--no-early-stop'
         # parser.add_argument('--early_stopping', '-early_stopping', type=int, default=0,
         #           help='Number of validation steps without improving.')
@@ -149,8 +148,8 @@ class SummarizationTask(FairseqTask):
         #           help="If the norm of the gradient vector exceeds this, "
         #                "renormalize it to have the norm equal to "
         #                "max_grad_norm")
-        # parser.add_argument('--dropout', '-dropout', type=float, default=0.3,
-        #                     help="Dropout probability; applied in LSTM stacks.")
+        parser.add_argument('--dropout', '-dropout', type=float, default=0.3,
+                            help="Dropout probability; applied in LSTM stacks.")
         parser.add_argument('--truncated_decoder', '-truncated_decoder', type=int, default=0,
                   help="Truncated bptt.")
         # = '--adam-betas' (optim/adam.py)
@@ -195,18 +194,18 @@ class SummarizationTask(FairseqTask):
         #                "if -average_decay is set.")
 
         # learning rate
-        # = '--lr'
+        # -> optim/lr_scheduler/opennmt_lr_scheduler.py
         # parser.add_argument('--learning_rate', '-learning_rate', type=float, default=1.0,
         #           help="Starting learning rate. "
         #                "Recommended settings: sgd = 1, adagrad = 0.1, "
         #                "adadelta = 1, adam = 0.001")
-        # = '--lr-shrink' ??
+        # -> optim/lr_scheduler/opennmt_lr_scheduler.py
         # parser.add_argument('--learning_rate_decay', '-learning_rate_decay',
         #           type=float, default=0.5,
         #           help="If update_learning_rate, decay learning rate by "
         #                "this much if steps have gone past "
         #                "start_decay_steps")
-        # = '--lr-scheduler'
+        # -> optim/lr_scheduler/opennmt_lr_scheduler.py
         # parser.add_argument('--start_decay_steps', '-start_decay_steps',
         #           type=int, default=50000,
         #           help="Start decaying every decay_steps after "
@@ -214,11 +213,11 @@ class SummarizationTask(FairseqTask):
         # parser.add_argument('--decay_steps', '-decay_steps', type=int, default=10000,
         #           help="Decay every decay_steps")
 
-        # = '--lr-scheduler'
+        # -> optim/lr_scheduler/opennmt_lr_scheduler.py
         # parser.add_argument('--decay_method', '-decay_method', type=str, default="none",
         #           choices=['noam', 'noamwd', 'rsqrt', 'none'],
         #           help="Use a custom decay rate.")
-        # = '--warmup-updates' (optim/lr_scheduler/*.py)
+        # -> optim/lr_scheduler/opennmt_lr_scheduler.py
         # parser.add_argument('--warmup_steps', '-warmup_steps', type=int, default=4000,
         #           help="Number of warmup steps for custom decay.")
 
@@ -236,10 +235,10 @@ class SummarizationTask(FairseqTask):
         # parser.add_argument('--exp', '-exp', type=str, default="",
         #           help="Name of the experiment for logging.")
         # Use TensorboardX for visualization during training
+        # = '--tensorboard-logdir'
         # parser.add_argument('--tensorboard', '-tensorboard', action="store_true",
         #           help="Use tensorboardX for visualization during training. "
         #                "Must have the library tensorboardX.")
-        # = '--tensorboard-logdir'
         # parser.add_argument("--tensorboard_log_dir", "-tensorboard_log_dir",
         #           type=str, default="runs/onmt",
         #           help="Log directory for Tensorboard. "
@@ -270,16 +269,48 @@ class SummarizationTask(FairseqTask):
         assert src_dict.eos() == tgt_dict.eos()
         assert src_dict.unk() == tgt_dict.unk()
 
-        task = TranslationTask(args, src_dict, tgt_dict)
+        task = SummarizationTask(args, src_dict, tgt_dict)
         model = task.build_model(args)
         model.upgrade_state_dict(state_dict)
         model.load_state_dict(state_dict, strict=True)
+
+        # logger.info('Loading checkpoint from %s' % opt.train_from)
+        # checkpoint = torch.load(opt.train_from,
+        #                         map_location=lambda storage, loc: storage)
+        #
+        # model_opt = ArgumentParser.ckpt_model_opts(checkpoint["opt"])
+        # ArgumentParser.update_model_opts(model_opt)
+        # ArgumentParser.validate_model_opts(model_opt)
         return model
 
-    def __init__(self, args, src_dict, tgt_dict):
+    def __init__(self, args, fields):
         super().__init__(args)
-        self.src_dict = src_dict
-        self.tgt_dict = tgt_dict
+        self.fields = fields
+
+    # @classmethod
+    # def load_dictionary(cls, filename):
+    #     vocab = torch.load(filename + '.vocab.pt')
+    #
+    #     # check for code where vocab is saved instead of fields
+    #     # (in the future this will be done in a smarter way)
+    #     if old_style_vocab(vocab):
+    #         fields = load_old_vocab(
+    #             vocab, cls.args.model_type, dynamic_dict=cls.args.copy_attn)
+    #     else:
+    #         fields = vocab
+    #
+    #     # Report src and tgt vocab sizes, including for features
+    #     for side in ['src', 'tgt']:
+    #         f = fields[side]
+    #         try:
+    #             f_iter = iter(f)
+    #         except TypeError:
+    #             f_iter = [(side, f)]
+    #         for sn, sf in f_iter:
+    #             if sf.use_vocab:
+    #                 print(' * %s vocab size = %d' % (sn, len(sf.vocab)))
+    #
+    #     return fields
 
     @classmethod
     def setup_task(cls, args, **kwargs):
@@ -289,15 +320,11 @@ class SummarizationTask(FairseqTask):
             args (argparse.Namespace): parsed command-line arguments
         """
 
-        # def opennmt_compatible(args):
-        #     args.epochs = 0
-        #     return args
-        # args = opennmt_compatible(args)
-
         parse.ArgumentParser.validate_train_opts(args)
         parse.ArgumentParser.update_model_opts(args)
         parse.ArgumentParser.validate_model_opts(args)
 
+        """
         args.left_pad_source = options.eval_bool(args.left_pad_source)
         args.left_pad_target = options.eval_bool(args.left_pad_target)
 
@@ -317,7 +344,12 @@ class SummarizationTask(FairseqTask):
         print('| [{}] dictionary: {} types'.format(args.target_lang, len(tgt_dict)))
 
         return cls(args, src_dict, tgt_dict)
+        """
 
+        fields = OpenNMTDictionary.load(args.data + '.vocab.pt', args)
+        return cls(args, fields)
+
+    '''
     def load_dataset(self, split, combine=False, **kwargs):
         """Load a given dataset split.
 
@@ -390,9 +422,42 @@ class SummarizationTask(FairseqTask):
             max_source_positions=self.args.max_source_positions,
             max_target_positions=self.args.max_target_positions,
         )
+    '''
+
+    def load_dataset(self, split, combine=False, **kwargs):
+        dataset_paths = list(sorted(
+            glob.glob(self.args.data + '.' + split + '*.pt')))
+        if not dataset_paths:
+            return None
+
+        datasets = []
+
+        for dataset_path in dataset_paths:
+            datasets.append(OpenNMTDataset(dataset_path, self.fields))
+
+        if len(datasets) == 1:
+            dataset = datasets[0]
+        else:
+            dataset = ConcatDataset(datasets)
+
+        self.datasets[split] = dataset
 
     def build_dataset_for_inference(self, src_tokens, src_lengths):
         return LanguagePairDataset(src_tokens, src_lengths, self.source_dictionary)
+
+    def build_criterion(self, args):
+        """
+        Build the :class:`~fairseq.criterions.FairseqCriterion` instance for
+        this task.
+
+        Args:
+            args (argparse.Namespace): parsed command-line arguments
+
+        Returns:
+            a :class:`~fairseq.criterions.FairseqCriterion` instance
+        """
+        from fairseq import criterions
+        return criterions.build_criterion(args, self)
 
     def max_positions(self):
         """Return the max sentence length allowed by the task."""

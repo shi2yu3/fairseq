@@ -21,13 +21,14 @@ from fairseq.modules import (
     LearnedPositionalEmbedding, MultiheadAttention, SinusoidalPositionalEmbedding,
 )
 
-from fairseq.modules.onmt import (
+from onmt.modules import (
     sparse_activations, util_class, copy_generator, Embeddings
 )
 
-from .onmt.model_builder import build_embeddings, build_encoder, build_decoder
-from .onmt.models import NMTModel
-from .onmt.models.sru import CheckSRU
+from onmt.model_builder import build_base_model, build_embeddings, build_encoder, build_decoder
+from onmt.models import NMTModel
+from onmt.models.sru import CheckSRU
+from onmt.utils import parse
 
 from . import (
     FairseqIncrementalDecoder, FairseqEncoder, FairseqLanguageModel,
@@ -53,10 +54,6 @@ class OpenNMTModel(FairseqModel):
 
         # fmt: off
 
-        # Optimization Options
-        parser.add_argument('--dropout', '-dropout', type=float, default=0.3,
-                            help="Dropout probability; applied in LSTM stacks.")
-
         # Embedding Options
         parser.add_argument('--src_word_vec_size', '-src_word_vec_size',
                             type=int, default=500,
@@ -71,7 +68,8 @@ class OpenNMTModel(FairseqModel):
                             action='store_true',
                             help="Use a shared weight matrix for the input and "
                                  "output word  embeddings in the decoder.")
-        parser.add_argument('--share_embeddings', '-share_embeddings', action='store_true',
+        parser.add_argument('--share_embeddings', '-share_embeddings',
+                            default=False, action='store_true',
                             help="Share the word embeddings between encoder "
                                  "and decoder. Need to use shared dictionary for this "
                                  "option.")
@@ -92,22 +90,25 @@ class OpenNMTModel(FairseqModel):
                             help="If -feat_merge_size is not set, feature "
                                  "embedding sizes will be set to N^feat_vec_exponent "
                                  "where N is the number of values the feature takes.")
+
+        ''' Should be in task definition
         # Pretrained word vectors
-        parser.add_argument('--pre_word_vecs_enc', '-pre_word_vecs_enc',
-                  help="If a valid path is specified, then this will load "
-                       "pretrained word embeddings on the encoder side. "
-                       "See README for specific formatting instructions.")
-        parser.add_argument('--pre_word_vecs_dec', '-pre_word_vecs_dec',
-                  help="If a valid path is specified, then this will load "
-                       "pretrained word embeddings on the decoder side. "
-                       "See README for specific formatting instructions.")
+        # parser.add_argument('--pre_word_vecs_enc', '-pre_word_vecs_enc',
+        #           help="If a valid path is specified, then this will load "
+        #                "pretrained word embeddings on the encoder side. "
+        #                "See README for specific formatting instructions.")
+        # parser.add_argument('--pre_word_vecs_dec', '-pre_word_vecs_dec',
+        #           help="If a valid path is specified, then this will load "
+        #                "pretrained word embeddings on the decoder side. "
+        #                "See README for specific formatting instructions.")
         # Fixed word vectors
-        parser.add_argument('--fix_word_vecs_enc', '-fix_word_vecs_enc',
-                  action='store_true',
-                  help="Fix word embeddings on the encoder side.")
-        parser.add_argument('--fix_word_vecs_dec', '-fix_word_vecs_dec',
-                  action='store_true',
-                  help="Fix word embeddings on the decoder side.")
+        # parser.add_argument('--fix_word_vecs_enc', '-fix_word_vecs_enc',
+        #           action='store_true',
+        #           help="Fix word embeddings on the encoder side.")
+        # parser.add_argument('--fix_word_vecs_dec', '-fix_word_vecs_dec',
+        #           action='store_true',
+        #           help="Fix word embeddings on the decoder side.")
+        '''
 
         # Encoder-Decoder Options
         parser.add_argument('--model_type', '-model_type', default='text',
@@ -233,6 +234,9 @@ class OpenNMTModel(FairseqModel):
         # make sure all arguments are present in older models
         base_architecture(args)
 
+        model = build_base_model(args, task.fields, task.checkpoint)
+
+        """
         # Build embeddings.
         # if not hasattr(args, 'max_source_positions'):
         #     args.max_source_positions = 1024
@@ -330,8 +334,8 @@ class OpenNMTModel(FairseqModel):
             vocab_size = len(tgt_dict)
             pad_idx = tgt_dict.pad()
             generator = copy_generator.CopyGenerator(args.dec_rnn_size, vocab_size, pad_idx)
-
-        """
+        ""
+        
         # Load the model states from checkpoint or initialize them.
         if False: # checkpoint is not None:
             # This preserves backward-compat for models using customed layernorm
@@ -368,11 +372,12 @@ class OpenNMTModel(FairseqModel):
             if hasattr(model.decoder, 'embeddings'):
                 model.decoder.embeddings.load_pretrained_vectors(
                     args.pre_word_vecs_dec)
-        """
+        ""
 
         model.generator = generator
-        return model
+        """
 
+        return model
 
     def forward(self, src_tokens, src_lengths, prev_output_tokens, bptt=False):
         # convert to OpenNMT shape
@@ -922,68 +927,69 @@ def Embedding(num_embeddings, embedding_dim, padding_idx):
 
 @register_model_architecture('opennmt', 'opennmt')
 def base_architecture(args):
-    # Optimization Options
-    args.dropout = getattr(args, 'dropout', 0.3)
-
-    # Embedding Options
-    args.src_word_vec_size = getattr(args, 'src_word_vec_size', 500)
-    args.tgt_word_vec_size = getattr(args, 'tgt_word_vec_size', 500)
-    args.word_vec_size = getattr(args, 'word_vec_size', -1)
-
-    args.share_decoder_embeddings = getattr(args, 'share_decoder_embeddings', False)
-    args.share_embeddings = getattr(args, 'share_embeddings', False)
-    args.position_encoding = getattr(args, 'position_encoding', False)
-
-    args.feat_merge = getattr(args, 'feat_merge', 'concat')
-    args.feat_vec_size = getattr(args, 'feat_vec_size', -1)
-    args.feat_vec_exponent = getattr(args, 'feat_vec_exponent', 0.7)
-
-    args.pre_word_vecs_enc = getattr(args, 'pre_word_vecs_enc', None)
-    args.pre_word_vecs_dec = getattr(args, 'pre_word_vecs_dec', None)
-    args.fix_word_vecs_enc = getattr(args, 'fix_word_vecs_enc', False)
-    args.fix_word_vecs_dec = getattr(args, 'fix_word_vecs_dec', False)
-
-    # Encoder-Decoder Options
-    args.model_type = getattr(args, 'model_type', 'text')
-    args.model_dtype = getattr(args, 'model_dtype', 'fp32')
-
-    args.encoder_type = getattr(args, 'encoder_type', 'rnn')
-    args.decoder_type = getattr(args, 'decoder_type', 'rnn')
-
-    args.layers = getattr(args, 'layers', -1)
-    args.enc_layers = getattr(args, 'enc_layers', 2)
-    args.dec_layers = getattr(args, 'dec_layers', 2)
-    args.rnn_size = getattr(args, 'rnn_size', -1)
-    args.enc_rnn_size = getattr(args, 'enc_rnn_size', 500)
-    args.dec_rnn_size = getattr(args, 'dec_rnn_size', 500)
-    args.audio_enc_pooling = getattr(args, 'audio_enc_pooling', '1')
-    args.cnn_kernel_width = getattr(args, 'cnn_kernel_width', 3)
-
-    args.input_feed = getattr(args, 'input_feed', 1)
-    args.bridge = getattr(args, 'bridge', False)
-    args.rnn_type = getattr(args, 'rnn_type', 'LSTM')
-
-    args.context_gate = getattr(args, 'context_gate', None)
-    args.pre_word_vecs_dec = getattr(args, 'pre_word_vecs_dec', None)
-
-    # Attention options
-    args.global_attention = getattr(args, 'global_attention', 'general')
-    args.global_attention_function = getattr(args, 'global_attention_function', "softmax")
-    args.self_attn_type = getattr(args, 'self_attn_type', "scaled-dot")
-    args.max_relative_positions = getattr(args, 'max_relative_positions', 0)
-    args.heads = getattr(args, 'heads', 8)
-    args.transformer_ff = getattr(args, 'transformer_ff', 2048)
-
-    # Generator and loss options.
-    args.copy_attn = getattr(args, 'copy_attn', False)
-    args.copy_attn_type = getattr(args, 'copy_attn_type', None)
-    args.generator_function = getattr(args, 'generator_function', "softmax")
-    args.copy_attn_force = getattr(args, 'copy_attn_force', False)
-    args.reuse_copy_attn = getattr(args, 'reuse_copy_attn', False)
-    args.copy_loss_by_seqlength = getattr(args, 'copy_loss_by_seqlength', False)
-    args.coverage_attn = getattr(args, 'coverage_attn', False)
-    args.lambda_coverage = getattr(args, 'lambda_coverage', 1)
-    args.loss_scale = getattr(args, 'loss_scale', 0)
+    pass
+    # # Optimization Options
+    # args.dropout = getattr(args, 'dropout', 0.3)
+    #
+    # # Embedding Options
+    # args.src_word_vec_size = getattr(args, 'src_word_vec_size', 500)
+    # args.tgt_word_vec_size = getattr(args, 'tgt_word_vec_size', 500)
+    # args.word_vec_size = getattr(args, 'word_vec_size', -1)
+    #
+    # args.share_decoder_embeddings = getattr(args, 'share_decoder_embeddings', False)
+    # args.share_embeddings = getattr(args, 'share_embeddings', False)
+    # args.position_encoding = getattr(args, 'position_encoding', False)
+    #
+    # args.feat_merge = getattr(args, 'feat_merge', 'concat')
+    # args.feat_vec_size = getattr(args, 'feat_vec_size', -1)
+    # args.feat_vec_exponent = getattr(args, 'feat_vec_exponent', 0.7)
+    #
+    # args.pre_word_vecs_enc = getattr(args, 'pre_word_vecs_enc', None)
+    # args.pre_word_vecs_dec = getattr(args, 'pre_word_vecs_dec', None)
+    # args.fix_word_vecs_enc = getattr(args, 'fix_word_vecs_enc', False)
+    # args.fix_word_vecs_dec = getattr(args, 'fix_word_vecs_dec', False)
+    #
+    # # Encoder-Decoder Options
+    # args.model_type = getattr(args, 'model_type', 'text')
+    # args.model_dtype = getattr(args, 'model_dtype', 'fp32')
+    #
+    # args.encoder_type = getattr(args, 'encoder_type', 'rnn')
+    # args.decoder_type = getattr(args, 'decoder_type', 'rnn')
+    #
+    # args.layers = getattr(args, 'layers', -1)
+    # args.enc_layers = getattr(args, 'enc_layers', 2)
+    # args.dec_layers = getattr(args, 'dec_layers', 2)
+    # args.rnn_size = getattr(args, 'rnn_size', -1)
+    # args.enc_rnn_size = getattr(args, 'enc_rnn_size', 500)
+    # args.dec_rnn_size = getattr(args, 'dec_rnn_size', 500)
+    # args.audio_enc_pooling = getattr(args, 'audio_enc_pooling', '1')
+    # args.cnn_kernel_width = getattr(args, 'cnn_kernel_width', 3)
+    #
+    # args.input_feed = getattr(args, 'input_feed', 1)
+    # args.bridge = getattr(args, 'bridge', False)
+    # args.rnn_type = getattr(args, 'rnn_type', 'LSTM')
+    #
+    # args.context_gate = getattr(args, 'context_gate', None)
+    # args.pre_word_vecs_dec = getattr(args, 'pre_word_vecs_dec', None)
+    #
+    # # Attention options
+    # args.global_attention = getattr(args, 'global_attention', 'general')
+    # args.global_attention_function = getattr(args, 'global_attention_function', "softmax")
+    # args.self_attn_type = getattr(args, 'self_attn_type', "scaled-dot")
+    # args.max_relative_positions = getattr(args, 'max_relative_positions', 0)
+    # args.heads = getattr(args, 'heads', 8)
+    # args.transformer_ff = getattr(args, 'transformer_ff', 2048)
+    #
+    # # Generator and loss options.
+    # args.copy_attn = getattr(args, 'copy_attn', False)
+    # args.copy_attn_type = getattr(args, 'copy_attn_type', None)
+    # args.generator_function = getattr(args, 'generator_function', "softmax")
+    # args.copy_attn_force = getattr(args, 'copy_attn_force', False)
+    # args.reuse_copy_attn = getattr(args, 'reuse_copy_attn', False)
+    # args.copy_loss_by_seqlength = getattr(args, 'copy_loss_by_seqlength', False)
+    # args.coverage_attn = getattr(args, 'coverage_attn', False)
+    # args.lambda_coverage = getattr(args, 'lambda_coverage', 1)
+    # args.loss_scale = getattr(args, 'loss_scale', 0)
 
 
 
@@ -1001,15 +1007,16 @@ def opennmt_cnndm(args):
                 -seed 777 \
                 -world_size 2
     '''
-    args.dropout = getattr(args, 'dropout', 0.0)
-    args.word_vec_size = getattr(args, 'word_vec_size', 128)
-    args.encoder_type = getattr(args, 'encoder_type', 'brnn')
-    args.layers = getattr(args, 'layers', 1)
-    args.rnn_size = getattr(args, 'rnn_size', 512)
-    args.bridge = getattr(args, 'bridge', True)
-    args.global_attention = getattr(args, 'global_attention', 'mlp')
-    args.copy_attn = getattr(args, 'copy_attn', True)
-    args.reuse_copy_attn = getattr(args, 'reuse_copy_attn', True)
+    pass
+    # args.dropout = getattr(args, 'dropout', 0.0)
+    # args.word_vec_size = getattr(args, 'word_vec_size', 128)
+    # args.encoder_type = getattr(args, 'encoder_type', 'brnn')
+    # args.layers = getattr(args, 'layers', 1)
+    # args.rnn_size = getattr(args, 'rnn_size', 512)
+    # args.bridge = getattr(args, 'bridge', True)
+    # args.global_attention = getattr(args, 'global_attention', 'mlp')
+    # args.copy_attn = getattr(args, 'copy_attn', True)
+    # args.reuse_copy_attn = getattr(args, 'reuse_copy_attn', True)
 
 
 @register_model_architecture('opennmt', 'opennmt_cnndm_transformer')
@@ -1032,15 +1039,16 @@ def opennmt_cnndm_transformer(args):
                    -param_init_glorot \
                    -world_size 2
     '''
-    args.dropout = getattr(args, 'dropout', 0.2)
-    args.word_vec_size = getattr(args, 'word_vec_size', 512)
-    args.share_embeddings = getattr(args, 'share_embeddings', True)
-    args.position_encoding = getattr(args, 'position_encoding', True)
-    args.encoder_type = getattr(args, 'encoder_type', 'transformer')
-    args.decoder_type = getattr(args, 'decoder_type', 'transformer')
-    args.layers = getattr(args, 'layers', 4)
-    args.rnn_size = getattr(args, 'rnn_size', 512)
-    args.copy_attn = getattr(args, 'copy_attn', True)
+    pass
+    # args.dropout = getattr(args, 'dropout', 0.2)
+    # args.word_vec_size = getattr(args, 'word_vec_size', 512)
+    # args.share_embeddings = getattr(args, 'share_embeddings', True)
+    # args.position_encoding = getattr(args, 'position_encoding', True)
+    # args.encoder_type = getattr(args, 'encoder_type', 'transformer')
+    # args.decoder_type = getattr(args, 'decoder_type', 'transformer')
+    # args.layers = getattr(args, 'layers', 4)
+    # args.rnn_size = getattr(args, 'rnn_size', 512)
+    # args.copy_attn = getattr(args, 'copy_attn', True)
 
 
 @register_model_architecture('opennmt', 'opennmt_gigaword')
@@ -1048,5 +1056,6 @@ def opennmt_gigaword(args):
     '''
                 -train_steps 200000
     '''
-    args.copy_attn = getattr(args, 'copy_attn', True)
-    args.reuse_copy_attn = getattr(args, 'reuse_copy_attn', True)
+    pass
+    # args.copy_attn = getattr(args, 'copy_attn', True)
+    # args.reuse_copy_attn = getattr(args, 'reuse_copy_attn', True)
