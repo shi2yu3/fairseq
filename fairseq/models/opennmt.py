@@ -234,10 +234,10 @@ class OpenNMTModel(FairseqModel):
         base_architecture(args)
 
         # Build embeddings.
-        if not hasattr(args, 'max_source_positions'):
-            args.max_source_positions = 1024
-        if not hasattr(args, 'max_target_positions'):
-            args.max_target_positions = 1024
+        # if not hasattr(args, 'max_source_positions'):
+        #     args.max_source_positions = 1024
+        # if not hasattr(args, 'max_target_positions'):
+        #     args.max_target_positions = 1024
 
         src_dict, tgt_dict = task.source_dictionary, task.target_dictionary
 
@@ -304,13 +304,13 @@ class OpenNMTModel(FairseqModel):
         )
 
         # Build encoder.
-        encoder = build_encoder(args, src_emb)
+        encoder = build_encoder(args, src_emb, src_dict)
 
         # Build decoder.
-        decoder = build_decoder(args, tgt_emb)
+        decoder = build_decoder(args, tgt_emb, src_dict)
 
         # Build NMTModel(= encoder + decoder).
-        model = NMTModel(encoder, decoder)
+        model = OpenNMTModel(encoder, decoder)
 
         # Build Generator.
         if not args.copy_attn:
@@ -331,6 +331,7 @@ class OpenNMTModel(FairseqModel):
             pad_idx = tgt_dict.pad()
             generator = copy_generator.CopyGenerator(args.dec_rnn_size, vocab_size, pad_idx)
 
+        """
         # Load the model states from checkpoint or initialize them.
         if False: # checkpoint is not None:
             # This preserves backward-compat for models using customed layernorm
@@ -367,9 +368,32 @@ class OpenNMTModel(FairseqModel):
             if hasattr(model.decoder, 'embeddings'):
                 model.decoder.embeddings.load_pretrained_vectors(
                     args.pre_word_vecs_dec)
+        """
 
         model.generator = generator
         return model
+
+
+    def forward(self, src_tokens, src_lengths, prev_output_tokens, bptt=False):
+        # convert to OpenNMT shape
+        src_tokens = src_tokens.transpose(1, 0).unsqueeze(2)
+        prev_output_tokens = prev_output_tokens.transpose(1, 0).unsqueeze(2)
+
+        from fairseq.onmt_utils.misc import aeq
+        aeq(prev_output_tokens[0])
+        prev_output_tokens = prev_output_tokens[1:]
+
+        enc_state, memory_bank, lengths = self.encoder(src_tokens, src_lengths)
+        if bptt is False:
+            self.decoder.init_state(src_tokens, memory_bank, enc_state)
+        dec_out, attns = self.decoder(prev_output_tokens, memory_bank, memory_lengths=lengths)
+
+        # convert to FairSeq shape
+        dec_out = dec_out.permute(1, 0, 2)
+        attns['std'] = attns['std'].permute(1, 0, 2)
+        attns['copy'] = attns['copy'].permute(1, 0, 2)
+
+        return dec_out, attns
 
 
 # def config_opts(parser):

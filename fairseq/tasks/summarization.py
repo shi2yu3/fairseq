@@ -289,10 +289,10 @@ class SummarizationTask(FairseqTask):
             args (argparse.Namespace): parsed command-line arguments
         """
 
-        def opennmt_compatible(args):
-            args.epochs = 0
-            return args
-        args = opennmt_compatible(args)
+        # def opennmt_compatible(args):
+        #     args.epochs = 0
+        #     return args
+        # args = opennmt_compatible(args)
 
         parse.ArgumentParser.validate_train_opts(args)
         parse.ArgumentParser.update_model_opts(args)

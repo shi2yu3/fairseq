@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
     "params": {
         "--max-lr": "0.0005240743099082972",
@@ -13,4 +14,21 @@
     "vc": "msrmt",
     "status": "running",
     "target": -10.75
+=======
+{
+    "params": {
+        "--max-lr": 0.0005240743099082972,
+        "--dropout": 0.2873622563409467,
+        "--clip-norm": 0.3355313867974851,
+        "--weight-decay": 0.0006347863188206518,
+        "--label-smoothing": 0.12701017916353816,
+        "--lr-period-updates": 141691.61689564702
+    },
+    "trial_id": "cbfabd3b",
+    "philly_id": "1553675282044_4080",
+    "cluster": "wu3",
+    "vc": "msrmt",
+    "status": "finished",
+    "target": -10.75
+>>>>>>> 930faa0a754dac88659bed3dda32e969d3c17571
 }

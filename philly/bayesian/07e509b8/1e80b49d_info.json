@@ -13,6 +13,10 @@
     "philly_id": "1553675282044_4058",
     "cluster": "wu3",
     "vc": "msrmt",
+<<<<<<< HEAD
     "status": "running",
+=======
+    "status": "finished",
+>>>>>>> 930faa0a754dac88659bed3dda32e969d3c17571
     "target": -8.381
 }

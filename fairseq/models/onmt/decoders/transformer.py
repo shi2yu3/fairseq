@@ -119,10 +119,10 @@ class TransformerDecoder(DecoderBase):
           embeddings to use, should have positional encodings
     """
 
-    def __init__(self, num_layers, d_model, heads, d_ff,
+    def __init__(self, dictionary, num_layers, d_model, heads, d_ff,
                  copy_attn, self_attn_type, dropout, embeddings,
                  max_relative_positions):
-        super(TransformerDecoder, self).__init__()
+        super(TransformerDecoder, self).__init__(dictionary)
 
         self.embeddings = embeddings
 
@@ -142,9 +142,10 @@ class TransformerDecoder(DecoderBase):
         self.layer_norm = nn.LayerNorm(d_model, eps=1e-6)
 
     @classmethod
-    def from_opt(cls, opt, embeddings):
+    def from_opt(cls, dictionary, opt, embeddings):
         """Alternate constructor."""
         return cls(
+            dictionary,
             opt.dec_layers,
             opt.dec_rnn_size,
             opt.heads,

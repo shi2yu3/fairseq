@@ -1,0 +1,50 @@
+<<<<<<< HEAD:philly/bayesian/11853456/a84a8082_job.json
+{
+    "version": "2019_05_05",
+    "metadata": {
+        "name": "fairseq_tr_11853456_a84a8082",
+        "cluster": "wu3",
+        "vc": "msrmt",
+        "username": "yushi",
+        "queue": "sdrg"
+    },
+    "environmentVariables": {
+        "rootdir": "/philly/wu3/msrmt/yushi/fairseq",
+        "datadir": "data-bin/cnndm",
+        "arch": "transformer_vaswani_wmt_en_de_big"
+    },
+    "resources": {
+        "workers": {
+            "type": "skuResource",
+            "sku": "G1",
+            "count": 1,
+            "image": "phillyregistry.azurecr.io/philly/jobs/custom/pytorch:pytorch1.0.0-py36-vcr",
+            "commandLine": "python $rootdir/train.py $rootdir/$datadir -s src -t tgt --max-tokens 4000 -a $arch --share-all-embeddings --dropout 0.35654526419229454 --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.022013519063556752 --weight-decay 0.0004635175463210908 --lr 0.000550551214819255 --lr-scheduler fixed --warmup-updates 122270 --min-lr 1e-09 --criterion label_smoothed_cross_entropy --label-smoothing 0.1521286046910728 --max-update 350000 --max-epoch 10 --save-dir $PHILLY_JOB_DIRECTORY --tensorboard-logdir $PHILLY_SCRATCH_DIRECTORY"
+        }
+    }
+=======
+{
+    "version": "2019_05_05",
+    "metadata": {
+        "name": "fairseq_tr_11853456_4c5a8031",
+        "cluster": "wu3",
+        "vc": "msrmt",
+        "username": "yushi",
+        "queue": "sdrg"
+    },
+    "environmentVariables": {
+        "rootdir": "/philly/wu3/msrmt/yushi/fairseq",
+        "datadir": "data-bin/cnndm",
+        "arch": "transformer_vaswani_wmt_en_de_big"
+    },
+    "resources": {
+        "workers": {
+            "type": "skuResource",
+            "sku": "G1",
+            "count": 1,
+            "image": "phillyregistry.azurecr.io/philly/jobs/custom/pytorch:pytorch1.0.0-py36-vcr",
+            "commandLine": "python $rootdir/train.py $rootdir/$datadir -s src -t tgt --max-tokens 4000 -a $arch --share-all-embeddings --dropout 0.09614048566716277 --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.34945151371469474 --weight-decay 0.0007370010765346588 --lr 0.0005048731388980704 --lr-scheduler fixed --warmup-updates 25461 --min-lr 1e-09 --criterion label_smoothed_cross_entropy --label-smoothing 0.07593146991661011 --max-update 350000 --max-epoch 10 --save-dir $PHILLY_JOB_DIRECTORY --tensorboard-logdir $PHILLY_SCRATCH_DIRECTORY"
+        }
+    }
+>>>>>>> 930faa0a754dac88659bed3dda32e969d3c17571:philly/bayesian/11853456/4c5a8031_job.json
+}

@@ -55,7 +55,7 @@ def build_embeddings(opt, text_field, for_encoder=True):
     return emb
 
 
-def build_encoder(opt, embeddings):
+def build_encoder(opt, embeddings, dictionary):
     """
     Various encoder dispatcher function.
     Args:
@@ -63,10 +63,10 @@ def build_encoder(opt, embeddings):
         embeddings (Embeddings): vocab embeddings for this encoder.
     """
     enc_type = opt.encoder_type if opt.model_type == "text" else opt.model_type
-    return str2enc[enc_type].from_opt(opt, embeddings)
+    return str2enc[enc_type].from_opt(dictionary, opt, embeddings)
 
 
-def build_decoder(opt, embeddings):
+def build_decoder(opt, embeddings, dictionary):
     """
     Various decoder dispatcher function.
     Args:
@@ -75,7 +75,7 @@ def build_decoder(opt, embeddings):
     """
     dec_type = "ifrnn" if opt.decoder_type == "rnn" and opt.input_feed \
                else opt.decoder_type
-    return str2dec[dec_type].from_opt(opt, embeddings)
+    return str2dec[dec_type].from_opt(dictionary, opt, embeddings)
 
 
 def load_test_model(opt, model_path=None):

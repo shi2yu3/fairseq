@@ -4,23 +4,24 @@ import torch.nn as nn
 from ..models.stacked_rnn import StackedLSTM, StackedGRU
 from fairseq.modules.onmt import context_gate_factory, GlobalAttention
 from fairseq.onmt_utils.rnn_factory import rnn_factory
+from fairseq.models import FairseqIncrementalDecoder
 
 from fairseq.onmt_utils.misc import aeq
 
 
-class DecoderBase(nn.Module):
+class DecoderBase(FairseqIncrementalDecoder):
     """Abstract class for decoders.
 
     Args:
         attentional (bool): The decoder returns non-empty attention.
     """
 
-    def __init__(self, attentional=True):
-        super(DecoderBase, self).__init__()
+    def __init__(self, dictionary, attentional=True):
+        super(DecoderBase, self).__init__(dictionary)
         self.attentional = attentional
 
     @classmethod
-    def from_opt(cls, opt, embeddings):
+    def from_opt(cls, dictionary, opt, embeddings):
         """Alternate constructor.
 
         Subclasses should override this method.
@@ -80,12 +81,12 @@ class RNNDecoderBase(DecoderBase):
         :class:`~onmt.modules.GlobalAttention`.
     """
 
-    def __init__(self, rnn_type, bidirectional_encoder, num_layers,
+    def __init__(self, dictionary, rnn_type, bidirectional_encoder, num_layers,
                  hidden_size, attn_type="general", attn_func="softmax",
                  coverage_attn=False, context_gate=None,
                  copy_attn=False, dropout=0.0, embeddings=None,
                  reuse_copy_attn=False, copy_attn_type="general"):
-        super(RNNDecoderBase, self).__init__(
+        super(RNNDecoderBase, self).__init__(dictionary,
             attentional=attn_type != "none" and attn_type is not None)
 
         self.bidirectional_encoder = bidirectional_encoder
@@ -139,9 +140,10 @@ class RNNDecoderBase(DecoderBase):
             raise ValueError("Cannot reuse copy attention with no attention.")
 
     @classmethod
-    def from_opt(cls, opt, embeddings):
+    def from_opt(cls, dictionary, opt, embeddings):
         """Alternate constructor."""
         return cls(
+            dictionary,
             opt.rnn_type,
             opt.brnn,
             opt.dec_layers,

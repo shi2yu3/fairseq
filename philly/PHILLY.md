@@ -28,31 +28,27 @@ curl -k --ntlm --user : "https://philly/api/list?clusterId=eu2&vcId=ipgsrch"
 curl -k --ntlm --user : "https://philly/api/metadata?clusterId=eu2&vcId=ipgsrch&jobId=application_1555486458178_13653"
 ```
 
-# encryption (not work yet)
+# To run bo.py in background on linux machine
 
-**create .netrc with the following format**
-```
-machine philly
-login yushi
-password <your password>
-```
+Requirement: Python 3.6
 
-**create a key**
 ```
-gpg --gen-key
+nohup python3.6 -u bo.py --num_new_jobs 6 --num_rounds 10 --port 9000 bayesian/07e509b8/ > 07e509b8.log &
+nohup python3.6 -u bo.py --num_new_jobs 6 --num_rounds 10 --port 9001 bayesian/11853456/ > 11853456.log &
+nohup python3.6 -u bo.py --num_new_jobs 6 --num_rounds 10 --port 9002 bayesian/9394bf00/ > 9394bf00.log &
+nohup python3.6 -u bo.py --num_new_jobs 6 --num_rounds 10 --port 9003 bayesian/e3f5b02d/ > e3f5b02d.log &
 ```
 
-**encrypt .netrc**
+Find nohup process
+
 ```
-gpg -r yushi -e .netrc
+ps ax | grep bo.py
 ```
 
-**remove .netrc**
-```
-rm .netrc
-```
+Kill the process
 
-**add decryption in curl command**
 ```
-gpg --batch -q -d .netrc.gpg | curl --netrc-file /dev/stdin -n <url>
+kill PID
+or
+pkill -f bo.py
 ```

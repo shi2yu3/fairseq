@@ -2,10 +2,12 @@
 
 import torch.nn as nn
 
+from fairseq.models import FairseqEncoder
+
 from fairseq.onmt_utils.misc import aeq
 
 
-class EncoderBase(nn.Module):
+class EncoderBase(FairseqEncoder):
     """
     Base encoder class. Specifies the interface used by different encoder types
     and required by :class:`onmt.Models.NMTModel`.
@@ -31,7 +33,7 @@ class EncoderBase(nn.Module):
     """
 
     @classmethod
-    def from_opt(cls, opt, embeddings=None):
+    def from_opt(cls, opt, dictionary, embeddings=None):
         raise NotImplementedError
 
     def _check_args(self, src, lengths=None, hidden=None):
