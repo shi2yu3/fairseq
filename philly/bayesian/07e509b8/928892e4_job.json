@@ -1,3 +1,28 @@
+<<<<<<< HEAD:philly/bayesian/07e509b8/de64b190_job.json
+{
+    "version": "2019_05_05",
+    "metadata": {
+        "name": "fairseq_tr_07e509b8_de64b190",
+        "cluster": "wu3",
+        "vc": "msrmt",
+        "username": "yushi",
+        "queue": "sdrg"
+    },
+    "environmentVariables": {
+        "rootdir": "/philly/wu3/msrmt/yushi/fairseq",
+        "datadir": "data-bin/cnndm",
+        "arch": "transformer_vaswani_wmt_en_de_big"
+    },
+    "resources": {
+        "workers": {
+            "type": "skuResource",
+            "sku": "G1",
+            "count": 1,
+            "image": "phillyregistry.azurecr.io/philly/jobs/custom/pytorch:pytorch1.0.0-py36-vcr",
+            "commandLine": "python $rootdir/train.py $rootdir/$datadir -s src -t tgt --max-tokens 4000 -a $arch --share-all-embeddings --dropout 0.28484102038313697 --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.42831912588832083 --weight-decay 1.9951850308819185e-07 --lr 0.000756056135883662 --lr-scheduler cosine --warmup-init-lr 1e-7 --warmup-updates 167855 --max-lr 0.0008900043969141157 --min-lr 1e-09 --t-mult 0.6724334340168511 --criterion label_smoothed_cross_entropy --label-smoothing 0.0751008157835458 --max-update 350000 --max-epoch 10 --save-dir $PHILLY_JOB_DIRECTORY --tensorboard-logdir $PHILLY_SCRATCH_DIRECTORY"
+        }
+    }
+=======
 {
     "version": "2019_05_05",
     "metadata": {
@@ -21,4 +46,5 @@
             "commandLine": "python $rootdir/train.py $rootdir/$datadir -s src -t tgt --max-tokens 4000 -a $arch --share-all-embeddings --dropout 0.37589224219963213 --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.18528145410531 --weight-decay 0.0008163808889309009 --lr 7.522516945820178e-05 --lr-scheduler cosine --warmup-init-lr 1e-7 --warmup-updates 101617 --max-lr 0.0007509056660593562 --min-lr 1e-09 --t-mult 0.09376434535086431 --criterion label_smoothed_cross_entropy --label-smoothing 0.055811102299290385 --max-update 350000 --max-epoch 10 --save-dir $PHILLY_JOB_DIRECTORY --tensorboard-logdir $PHILLY_SCRATCH_DIRECTORY"
         }
     }
+>>>>>>> 930faa0a754dac88659bed3dda32e969d3c17571:philly/bayesian/07e509b8/928892e4_job.json
 }

@@ -1,3 +1,28 @@
+<<<<<<< HEAD:philly/bayesian/11853456/25eeef3d_job.json
+{
+    "version": "2019_05_05",
+    "metadata": {
+        "name": "fairseq_tr_11853456_25eeef3d",
+        "cluster": "wu3",
+        "vc": "msrmt",
+        "username": "yushi",
+        "queue": "sdrg"
+    },
+    "environmentVariables": {
+        "rootdir": "/philly/wu3/msrmt/yushi/fairseq",
+        "datadir": "data-bin/cnndm",
+        "arch": "transformer_vaswani_wmt_en_de_big"
+    },
+    "resources": {
+        "workers": {
+            "type": "skuResource",
+            "sku": "G1",
+            "count": 1,
+            "image": "phillyregistry.azurecr.io/philly/jobs/custom/pytorch:pytorch1.0.0-py36-vcr",
+            "commandLine": "python $rootdir/train.py $rootdir/$datadir -s src -t tgt --max-tokens 4000 -a $arch --share-all-embeddings --dropout 0.46282178037141497 --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.17595374074570652 --weight-decay 0.0003359394302509676 --lr 0.000332557083312353 --lr-scheduler fixed --warmup-updates 165571 --min-lr 1e-09 --criterion label_smoothed_cross_entropy --label-smoothing 0.18151682949732467 --max-update 350000 --max-epoch 10 --save-dir $PHILLY_JOB_DIRECTORY --tensorboard-logdir $PHILLY_SCRATCH_DIRECTORY"
+        }
+    }
+=======
 {
     "version": "2019_05_05",
     "metadata": {
@@ -21,4 +46,5 @@
             "commandLine": "python $rootdir/train.py $rootdir/$datadir -s src -t tgt --max-tokens 4000 -a $arch --share-all-embeddings --dropout 0.16403452312610184 --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.1509625264746996 --weight-decay 1.9663298891508973e-05 --lr 0.00039993944518662035 --lr-scheduler fixed --warmup-updates 99249 --min-lr 1e-09 --criterion label_smoothed_cross_entropy --label-smoothing 0.0650859756732183 --max-update 350000 --max-epoch 10 --save-dir $PHILLY_JOB_DIRECTORY --tensorboard-logdir $PHILLY_SCRATCH_DIRECTORY"
         }
     }
+>>>>>>> 930faa0a754dac88659bed3dda32e969d3c17571:philly/bayesian/11853456/7c380eb4_job.json
 }

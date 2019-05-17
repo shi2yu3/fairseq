@@ -1,3 +1,28 @@
+<<<<<<< HEAD:philly/bayesian/e3f5b02d/baa76428_job.json
+{
+    "version": "2019_05_05",
+    "metadata": {
+        "name": "fairseq_tr_e3f5b02d_baa76428",
+        "cluster": "wu3",
+        "vc": "msrmt",
+        "username": "yushi",
+        "queue": "sdrg"
+    },
+    "environmentVariables": {
+        "rootdir": "/philly/wu3/msrmt/yushi/fairseq",
+        "datadir": "data-bin/cnndm",
+        "arch": "transformer_vaswani_wmt_en_de_big"
+    },
+    "resources": {
+        "workers": {
+            "type": "skuResource",
+            "sku": "G1",
+            "count": 1,
+            "image": "phillyregistry.azurecr.io/philly/jobs/custom/pytorch:pytorch1.0.0-py36-vcr",
+            "commandLine": "python $rootdir/train.py $rootdir/$datadir -s src -t tgt --max-tokens 4000 -a $arch --share-all-embeddings --dropout 0.16969903052755392 --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.45965856162354707 --weight-decay 0.00021799548247602318 --lr 1e-9 --lr-scheduler triangular --min-lr 1e-10 --max-lr 0.0003837947029562916 --lr-period-updates 121701.24362256593 --criterion label_smoothed_cross_entropy --label-smoothing 0.09602194321144551 --max-update 350000 --max-epoch 10 --save-dir $PHILLY_JOB_DIRECTORY --tensorboard-logdir $PHILLY_SCRATCH_DIRECTORY"
+        }
+    }
+=======
 {
     "version": "2019_05_05",
     "metadata": {
@@ -21,4 +46,5 @@
             "commandLine": "python $rootdir/train.py $rootdir/$datadir -s src -t tgt --max-tokens 4000 -a $arch --share-all-embeddings --dropout 0.20456079578796205 --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.47011530556892883 --weight-decay 0.00020658331699070298 --lr 1e-9 --lr-scheduler triangular --min-lr 1e-10 --max-lr 0.0005590938243314639 --lr-period-updates 119013.30302046092 --criterion label_smoothed_cross_entropy --label-smoothing 0.12395899951214162 --max-update 350000 --max-epoch 10 --save-dir $PHILLY_JOB_DIRECTORY --tensorboard-logdir $PHILLY_SCRATCH_DIRECTORY"
         }
     }
+>>>>>>> 930faa0a754dac88659bed3dda32e969d3c17571:philly/bayesian/e3f5b02d/4aa6823e_job.json.bad
 }
