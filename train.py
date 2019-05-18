@@ -90,6 +90,7 @@ def main(args, init_distributed=False):
         print('| initialized host {} as rank {}'.format(socket.gethostname(), args.distributed_rank))
 
     # Load the latest checkpoint if one is available
+    # TODO: uncomment following code
     if not load_checkpoint(args, trainer, epoch_itr):
         trainer.dummy_train_step([dummy_batch])
 
