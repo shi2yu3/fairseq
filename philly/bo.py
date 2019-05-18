@@ -31,10 +31,6 @@ except ImportError:
     os.system('pip install --user tornado')
     import tornado.httpserver
     from tornado.web import RequestHandler
-    # raise ImportError(
-    #     "In order to run this example you must have the libraries: " +
-    #     "`tornado` and `requests` installed."
-    # )
 
 
 parser = argparse.ArgumentParser()
@@ -46,10 +42,6 @@ parser.add_argument("--port", default=9009, type=int,
                     help="the localhost port number")
 parser.add_argument("--new_philly_jobs", default="", type=str,
                     help="Ids of new Philly jobs that have not been tracked")
-parser.add_argument("--user", default="", type=str,
-                    help="user name")
-parser.add_argument("--password", default="", type=str,
-                    help="user password")
 args, input_config_file = parser.parse_known_args()
 assert len(input_config_file) == 1
 input_config_file = input_config_file[0]
@@ -75,6 +67,11 @@ def load_config(config_file):
 
 
 root_dir, philly_config, pbounds = load_config(input_config_file)
+if os.path.basename(root_dir) is "":
+    root_dir = os.path.dirname(root_dir)
+
+
+user, pswd = json.load(open('.auth')).values()
 
 
 def black_box_function(x, y):
@@ -109,17 +106,23 @@ def parse_arguments(arguments):
     return args
 
 
+def fix_int_params(params):
+    for p, v in params.items():
+        if p in ["--warmup-updates"] and not isinstance(v, int):
+            params[p] = int(v + 1 - 1e-10)
+            # print(f"{p} changed from {v} to {params[p]}")
+    return params
+
+
 def create_config_file(config_file, philly_config, **kwargs):
     trial_id = os.path.basename(config_file).replace("_job.json", "")
     config = copy.deepcopy(philly_config)
     config["metadata"]["name"] += f"_{os.path.basename(root_dir)}_{trial_id}"
     args_in_command = parse_command(config["resources"]["workers"]["commandLine"])
 
-    for arg in kwargs:
-        val = kwargs[arg]
-        if arg == "--warmup-updates":
-            val = int(val)
+    kwargs = fix_int_params(kwargs)
 
+    for arg, val in kwargs.items():
         if arg in config["environmentVariables"]:
             config["environmentVariables"][arg] = val
         elif arg in args_in_command:
@@ -142,7 +145,7 @@ def create_config_file(config_file, philly_config, **kwargs):
 
 
 def submit_job(config_fn):
-    cmd = f'curl -k --silent --ntlm --user "{args.user}":"{args.password}" -X POST -H "Content-Type: application/json" --data @{config_fn} https://philly/api/jobs'
+    cmd = f'curl -k --silent --ntlm --user "{user}":"{pswd}" -X POST -H "Content-Type: application/json" --data @{config_fn} https://philly/api/jobs'
     job_id = subprocess.check_output(cmd, shell=True)
     # job_id = b'{"jobId":"application_1553675282044_3023"}'
     print(job_id)
@@ -157,7 +160,7 @@ def submit_job(config_fn):
 
 
 def kill_job(job_id, cluster):
-    cmd = f'curl -k --silent --ntlm --user "{args.user}":"{args.password}" "https://philly/api/abort?clusterId={cluster}&jobId=application_{job_id}"'
+    cmd = f'curl -k --silent --ntlm --user "{user}":"{pswd}" "https://philly/api/abort?clusterId={cluster}&jobId=application_{job_id}"'
     killed = subprocess.check_output(cmd, shell=True)
     # killed = b'{"phillyversion": 116, "jobkilled": "application_1553675282044_3310"}'
     print(killed)
@@ -172,7 +175,7 @@ def kill_job(job_id, cluster):
 
 
 def job_status(job_id, cluster, vc):
-    cmd = f'curl -k --silent --ntlm --user "{args.user}":"{args.password}" "https://philly/api/status?clusterId={cluster}&vcId={vc}&jobId=application_{job_id}&jobType=cust&content=full"'
+    cmd = f'curl -k --silent --ntlm --user "{user}":"{pswd}" "https://philly/api/status?clusterId={cluster}&vcId={vc}&jobId=application_{job_id}&jobType=cust&content=full"'
     while True:
         status = subprocess.check_output(cmd, shell=True)
         status = status.decode("utf-8").replace("true", "True").replace("false", "False").replace("null", "None")
@@ -190,7 +193,7 @@ def job_status(job_id, cluster, vc):
 
 
 def job_metadata(job_id, cluster, vc):
-    cmd = f'curl -k --silent --ntlm --user "{args.user}":"{args.password}" "https://philly/api/metadata?clusterId={cluster}&vcId={vc}&jobId=application_{job_id}"'
+    cmd = f'curl -k --silent --ntlm --user "{user}":"{pswd}" "https://philly/api/metadata?clusterId={cluster}&vcId={vc}&jobId=application_{job_id}"'
     while True:
         metadata = subprocess.check_output(cmd, shell=True)
         metadata = metadata.decode("utf-8").replace("true", "True").replace("false", "False").replace("null", "None")
@@ -223,7 +226,6 @@ def val_loss(job_id, cluster, vc):
                         best_loss = float(loss)
                         best_epoch = epoch
                         diverged_steps = 0
-                        # print(f"** job {job_id} epoch {best_epoch} best loss {best_loss}")
                     else:
                         diverged_steps += 1
                         if diverged_steps >= 4:
@@ -308,6 +310,7 @@ class BayesianOptimizationHandler(RequestHandler):
     def post(self):
         """Deal with incoming requests."""
         body = tornado.escape.json_decode(self.request.body)
+        suggest = body.pop("suggest")
 
         try:
             self._bo.register(
@@ -317,13 +320,12 @@ class BayesianOptimizationHandler(RequestHandler):
             status = f"BO registered: {body}.\n"
             status += f"BO has registered: {len(self._bo.space)} points.\n"
             print(status)
-            # print(f"{name} registered: {register_data}.\n")
-            # print(f"BO has registered: {len(self._bo.space)} points.")
         except KeyError:
             pass
         finally:
-            time.sleep(random.randint(0, 2))
-            suggested_params = self._bo.suggest(self._uf)
+            suggested_params = {}
+            if suggest:
+                suggested_params = self._bo.suggest(self._uf)
 
         self.write(json.dumps(suggested_params))
 
@@ -339,16 +341,26 @@ def run_optimization_app():
     server.listen(args.port)
     tornado.ioloop.IOLoop.instance().start()
 
+
+def swap_params(params):
+    if "--max-lr" in params and "--lr" in params:
+        if params["--max-lr"] < params["--lr"]:
+            params["--max-lr"], params["--lr"] = params["--lr"], params["--max-lr"]
+            # print(f"--max-lr and --lr are swapped")
+    return params
+
+
 def run_optimizer():
     global optimizers_config
     opt_config = optimizers_config.pop()
     name = opt_config["name"]
 
-    register_data = {}
+    register_data = {"suggest": True}
     max_target = None
     if "philly_config" in opt_config:
         while len(jobs_to_resume) > 0:
             time.sleep(random.randint(1, 10))
+        time.sleep(random.randint(60, 120))
 
         philly_config = opt_config["philly_config"]
 
@@ -358,9 +370,7 @@ def run_optimizer():
         ).json()
 
         for _ in range(args.num_rounds):
-            if "--max-lr" in resp and "--lr" in resp:
-                if resp["--max-lr"] < resp["--lr"]:
-                    resp["--max-lr"], resp["--lr"] = resp["--lr"], resp["--max-lr"]
+            resp = swap_params(resp)
             print(f"{name} is trying {resp}")
 
             job_info = philly_job(philly_config, **resp)
@@ -368,7 +378,8 @@ def run_optimizer():
 
             target = None if job_info["status"] == "running" else job_info["target"]
             register_data = {} if target is None else {"params": resp,
-                                                       "target": target}
+                                                       "target": target,
+                                                       "suggest": True}
 
             if target is not None:
                 if max_target is None or target > max_target:
@@ -383,22 +394,27 @@ def run_optimizer():
     elif "job_info" in opt_config:
         job_info = opt_config["job_info"]
         target = job_info["target"]
+
+        jobs_to_resume.remove(name)
+        print(f"({len(jobs_to_resume)} jobs left to resume)")
+
         if job_info["status"] != "running" and target is not None:
             register_data = {
                 "params": job_info["params"],
                 "target": target,
-            }
+                "suggest": False}
         elif job_info["status"] != "failed":
             job_info = update_job(job_info["philly_id"],
                                   job_info["cluster"],
                                   job_info["vc"],
                                   job_info["trial_id"],
-                                  False,
+                                  False if args.num_new_jobs == 0 or args.num_rounds <= 1 else True,
                                   **job_info["params"])
 
             target = None if job_info["status"] == "running" else job_info["target"]
             register_data = {} if target is None else {"params": job_info["params"],
-                                                       "target": target}
+                                                       "target": target,
+                                                       "suggest": False}
 
         if target is not None:
             if max_target is None or target > max_target:
@@ -413,12 +429,11 @@ def run_optimizer():
     else:
         raise ValueError("Optimizers config should contain 'philly_config' or 'job_info'")
 
-    # global results
     results.append((name, max_target))
     status = f"{name} is done!"
-    if "job_info" in opt_config:
-        jobs_to_resume.remove(name)
-        status += f" ({len(jobs_to_resume)} jobs left to register)"
+    # if "job_info" in opt_config:
+    #     jobs_to_resume.remove(name)
+    #     status += f" ({len(jobs_to_resume)} jobs left to register)"
     status += "\n"
     print(status)
 
@@ -445,7 +460,15 @@ def resume_job_info(exp_dir):
     if os.path.isdir(exp_dir):
         info_files = glob.glob(f"{exp_dir}/*_info.json")
         for info_file in info_files:
-            existing_jobs.append(json.load(open(info_file)))
+            info = json.load(open(info_file))
+            if info["status"] == "failed":
+                job_file = info_file.replace('_info.json', '_job.json')
+                os.rename(job_file, f"{job_file}.bad")
+                os.rename(info_file, f"{info_file}.bad")
+            else:
+                for p in info["params"]:
+                    info["params"][p] = float(info["params"][p])
+                existing_jobs.append(info)
     return existing_jobs
 
 results = []
