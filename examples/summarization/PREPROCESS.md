@@ -126,5 +126,5 @@ python train.py data-bin/cnndm -s src -t tgt --max-tokens 4000 -a transformer_va
 
 **FairSeq for OpenNMT**
 ```
-python train.py data/cnndm/CNNDM --save-dir checkpoints/cnndm --task summarization -a opennmt --copy_attn --global_attention mlp --word_vec_size 128 --rnn_size 512 --layers 1 --encoder_type brnn --max-update 200000 --clip-norm 2 --dropout 0. --max-sentences 16 --max-sentences-valid 16 --optimizer adagrad --lr 0.15 --adagrad_accumulator_init 0.1 --reuse_copy_attn --copy_loss_by_seqlength --bridge --seed 777
+python train.py data/cnndm/CNNDM --save-dir checkpoints/cnndm --task summarization -a opennmt --copy_attn --global_attention mlp --word_vec_size 128 --rnn_size 512 --layers 1 --encoder_type brnn --max-update 200000 --clip-norm 2 --dropout 0. --max-sentences 16 --max-sentences-valid 16 --optimizer adagrad --lr 0.15 --adagrad_accumulator_init 0.1 --reuse_copy_attn --copy_loss_by_seqlength --bridge --seed 777 --criterion copy_generator_loss --lr-scheduler opennmt_scheduler
 ```

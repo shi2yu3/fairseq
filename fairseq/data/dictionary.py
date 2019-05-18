@@ -13,7 +13,8 @@ import torch
 
 from fairseq.tokenizer import tokenize_line
 from fairseq.binarizer import safe_readline
-from fairseq.data import data_utils, onmt
+from . import data_utils
+from onmt.inputters.inputter import old_style_vocab, load_old_vocab
 
 
 class Dictionary(object):
@@ -324,8 +325,8 @@ class OpenNMTDictionary(object):
 
         # check for code where vocab is saved instead of fields
         # (in the future this will be done in a smarter way)
-        if onmt.inputter.old_style_vocab(vocab):
-            fields = onmt.inputter.load_old_vocab(
+        if old_style_vocab(vocab):
+            fields = load_old_vocab(
                 vocab, args.model_type, dynamic_dict=args.copy_attn)
         else:
             fields = vocab

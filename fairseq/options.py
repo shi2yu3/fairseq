@@ -93,12 +93,16 @@ def parse_args_and_arch(parser, input_args=None, parse_known=False):
 
     # Add *-specific args to parser.
     if hasattr(args, 'criterion'):
+        print('Criterion: %s' % args.criterion)
         CRITERION_REGISTRY[args.criterion].add_args(parser)
     if hasattr(args, 'optimizer'):
+        print('Criterion: %s' % args.optimizer)
         OPTIMIZER_REGISTRY[args.optimizer].add_args(parser)
     if hasattr(args, 'lr_scheduler'):
+        print('Criterion: %s' % args.lr_scheduler)
         LR_SCHEDULER_REGISTRY[args.lr_scheduler].add_args(parser)
     if hasattr(args, 'task'):
+        print('Criterion: %s' % args.task)
         TASK_REGISTRY[args.task].add_args(parser)
 
     # Parse a second time.
