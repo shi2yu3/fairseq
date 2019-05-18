@@ -463,7 +463,8 @@ def resume_job_info(exp_dir):
             info = json.load(open(info_file))
             if info["status"] == "failed":
                 job_file = info_file.replace('_info.json', '_job.json')
-                os.rename(job_file, f"{job_file}.bad")
+                if os.path.exists(job_file):
+                    os.rename(job_file, f"{job_file}.bad")
                 os.rename(info_file, f"{info_file}.bad")
             else:
                 for p in info["params"]:
