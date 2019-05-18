@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch
 
-from .encoder import EncoderBase
+from onmt.encoders.encoder import EncoderBase
 
 
 class ImageEncoder(EncoderBase):

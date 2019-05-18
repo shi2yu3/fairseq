@@ -1,5 +1,5 @@
 """Define a minimal encoder."""
-from .encoder import EncoderBase
+from onmt.encoders.encoder import EncoderBase
 from onmt.utils.misc import sequence_mask
 import torch
 

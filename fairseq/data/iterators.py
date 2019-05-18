@@ -9,11 +9,14 @@ import itertools
 import math
 import queue
 import threading
+import random
 
 import numpy as np
 import torch
 
 from . import data_utils
+
+from onmt.inputters.inputter import DatasetLazyIter
 
 
 class CountingIterator(object):
@@ -252,3 +255,78 @@ class ShardedIterator(object):
 
     def __next__(self):
         return next(self.itr)[1]
+
+
+class OpenNMTEpochBatchIterator(object):
+    def __init__(self, dataset_paths, batch_size, batch_fn, batch_size_multiple,
+                 device, fields, num_batches_multiple, is_train=True, seed=1):
+        self.dataset_paths = dataset_paths
+        self.batch_size = batch_size
+        self.batch_fn = batch_fn
+        self.batch_size_multiple = batch_size_multiple
+        self.device = device
+        self.fields = fields
+        self.num_batches_multiple = num_batches_multiple
+        self.is_train = is_train
+
+        self.seed = seed
+        self.epoch = 0
+        self._cur_epoch_itr = None
+        self._next_epoch_itr = None
+
+    def next_epoch_itr(self, shuffle=True, fix_batches_to_gpus=False):
+        if self._next_epoch_itr is not None:
+            self._cur_epoch_itr = self._next_epoch_itr
+            self._next_epoch_itr = None
+        else:
+            self.epoch += 1
+            self._cur_epoch_itr = self._get_iterator_for_epoch(self.epoch)
+        return self._cur_epoch_itr
+
+    def end_of_epoch(self):
+        """Returns whether the most recent epoch iterator has been exhausted"""
+        return not self._cur_epoch_itr.has_next()
+
+    @property
+    def iterations_in_epoch(self):
+        """The number of consumed batches in the current epoch."""
+        if self._cur_epoch_itr is not None:
+            return self._cur_epoch_itr.count
+        elif self._next_epoch_itr is not None:
+            return self._next_epoch_itr.count
+        return 0
+
+    def state_dict(self):
+        """Returns a dictionary containing a whole state of the iterator."""
+        return {
+            'epoch': self.epoch,
+            'iterations_in_epoch': self.iterations_in_epoch,
+        }
+
+    def load_state_dict(self, state_dict):
+        """Copies the state of the iterator from the given *state_dict*."""
+        self.epoch = state_dict['epoch']
+        itr_pos = state_dict.get('iterations_in_epoch', 0)
+        if itr_pos > 0:
+            # fast-forward epoch iterator
+            itr = self._get_iterator_for_epoch(self.epoch)
+            if itr_pos < len(itr):
+                self._next_epoch_itr = itr.skip(itr_pos)
+
+    def _get_iterator_for_epoch(self, epoch):
+        seed = self.seed + epoch
+        random.seed(seed)
+        torch.manual_seed(seed)
+        if self.device == 'cuda':
+            torch.cuda.manual_seed(seed)
+
+        return CountingIterator(DatasetLazyIter(
+            self.dataset_paths,
+            self.fields,
+            self.batch_size,
+            self.batch_fn,
+            self.batch_size_multiple,
+            self.device,
+            self.is_train,
+            repeat=False,
+            num_batches_multiple=self.num_batches_multiple))

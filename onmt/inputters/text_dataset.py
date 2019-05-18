@@ -5,7 +5,7 @@ import six
 import torch
 from torchtext.data import Field, RawField
 
-from .datareader_base import DataReaderBase
+from onmt.inputters.datareader_base import DataReaderBase
 
 
 class TextDataReader(DataReaderBase):

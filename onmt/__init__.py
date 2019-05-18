@@ -7,14 +7,14 @@ import onmt.decoders
 import onmt.models
 import onmt.utils
 import onmt.modules
-from .trainer import Trainer
+from onmt.trainer import Trainer
 import sys
 import onmt.utils.optimizers
-utils.optimizers.Optim = utils.optimizers.Optimizer
-sys.modules["onmt.Optim"] = utils.optimizers
+onmt.utils.optimizers.Optim = onmt.utils.optimizers.Optimizer
+sys.modules["onmt.Optim"] = onmt.utils.optimizers
 
 # For Flake
-__all__ = [inputters, encoders, decoders, models,
-           utils, modules, "Trainer"]
+__all__ = [onmt.inputters, onmt.encoders, onmt.decoders, onmt.models,
+           onmt.utils, onmt.modules, "Trainer"]
 
 __version__ = "0.8.2"

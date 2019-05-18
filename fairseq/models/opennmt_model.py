@@ -31,19 +31,17 @@ from onmt.models.sru import CheckSRU
 from onmt.utils import parse
 
 from . import (
-    FairseqIncrementalDecoder, FairseqEncoder, FairseqLanguageModel,
+    FairseqIncrementalDecoder, FairseqEncoder, FairseqDecoder, FairseqLanguageModel,
     FairseqModel, register_model, register_model_architecture,
 )
 
 
 @register_model('opennmt')
 class OpenNMTModel(FairseqModel):
-    """
-    from https://github.com/OpenNMT/OpenNMT-py
-    """
-
-    def __init__(self, encoder, decoder):
+    def __init__(self, encoder, decoder, model, args):
         super().__init__(encoder, decoder)
+        self.opennmt_model = model
+        self.args = args
 
     @staticmethod
     def add_args(parser):
@@ -68,12 +66,11 @@ class OpenNMTModel(FairseqModel):
                             action='store_true',
                             help="Use a shared weight matrix for the input and "
                                  "output word  embeddings in the decoder.")
-        parser.add_argument('--share_embeddings', '-share_embeddings',
-                            default=False, action='store_true',
+        parser.add_argument('--share_embeddings', '-share_embeddings', default=False, action='store_true',
                             help="Share the word embeddings between encoder "
                                  "and decoder. Need to use shared dictionary for this "
                                  "option.")
-        parser.add_argument('--position_encoding', '-position_encoding', action='store_true',
+        parser.add_argument('--position_encoding', '-position_encoding', default=False, action='store_true',
                             help="Use a sin to mark relative words positions. "
                                  "Necessary for non-RNN style models.")
 
@@ -211,14 +208,14 @@ class OpenNMTModel(FairseqModel):
                             help="Which function to use for generating "
                                  "probabilities over the target vocabulary (choices: "
                                  "softmax, sparsemax)")
-        parser.add_argument('--copy_attn_force', '-copy_attn_force', action="store_true",
+        parser.add_argument('--copy_attn_force', '-copy_attn_force', default=False, action="store_true",
                             help='When available, train to copy.')
         parser.add_argument('--reuse_copy_attn', '-reuse_copy_attn', action="store_true",
                             help="Reuse standard attention for copy")
         parser.add_argument('--copy_loss_by_seqlength', '-copy_loss_by_seqlength',
                             action="store_true",
                             help="Divide copy loss by length of sequence")
-        parser.add_argument('--coverage_attn', '-coverage_attn', action="store_true",
+        parser.add_argument('--coverage_attn', '-coverage_attn', default=False, action="store_true",
                             help='Train a coverage attention layer.')
         parser.add_argument('--lambda_coverage', '-lambda_coverage', type=float, default=1,
                             help='Lambda value for coverage.')
@@ -234,158 +231,18 @@ class OpenNMTModel(FairseqModel):
         # make sure all arguments are present in older models
         base_architecture(args)
 
-        model = build_base_model(args, task.fields, task.checkpoint)
+        model = build_base_model(args, task.source_dictionary.fields, False)
 
-        """
-        # Build embeddings.
-        # if not hasattr(args, 'max_source_positions'):
-        #     args.max_source_positions = 1024
-        # if not hasattr(args, 'max_target_positions'):
-        #     args.max_target_positions = 1024
+        vocab = task.target_field.vocab
+        encoder = OpenNMTEncoder(vocab, model.encoder)
+        decoder = OpenNMTDecoder(vocab, model.decoder)
 
-        src_dict, tgt_dict = task.source_dictionary, task.target_dictionary
-
-        def build_embedding(dictionary, embed_dim, path=None):
-            num_embeddings = len(dictionary)
-            padding_idx = dictionary.pad()
-            emb = Embedding(num_embeddings, embed_dim, padding_idx)
-            # if provided, load from preloaded dictionaries
-            if path:
-                embed_dict = utils.parse_embedding(path)
-                utils.load_embedding(embed_dict, dictionary, emb)
-            return emb
-
-        if args.share_embeddings:
-            if src_dict != tgt_dict:
-                raise ValueError('--share-all-embeddings requires a joined dictionary')
-            if args.src_word_vec_size != args.tgt_word_vec_size:
-                raise ValueError(
-                    '--share-all-embeddings requires --encoder-embed-dim to match --decoder-embed-dim')
-            if args.pre_word_vecs_dec and (
-                    args.pre_word_vecs_dec != args.pre_word_vecs_enc):
-                raise ValueError('--share-all-embeddings not compatible with --decoder-embed-path')
-            encoder_embed_tokens = build_embedding(
-                src_dict, args.src_word_vec_size, args.pre_word_vecs_enc
-            )
-            decoder_embed_tokens = encoder_embed_tokens
-            args.share_decoder_input_output_embed = True
-        else:
-            encoder_embed_tokens = build_embedding(
-                src_dict, args.src_word_vec_size, args.pre_word_vecs_enc
-            )
-            decoder_embed_tokens = build_embedding(
-                tgt_dict, args.tgt_word_vec_size, args.pre_word_vecs_dec
-            )
-
-        # convert to OpenNMT Embeddings class
-        src_emb = Embeddings(
-            word_vec_size=args.src_word_vec_size,
-            position_encoding=args.position_encoding,
-            feat_merge=args.feat_merge,
-            feat_vec_exponent=args.feat_vec_exponent,
-            feat_vec_size=args.feat_vec_size,
-            dropout=args.dropout,
-            word_padding_idx=src_dict.pad(),
-            feat_padding_idx=[],
-            word_vocab_size=len(src_dict),
-            feat_vocab_sizes=[],
-            sparse=args.optimizer == "sparseadam",
-            fix_word_vecs=args.fix_word_vecs_enc
-        )
-        tgt_emb = Embeddings(
-            word_vec_size=args.tgt_word_vec_size,
-            position_encoding=args.position_encoding,
-            feat_merge=args.feat_merge,
-            feat_vec_exponent=args.feat_vec_exponent,
-            feat_vec_size=args.feat_vec_size,
-            dropout=args.dropout,
-            word_padding_idx=tgt_dict.pad(),
-            feat_padding_idx=[],
-            word_vocab_size=len(tgt_dict),
-            feat_vocab_sizes=[],
-            sparse=args.optimizer == "sparseadam",
-            fix_word_vecs=args.fix_word_vecs_dec
-        )
-
-        # Build encoder.
-        encoder = build_encoder(args, src_emb, src_dict)
-
-        # Build decoder.
-        decoder = build_decoder(args, tgt_emb, src_dict)
-
-        # Build NMTModel(= encoder + decoder).
-        model = OpenNMTModel(encoder, decoder)
-
-        # Build Generator.
-        if not args.copy_attn:
-            if args.generator_function == "sparsemax":
-                gen_func = sparse_activations.LogSparsemax(dim=-1)
-            else:
-                gen_func = nn.LogSoftmax(dim=-1)
-            generator = nn.Sequential(
-                nn.Linear(args.dec_rnn_size,
-                          len(task.fields["tgt"].base_field.vocab)),
-                util_class.Cast(torch.float32),
-                gen_func
-            )
-            if args.share_decoder_embeddings:
-                generator[0].weight = decoder.embeddings.word_lut.weight
-        else:
-            vocab_size = len(tgt_dict)
-            pad_idx = tgt_dict.pad()
-            generator = copy_generator.CopyGenerator(args.dec_rnn_size, vocab_size, pad_idx)
-        ""
-        
-        # Load the model states from checkpoint or initialize them.
-        if False: # checkpoint is not None:
-            # This preserves backward-compat for models using customed layernorm
-            def fix_key(s):
-                s = re.sub(r'(.*)\.layer_norm((_\d+)?)\.b_2',
-                           r'\1.layer_norm\2.bias', s)
-                s = re.sub(r'(.*)\.layer_norm((_\d+)?)\.a_2',
-                           r'\1.layer_norm\2.weight', s)
-                return s
-
-            checkpoint['model'] = {fix_key(k): v
-                                   for k, v in checkpoint['model'].items()}
-            # end of patch for backward compatibility
-
-            model.load_state_dict(checkpoint['model'], strict=False)
-            generator.load_state_dict(checkpoint['generator'], strict=False)
-        else:
-            if args.param_init != 0.0:
-                for p in model.parameters():
-                    p.data.uniform_(-args.param_init, args.param_init)
-                for p in generator.parameters():
-                    p.data.uniform_(-args.param_init, args.param_init)
-            if args.param_init_glorot:
-                for p in model.parameters():
-                    if p.dim() > 1:
-                        xavier_uniform_(p)
-                for p in generator.parameters():
-                    if p.dim() > 1:
-                        xavier_uniform_(p)
-
-            if hasattr(model.encoder, 'embeddings'):
-                model.encoder.embeddings.load_pretrained_vectors(
-                    args.pre_word_vecs_enc)
-            if hasattr(model.decoder, 'embeddings'):
-                model.decoder.embeddings.load_pretrained_vectors(
-                    args.pre_word_vecs_dec)
-        ""
-
-        model.generator = generator
-        """
-
-        return model
+        return OpenNMTModel(encoder, decoder, model, args)
 
     def forward(self, src_tokens, src_lengths, prev_output_tokens, bptt=False):
-        # convert to OpenNMT shape
-        src_tokens = src_tokens.transpose(1, 0).unsqueeze(2)
-        prev_output_tokens = prev_output_tokens.transpose(1, 0).unsqueeze(2)
+        '''code copied from class NMTModel()'''
 
-        from fairseq.onmt_utils.misc import aeq
-        aeq(prev_output_tokens[0])
+        # exclude last target from inputs
         prev_output_tokens = prev_output_tokens[1:]
 
         enc_state, memory_bank, lengths = self.encoder(src_tokens, src_lengths)
@@ -393,12 +250,11 @@ class OpenNMTModel(FairseqModel):
             self.decoder.init_state(src_tokens, memory_bank, enc_state)
         dec_out, attns = self.decoder(prev_output_tokens, memory_bank, memory_lengths=lengths)
 
-        # convert to FairSeq shape
-        dec_out = dec_out.permute(1, 0, 2)
-        attns['std'] = attns['std'].permute(1, 0, 2)
-        attns['copy'] = attns['copy'].permute(1, 0, 2)
-
         return dec_out, attns
+
+    def max_positions(self):
+        """Maximum length supported by the model."""
+        return (self.args.src_seq_length, self.args.tgt_seq_length)
 
 
 # def config_opts(parser):
@@ -916,6 +772,31 @@ class OpenNMTModel(FairseqModel):
 #               type=int, default=3, choices=[3, 1],
 #               help="Using grayscale image can training "
 #                    "model faster and smaller")
+
+
+class OpenNMTEncoder(FairseqEncoder):
+    """Base class for encoders."""
+
+    def __init__(self, dictionary, opennmt_encoder):
+        super().__init__(dictionary)
+        self.opennmt_encoder = opennmt_encoder
+
+    def forward(self, src_tokens, src_lengths):
+        return self.opennmt_encoder(src_tokens, src_lengths)
+
+
+class OpenNMTDecoder(FairseqDecoder):
+    """Base class for decoders."""
+
+    def __init__(self, dictionary, opennmt_decoder):
+        super().__init__(dictionary)
+        self.opennmt_decoder = opennmt_decoder
+
+    def forward(self, prev_output_tokens, encoder_out, memory_lengths=None, step=None):
+        return self.opennmt_decoder(prev_output_tokens, encoder_out)
+
+    def init_state(self, src, memory_bank, encoder_final):
+        self.opennmt_decoder.init_state(src, memory_bank, encoder_final)
 
 
 def Embedding(num_embeddings, embedding_dim, padding_idx):

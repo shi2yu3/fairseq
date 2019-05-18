@@ -4,7 +4,7 @@ import os
 import torch
 
 import onmt.opts as opts
-from .logging import logger
+from onmt.utils.logging import logger
 
 
 class ArgumentParser(cfargparse.ArgumentParser):
@@ -79,26 +79,26 @@ class ArgumentParser(cfargparse.ArgumentParser):
 
     @classmethod
     def validate_train_opts(cls, opt):
-        # if opt.epochs:
-        #     raise AssertionError(
-        #           "-epochs is deprecated please use -train_steps.")
+        if opt.epochs:
+            raise AssertionError(
+                  "-epochs is deprecated please use -train_steps.")
         if opt.truncated_decoder > 0 and max(opt.accum_count) > 1:
             raise AssertionError("BPTT is not compatible with -accum > 1")
-        # if opt.gpuid:
-        #     raise AssertionError(
-        #           "gpuid is deprecated see world_size and gpu_ranks")
-        # if torch.cuda.is_available() and not opt.gpu_ranks:
-        #     logger.info("WARNING: You have a CUDA device, \
-        #                 should run with -gpu_ranks")
-        # if opt.world_size < len(opt.gpu_ranks):
-        #     raise AssertionError(
-        #           "parameter counts of -gpu_ranks must be less or equal "
-        #           "than -world_size.")
-        # if opt.world_size == len(opt.gpu_ranks) and \
-        #         min(opt.gpu_ranks) > 0:
-        #     raise AssertionError(
-        #           "-gpu_ranks should have master(=0) rank "
-        #           "unless -world_size is greater than len(gpu_ranks).")
+        if opt.gpuid:
+            raise AssertionError(
+                  "gpuid is deprecated see world_size and gpu_ranks")
+        if torch.cuda.is_available() and not opt.gpu_ranks:
+            logger.info("WARNING: You have a CUDA device, \
+                        should run with -gpu_ranks")
+        if opt.world_size < len(opt.gpu_ranks):
+            raise AssertionError(
+                  "parameter counts of -gpu_ranks must be less or equal "
+                  "than -world_size.")
+        if opt.world_size == len(opt.gpu_ranks) and \
+                min(opt.gpu_ranks) > 0:
+            raise AssertionError(
+                  "-gpu_ranks should have master(=0) rank "
+                  "unless -world_size is greater than len(gpu_ranks).")
 
     @classmethod
     def validate_translate_opts(cls, opt):
@@ -107,12 +107,12 @@ class ArgumentParser(cfargparse.ArgumentParser):
 
     @classmethod
     def validate_preprocess_args(cls, opt):
-        # assert opt.max_shard_size == 0, \
-        #     "-max_shard_size is deprecated. Please use \
-        #     -shard_size (number of examples) instead."
-        # assert opt.shuffle == 0, \
-        #     "-shuffle is not implemented. Please shuffle \
-        #     your data before pre-processing."
+        assert opt.max_shard_size == 0, \
+            "-max_shard_size is deprecated. Please use \
+            -shard_size (number of examples) instead."
+        assert opt.shuffle == 0, \
+            "-shuffle is not implemented. Please shuffle \
+            your data before pre-processing."
 
         assert os.path.isfile(opt.train_src) \
             and os.path.isfile(opt.train_tgt), \

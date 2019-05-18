@@ -12,13 +12,13 @@ import torchtext.data
 from torchtext.data import Field
 from torchtext.vocab import Vocab
 
-from .text_dataset import text_fields, TextMultiField
-from .image_dataset import image_fields
-from .audio_dataset import audio_fields
+from onmt.inputters.text_dataset import text_fields, TextMultiField
+from onmt.inputters.image_dataset import image_fields
+from onmt.inputters.audio_dataset import audio_fields
 from onmt.utils.logging import logger
 # backwards compatibility
-from .text_dataset import _feature_tokenize  # noqa: F401
-from .image_dataset import (  # noqa: F401
+from onmt.inputters.text_dataset import _feature_tokenize  # noqa: F401
+from onmt.inputters.image_dataset import (  # noqa: F401
     batch_img as make_img)
 
 import gc
@@ -555,6 +555,14 @@ class DatasetLazyIter(object):
         self.is_train = is_train
         self.repeat = repeat
         self.num_batches_multiple = num_batches_multiple
+
+        self.num_examples = 0
+        for path in dataset_paths:
+            dataset = torch.load(path)
+            self.num_examples += len(dataset)
+
+    def __len__(self):
+        return self.num_examples
 
     def _iter_dataset(self, path):
         cur_dataset = torch.load(path)

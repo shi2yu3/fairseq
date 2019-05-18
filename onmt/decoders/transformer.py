@@ -5,7 +5,7 @@ Implementation of "Attention is All You Need"
 import torch
 import torch.nn as nn
 
-from .decoder import DecoderBase
+from onmt.decoders.decoder import DecoderBase
 from onmt.modules import MultiHeadedAttention, AverageAttention
 from onmt.modules.position_ffn import PositionwiseFeedForward
 

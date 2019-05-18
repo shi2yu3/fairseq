@@ -10,6 +10,7 @@ import math
 from . import FairseqLRScheduler, register_lr_scheduler
 
 from onmt.utils import Optimizer
+from onmt.utils.optimizers import make_learning_rate_decay_fn
 
 
 @register_lr_scheduler('opennmt_scheduler')
@@ -22,20 +23,9 @@ class OpenNMTSchedule(FairseqLRScheduler):
                 ' Consider --lr-scheduler=fixed instead.'
             )
 
-        optim = Optimizer.from_opt(model, opt, checkpoint=checkpoint)
-
-        lr = args.lr[0]
-
-        assert args.max_lr > lr, 'max_lr must be more than lr'
-        self.min_lr = lr
-        self.max_lr = args.max_lr
-        self.stepsize = args.lr_period_updates // 2
-        self.lr_shrink = args.lr_shrink
-        self.shrink_min = args.shrink_min
-
-        # initial learning rate
-        self.lr = self.min_lr
-        self.optimizer.set_lr(self.lr)
+        self.optim = Optimizer(optimizer, args.lr,
+                               learning_rate_decay_fn=make_learning_rate_decay_fn(args),
+                               max_grad_norm=args.max_grad_norm)
 
     @staticmethod
     def add_args(parser):
@@ -64,26 +54,3 @@ class OpenNMTSchedule(FairseqLRScheduler):
         parser.add_argument('--warmup_steps', '-warmup_steps', type=int, default=4000,
                   help="Number of warmup steps for custom decay.")
         # fmt: on
-
-    def step(self, epoch, val_loss=None):
-        """Update the learning rate at the end of the given epoch."""
-        super().step(epoch, val_loss)
-        # we don't change the learning rate at epoch boundaries
-        return self.optimizer.get_lr()
-
-    def step_update(self, num_updates):
-        """Update the learning rate after each update."""
-        cycle = math.floor(num_updates / (2 * self.stepsize))
-
-        lr_shrink = self.lr_shrink ** cycle
-        max_lr = self.max_lr * lr_shrink
-        if self.shrink_min:
-            min_lr = self.min_lr * lr_shrink
-        else:
-            min_lr = self.min_lr
-
-        x = abs(num_updates / self.stepsize - 2 * (cycle + 1) + 1)
-        self.lr = min_lr + (max_lr - min_lr) * max(0, (1 - x))
-
-        self.optimizer.set_lr(self.lr)
-        return self.lr

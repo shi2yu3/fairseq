@@ -5,7 +5,7 @@ from datetime import datetime
 
 import onmt
 
-from .logging import logger
+from onmt.utils.logging import logger
 
 
 def build_report_manager(opt):

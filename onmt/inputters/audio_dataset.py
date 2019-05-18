@@ -5,7 +5,7 @@ from tqdm import tqdm
 import torch
 from torchtext.data import Field
 
-from .datareader_base import DataReaderBase
+from onmt.inputters.datareader_base import DataReaderBase
 
 # imports of datatype-specific dependencies
 try:

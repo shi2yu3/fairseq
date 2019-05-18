@@ -316,8 +316,35 @@ class BertDictionary(Dictionary):
 
 
 class OpenNMTDictionary(object):
-    def __init__(self):
-        pass
+    def __init__(self, fields):
+        self.fields = fields
+
+        tgt_base_field = fields["tgt"].base_field
+        self.unk_word = tgt_base_field.unk_token
+        self.pad_word = tgt_base_field.pad_token
+        self.eos_word = tgt_base_field.eos_token
+
+        tgt_vocab = tgt_base_field.vocab
+        self.pad_index = tgt_vocab.stoi[self.pad_word]
+        self.eos_index = tgt_vocab.stoi[self.eos_word]
+        self.unk_index = tgt_vocab.stoi[self.unk_word]
+        self.nspecial = 3
+
+    def __len__(self):
+        """Returns the number of symbols in the dictionary"""
+        return len(self.fields['src'].base_field.vocab)
+
+    def pad(self):
+        """Helper to get index of pad symbol"""
+        return self.pad_index
+
+    def eos(self):
+        """Helper to get index of end-of-sentence symbol"""
+        return self.eos_index
+
+    def unk(self):
+        """Helper to get index of unk symbol"""
+        return self.unk_index
 
     @classmethod
     def load(cls, path, args):
@@ -342,4 +369,10 @@ class OpenNMTDictionary(object):
                 if sf.use_vocab:
                     print(f'| [{sn}] dictionary: {len(sf.vocab)} types')
 
-        return fields
+        return cls(fields)
+
+    # def dummy_sentence(self, length):
+    #     t = torch.Tensor(length).uniform_(self.nspecial + 1, len(self)).long()
+    #     t[-1] = self.eos()
+    #     return t
+

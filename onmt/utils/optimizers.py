@@ -7,7 +7,7 @@ import functools
 from copy import copy
 from math import sqrt
 
-from .misc import fn_args
+from onmt.utils.misc import fn_args
 
 
 def build_torch_optimizer(model, opt):

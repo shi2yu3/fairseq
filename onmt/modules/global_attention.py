@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .sparse_activations import sparsemax
+from onmt.modules.sparse_activations import sparsemax
 from onmt.utils.misc import aeq, sequence_mask
 
 # This class is mainly used by decoder.py for RNNs but also

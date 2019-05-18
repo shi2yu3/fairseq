@@ -7,17 +7,17 @@ import torch
 import torch.nn as nn
 from torch.nn.init import xavier_uniform_
 
-import onmt.inputters
+import onmt.inputters as inputters
 import onmt.modules
-from .encoders import str2enc
+from onmt.encoders import str2enc
 
-from .decoders import str2dec
+from onmt.decoders import str2dec
 
-from .modules import Embeddings, CopyGenerator
-from .modules.util_class import Cast
-from .utils.misc import use_gpu
-from .utils.logging import logger
-from .utils.parse import ArgumentParser
+from onmt.modules import Embeddings, CopyGenerator
+from onmt.modules.util_class import Cast
+from onmt.utils.misc import use_gpu
+from onmt.utils.logging import logger
+from onmt.utils.parse import ArgumentParser
 
 
 def build_embeddings(opt, text_field, for_encoder=True):

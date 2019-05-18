@@ -121,10 +121,10 @@ python train.py --save_model models/cnndm --data data/cnndm/CNNDM --copy_attn --
 ```
 python preprocess.py --source-lang src --target-lang tgt --joined-dictionary --trainpref examples/summarization/$data_path/train --validpref examples/summarization/$data_path/valid --testpref examples/summarization/$data_path/test --destdir data-bin/cnndm
 
-python train.py data-bin/cnndm -s src -t tgt --max-tokens 4000 -a transformer_vaswani_wmt_en_de_big --share-all-embeddings --dropout 0.3 --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.0 --weight-decay 0.0001 --lr 0.0005 --lr-scheduler inverse_sqrt --warmup-init-lr 1e-7 --min-lr 1e-9 --warmup-updates 4000 --criterion label_smoothed_cross_entropy --label-smoothing 0.1 --max-update 350000 --max-epoch 10 --save-dir checkpoints --tensorboard-logdir tensorboard
+python train.py data-bin/cnndm -s src -t tgt --max-tokens 1000 -a transformer_vaswani_wmt_en_de_big --share-all-embeddings --dropout 0.3 --optimizer adam --adam-betas "(0.9, 0.98)" --clip-norm 0.0 --weight-decay 0.0001 --lr 0.0005 --lr-scheduler inverse_sqrt --warmup-init-lr 1e-7 --min-lr 1e-9 --warmup-updates 4000 --criterion label_smoothed_cross_entropy --label-smoothing 0.1 --max-update 350000 --max-epoch 10 --save-dir checkpoints --tensorboard-logdir tensorboard
 ```
 
 **FairSeq for OpenNMT**
 ```
-python train.py data/cnndm/CNNDM --save-dir checkpoints/cnndm --task summarization -a opennmt --copy_attn --global_attention mlp --word_vec_size 128 --rnn_size 512 --layers 1 --encoder_type brnn --max-update 200000 --clip-norm 2 --dropout 0. --max-sentences 16 --max-sentences-valid 16 --optimizer adagrad --lr 0.15 --adagrad_accumulator_init 0.1 --reuse_copy_attn --copy_loss_by_seqlength --bridge --seed 777 --criterion copy_generator_loss --lr-scheduler opennmt_scheduler
+python train.py data/cnndm/CNNDM --save-dir checkpoints/cnndm --task summarization -a opennmt --copy_attn --global_attention mlp --word_vec_size 128 --rnn_size 512 --layers 1 --encoder_type brnn --max-update 200000 --clip-norm 2 --dropout 0. --max-sentences 16 --max-sentences-valid 16 --optimizer adagrad --lr 0.15 --adagrad_accumulator_init 0.1 --reuse_copy_attn --copy_loss_by_seqlength --bridge --seed 777 --criterion opennmt_loss --lr-scheduler opennmt_scheduler  --src_seq_length 1024 --tgt_seq_length 1024 --sentence-avg
 ```

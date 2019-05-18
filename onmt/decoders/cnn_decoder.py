@@ -6,7 +6,7 @@ import torch.nn as nn
 
 from onmt.modules import ConvMultiStepAttention, GlobalAttention
 from onmt.utils.cnn_factory import shape_transform, GatedConv
-from .decoder import DecoderBase
+from onmt.decoders.decoder import DecoderBase
 
 SCALE_WEIGHT = 0.5 ** 0.5
 

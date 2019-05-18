@@ -1,6 +1,6 @@
 
 from enum import Enum
-from .logging import logger
+from onmt.utils.logging import logger
 
 
 class PatienceEnum(Enum):

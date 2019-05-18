@@ -8,19 +8,23 @@
 import itertools
 import os
 import glob
+import torch
 
 from fairseq import options, utils
 from fairseq.data import (
     ConcatDataset,
     data_utils,
-    OpenNMTDictionary,
     IndexedCachedDataset,
     IndexedDataset,
     IndexedRawTextDataset,
+    iterators,
     LanguagePairDataset,
+    OpenNMTDataset,
+    OpenNMTDictionary,
 )
+
 from onmt.utils import parse
-from onmt.inputters.inputter import load_old_vocab, old_style_vocab
+from onmt.inputters.inputter import max_tok_len
 
 from . import FairseqTask, register_task
 
@@ -92,11 +96,10 @@ class SummarizationTask(FairseqTask):
         # = '--max-sentences' or '--batch-size'
         # parser.add_argument('--batch_size', '-batch_size', type=int, default=64,
         #           help='Maximum batch size for training')
-        # = '--max-tokens' or '--max-sentences'
-        # parser.add_argument('--batch_type', '-batch_type', default='sents',
-        #           choices=["sents", "tokens"],
-        #           help="Batch grouping for batch_size. Standard "
-        #                "is sents. Tokens will do dynamic batching")
+        parser.add_argument('--batch_type', '-batch_type', default='sents',
+                  choices=["sents", "tokens"],
+                  help="Batch grouping for batch_size. Standard "
+                       "is sents. Tokens will do dynamic batching")
         # = '--sentence-avg'
         # parser.add_argument('--normalization', '-normalization', default='sents',
         #           choices=["sents", "tokens"],
@@ -255,62 +258,22 @@ class SummarizationTask(FairseqTask):
         #           type=int, default=3, choices=[3, 1],
         #           help="Using grayscale image can training "
         #                "model faster and smaller")
+
+        # From preprocess_opts() in onmt/opts.py
+        parser.add_argument('--src_seq_length', '-src_seq_length', type=int, default=50,
+                  help="Maximum source sequence length")
+        parser.add_argument('--tgt_seq_length', '-tgt_seq_length', type=int, default=50,
+                  help="Maximum target sequence length to keep.")
         # fmt: on
 
-    @staticmethod
-    def load_pretrained_model(path, src_dict_path, tgt_dict_path, arg_overrides=None):
-        model = utils.load_checkpoint_to_cpu(path)
-        args = model['args']
-        state_dict = model['model']
-        args = utils.override_model_args(args, arg_overrides)
-        src_dict = Dictionary.load(src_dict_path)
-        tgt_dict = Dictionary.load(tgt_dict_path)
-        assert src_dict.pad() == tgt_dict.pad()
-        assert src_dict.eos() == tgt_dict.eos()
-        assert src_dict.unk() == tgt_dict.unk()
-
-        task = SummarizationTask(args, src_dict, tgt_dict)
-        model = task.build_model(args)
-        model.upgrade_state_dict(state_dict)
-        model.load_state_dict(state_dict, strict=True)
-
-        # logger.info('Loading checkpoint from %s' % opt.train_from)
-        # checkpoint = torch.load(opt.train_from,
-        #                         map_location=lambda storage, loc: storage)
-        #
-        # model_opt = ArgumentParser.ckpt_model_opts(checkpoint["opt"])
-        # ArgumentParser.update_model_opts(model_opt)
-        # ArgumentParser.validate_model_opts(model_opt)
-        return model
-
-    def __init__(self, args, fields):
+    def __init__(self, args, dict):
         super().__init__(args)
-        self.fields = fields
+        self.dict = dict
+        self.model = None
 
-    # @classmethod
-    # def load_dictionary(cls, filename):
-    #     vocab = torch.load(filename + '.vocab.pt')
-    #
-    #     # check for code where vocab is saved instead of fields
-    #     # (in the future this will be done in a smarter way)
-    #     if old_style_vocab(vocab):
-    #         fields = load_old_vocab(
-    #             vocab, cls.args.model_type, dynamic_dict=cls.args.copy_attn)
-    #     else:
-    #         fields = vocab
-    #
-    #     # Report src and tgt vocab sizes, including for features
-    #     for side in ['src', 'tgt']:
-    #         f = fields[side]
-    #         try:
-    #             f_iter = iter(f)
-    #         except TypeError:
-    #             f_iter = [(side, f)]
-    #         for sn, sf in f_iter:
-    #             if sf.use_vocab:
-    #                 print(' * %s vocab size = %d' % (sn, len(sf.vocab)))
-    #
-    #     return fields
+    @classmethod
+    def load_dictionary(cls, filename):
+        return OpenNMTDictionary.load(filename, cls.args)
 
     @classmethod
     def setup_task(cls, args, **kwargs):
@@ -320,156 +283,112 @@ class SummarizationTask(FairseqTask):
             args (argparse.Namespace): parsed command-line arguments
         """
 
+        # OpenNMT deprecated
+        args.epochs = 0
+        args.gpuid = []
+
+        # OpenNMT equal to FairSeq
+        args.train_steps = args.max_update
+        args.optim = args.optimizer
+        args.gpu_ranks = [0] if torch.cuda.is_available() and not args.cpu else []
+        args.accum_count = [1]
+        args.world_size = 1
+        args.max_grad_norm = args.clip_norm
+
         parse.ArgumentParser.validate_train_opts(args)
         parse.ArgumentParser.update_model_opts(args)
         parse.ArgumentParser.validate_model_opts(args)
 
-        """
-        args.left_pad_source = options.eval_bool(args.left_pad_source)
-        args.left_pad_target = options.eval_bool(args.left_pad_target)
+        if args.optim in ['adafactor', 'adam', 'sparseadam']:
+            print('WARNING: OpenNMT and FairSeq have different implementations for optimizer ' + args.optim)
+        if args.batch_type == 'sents':
+            args.batch_size = args.max_sentences
+            args.max_tokens = 600000
+            # print('WARNING: batch_type is defined as "sents", max_tokens will be ignored')
+        if args.batch_type == 'tokens':
+            args.batch_size = args.max_tokens
+            args.max_sentences = 6000
+            # print('WARNING: batch_type is defined as "tokens", max_sentences will be ignored')
 
-        # find language pair automatically
-        if args.source_lang is None or args.target_lang is None:
-            args.source_lang, args.target_lang = data_utils.infer_language_pair(args.data[0])
-        if args.source_lang is None or args.target_lang is None:
-            raise Exception('Could not infer language pair, please provide it explicitly')
-
-        # load dictionaries
-        src_dict = cls.load_dictionary(os.path.join(args.data[0], 'dict.{}.txt'.format(args.source_lang)))
-        tgt_dict = cls.load_dictionary(os.path.join(args.data[0], 'dict.{}.txt'.format(args.target_lang)))
-        assert src_dict.pad() == tgt_dict.pad()
-        assert src_dict.eos() == tgt_dict.eos()
-        assert src_dict.unk() == tgt_dict.unk()
-        print('| [{}] dictionary: {} types'.format(args.source_lang, len(src_dict)))
-        print('| [{}] dictionary: {} types'.format(args.target_lang, len(tgt_dict)))
-
-        return cls(args, src_dict, tgt_dict)
-        """
-
-        fields = OpenNMTDictionary.load(args.data + '.vocab.pt', args)
-        return cls(args, fields)
-
-    '''
-    def load_dataset(self, split, combine=False, **kwargs):
-        """Load a given dataset split.
-
-        Args:
-            split (str): name of the split (e.g., train, valid, test)
-        """
-
-        def split_exists(split, src, tgt, lang, data_path):
-            filename = os.path.join(data_path, '{}.{}-{}.{}'.format(split, src, tgt, lang))
-            if self.args.raw_text and IndexedRawTextDataset.exists(filename):
-                return True
-            elif not self.args.raw_text and IndexedDataset.exists(filename):
-                return True
-            return False
-
-        def indexed_dataset(path, dictionary):
-            if self.args.raw_text:
-                return IndexedRawTextDataset(path, dictionary)
-            elif IndexedDataset.exists(path):
-                if self.args.lazy_load:
-                    return IndexedDataset(path, fix_lua_indexing=True)
-                else:
-                    return IndexedCachedDataset(path, fix_lua_indexing=True)
-            return None
-
-        src_datasets = []
-        tgt_datasets = []
-
-        data_paths = self.args.data
-
-        for dk, data_path in enumerate(data_paths):
-            for k in itertools.count():
-                split_k = split + (str(k) if k > 0 else '')
-
-                # infer langcode
-                src, tgt = self.args.source_lang, self.args.target_lang
-                if split_exists(split_k, src, tgt, src, data_path):
-                    prefix = os.path.join(data_path, '{}.{}-{}.'.format(split_k, src, tgt))
-                elif split_exists(split_k, tgt, src, src, data_path):
-                    prefix = os.path.join(data_path, '{}.{}-{}.'.format(split_k, tgt, src))
-                else:
-                    if k > 0 or dk > 0:
-                        break
-                    else:
-                        raise FileNotFoundError('Dataset not found: {} ({})'.format(split, data_path))
-
-                src_datasets.append(indexed_dataset(prefix + src, self.src_dict))
-                tgt_datasets.append(indexed_dataset(prefix + tgt, self.tgt_dict))
-
-                print('| {} {} {} examples'.format(data_path, split_k, len(src_datasets[-1])))
-
-                if not combine:
-                    break
-
-        assert len(src_datasets) == len(tgt_datasets)
-
-        if len(src_datasets) == 1:
-            src_dataset, tgt_dataset = src_datasets[0], tgt_datasets[0]
-        else:
-            sample_ratios = [1] * len(src_datasets)
-            sample_ratios[0] = self.args.upsample_primary
-            src_dataset = ConcatDataset(src_datasets, sample_ratios)
-            tgt_dataset = ConcatDataset(tgt_datasets, sample_ratios)
-
-        self.datasets[split] = LanguagePairDataset(
-            src_dataset, src_dataset.sizes, self.src_dict,
-            tgt_dataset, tgt_dataset.sizes, self.tgt_dict,
-            left_pad_source=self.args.left_pad_source,
-            left_pad_target=self.args.left_pad_target,
-            max_source_positions=self.args.max_source_positions,
-            max_target_positions=self.args.max_target_positions,
-        )
-    '''
+        dict = OpenNMTDictionary.load(args.data + '.vocab.pt', args)
+        return cls(args, dict)
 
     def load_dataset(self, split, combine=False, **kwargs):
         dataset_paths = list(sorted(
             glob.glob(self.args.data + '.' + split + '*.pt')))
         if not dataset_paths:
-            return None
+            raise FileNotFoundError('Dataset not found: {} ({})'.format(split, self.args.data + '.' + split + '*.pt'))
 
-        datasets = []
+        self.datasets[split] = OpenNMTDataset(dataset_paths, self.args, self.dict)
 
-        for dataset_path in dataset_paths:
-            datasets.append(OpenNMTDataset(dataset_path, self.fields))
+    def dataset(self, split):
+        from fairseq.data import FairseqDataset
+        if split not in self.datasets:
+            raise KeyError('Dataset not loaded: ' + split)
+        if not isinstance(self.datasets[split], FairseqDataset):
+            raise TypeError('Datasets are expected to be of type FairseqDataset')
+        return self.datasets[split]
 
-        if len(datasets) == 1:
-            dataset = datasets[0]
-        else:
-            dataset = ConcatDataset(datasets)
+    def get_batch_iterator(
+        self, dataset, max_tokens=None, max_sentences=None, max_positions=None,
+        ignore_invalid_inputs=False, required_batch_size_multiple=1,
+        seed=1, num_shards=1, shard_id=0, num_workers=0,
+        is_train=True,
+    ):
+        assert isinstance(dataset, OpenNMTDataset)
 
-        self.datasets[split] = dataset
+        batch_size = self.args.batch_size if is_train else self.args.valid_batch_size
+        batch_fn = max_tok_len if is_train and self.args.batch_type == "tokens" else None
+        batch_size_multiple = 8 if self.args.model_dtype == "fp16" else 1
 
-    def build_dataset_for_inference(self, src_tokens, src_lengths):
-        return LanguagePairDataset(src_tokens, src_lengths, self.source_dictionary)
+        device = "cuda" if self.args.gpu_ranks else "cpu"
+
+        return iterators.OpenNMTEpochBatchIterator(
+            dataset.iter, batch_size, batch_fn, batch_size_multiple,
+            device, self.dict.fields, max(self.args.accum_count) * self.args.world_size, is_train=is_train
+        )
+
+    def build_model(self, args):
+        from fairseq import models
+        self.model = models.build_model(args, self)
+        return self.model
 
     def build_criterion(self, args):
-        """
-        Build the :class:`~fairseq.criterions.FairseqCriterion` instance for
-        this task.
-
-        Args:
-            args (argparse.Namespace): parsed command-line arguments
-
-        Returns:
-            a :class:`~fairseq.criterions.FairseqCriterion` instance
-        """
         from fairseq import criterions
         return criterions.build_criterion(args, self)
 
+    def train_step(self, sample, model, criterion, optimizer, ignore_grad=False):
+        model.train()
+        loss, sample_size, logging_output = criterion(model, sample)
+        if ignore_grad:
+            loss *= 0
+        optimizer.backward(loss)
+        return loss, sample_size, logging_output
+
+    def valid_step(self, sample, model, criterion):
+        model.eval()
+        with torch.no_grad():
+            loss, sample_size, logging_output = criterion(model, sample)
+        return loss, sample_size, logging_output
+
     def max_positions(self):
         """Return the max sentence length allowed by the task."""
-        return (self.args.max_source_positions, self.args.max_target_positions)
+        return (self.args.src_seq_length, self.args.tgt_seq_length)
 
     @property
     def source_dictionary(self):
-        """Return the source :class:`~fairseq.data.Dictionary`."""
-        return self.src_dict
+        return self.dict
 
     @property
     def target_dictionary(self):
-        """Return the target :class:`~fairseq.data.Dictionary`."""
-        return self.tgt_dict
+        return self.dict
+
+    @property
+    def source_field(self):
+        return self.dict.fields['src'].base_field
+
+
+    @property
+    def target_field(self):
+        return self.dict.fields['tgt'].base_field
 

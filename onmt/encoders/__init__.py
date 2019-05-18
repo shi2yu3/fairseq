@@ -1,11 +1,11 @@
 """Module defining encoders."""
-from .encoder import EncoderBase
-from .transformer import TransformerEncoder
-from .rnn_encoder import RNNEncoder
-from .cnn_encoder import CNNEncoder
-from .mean_encoder import MeanEncoder
-from .audio_encoder import AudioEncoder
-from .image_encoder import ImageEncoder
+from onmt.encoders.encoder import EncoderBase
+from onmt.encoders.transformer import TransformerEncoder
+from onmt.encoders.rnn_encoder import RNNEncoder
+from onmt.encoders.cnn_encoder import CNNEncoder
+from onmt.encoders.mean_encoder import MeanEncoder
+from onmt.encoders.audio_encoder import AudioEncoder
+from onmt.encoders.image_encoder import ImageEncoder
 
 
 str2enc = {"rnn": RNNEncoder, "brnn": RNNEncoder, "cnn": CNNEncoder,

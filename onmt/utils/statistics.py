@@ -4,7 +4,7 @@ import time
 import math
 import sys
 
-from .logging import logger
+from onmt.utils.logging import logger
 
 
 class Statistics(object):

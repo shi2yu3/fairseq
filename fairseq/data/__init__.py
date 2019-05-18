@@ -19,6 +19,7 @@ from .token_block_dataset import TokenBlockDataset
 from .transform_eos_dataset import TransformEosDataset
 from .transform_eos_lang_pair_dataset import TransformEosLangPairDataset
 from .bertsum_dataset import BertSumDataset
+from .opennmt_dataset import OpenNMTDataset
 
 from .iterators import (
     CountingIterator,
@@ -33,7 +34,7 @@ __all__ = [
     'CountingIterator',
     'Dictionary',
     'BertDictionary',
-    'OpenNMTDictionary'
+    'OpenNMTDictionary',
     'EpochBatchIterator',
     'FairseqDataset',
     'GroupedIterator',
@@ -44,6 +45,7 @@ __all__ = [
     'LMContextWindowDataset',
     'MonolingualDataset',
     'NoisingDataset',
+    'OpenNMTDataset',
     'RoundRobinZipDatasets',
     'ShardedIterator',
     'TokenBlockDataset',

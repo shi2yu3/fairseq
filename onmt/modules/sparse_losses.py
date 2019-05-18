@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from torch.autograd import Function
-from .sparse_activations import _threshold_and_support
+from onmt.modules.sparse_activations import _threshold_and_support
 from onmt.utils.misc import aeq
 
 
