@@ -460,6 +460,7 @@ def resume_job_info(exp_dir):
     if os.path.isdir(exp_dir):
         info_files = glob.glob(f"{exp_dir}/*_info.json")
         for info_file in info_files:
+            print(f"resuming {info_file}")
             info = json.load(open(info_file))
             if info["status"] == "failed":
                 job_file = info_file.replace('_info.json', '_job.json')

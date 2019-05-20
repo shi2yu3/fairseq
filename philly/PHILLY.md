@@ -34,8 +34,13 @@ Requirement: Python 3.6
 
 ```
 nohup python3.6 -u bo.py --num_new_jobs 6 --num_rounds 10 --port 9000 bayesian/07e509b8/ > 07e509b8.log &
+
 nohup python3.6 -u bo.py --num_new_jobs 6 --num_rounds 10 --port 9001 bayesian/11853456/ > 11853456.log &
+nohup python3.6 -u bo.py --num_new_jobs 6 --num_rounds 10 --port 9005 bayesian/485a920e/ > 485a920e.log &
+
 nohup python3.6 -u bo.py --num_new_jobs 6 --num_rounds 10 --port 9002 bayesian/9394bf00/ > 9394bf00.log &
+nohup python3.6 -u bo.py --num_new_jobs 6 --num_rounds 10 --port 9004 bayesian/ab020539/ > ab020539.log &
+
 nohup python3.6 -u bo.py --num_new_jobs 6 --num_rounds 10 --port 9003 bayesian/e3f5b02d/ > e3f5b02d.log &
 ```
 
