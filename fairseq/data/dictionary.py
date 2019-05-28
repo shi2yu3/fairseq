@@ -371,8 +371,8 @@ class OpenNMTDictionary(object):
 
         return cls(fields)
 
-    # def dummy_sentence(self, length):
-    #     t = torch.Tensor(length).uniform_(self.nspecial + 1, len(self)).long()
-    #     t[-1] = self.eos()
-    #     return t
+    def dummy_sentence(self, length):
+        t = torch.Tensor(length).uniform_(self.nspecial + 1, len(self)).long()
+        t[-1] = self.eos()
+        return t
 
