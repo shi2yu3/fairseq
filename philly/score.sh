@@ -14,7 +14,7 @@ do
     sudo bash $phillyfs -cp //philly/$cluster/$vc/sys/jobs/application_$id/candidate results/candidate
     sudo bash $phillyfs -cp //philly/$cluster/$vc/sys/jobs/application_$id/gold results/gold
     ls -l results/
-    res=$(docker run --rm -it -v $(pwd):/workspace bertsum /bin/bash -c "pyrouge_set_rouge_path examples/summarization/BertSum/pyrouge/tools/ROUGE-1.5.5 && python examples/summarization/BertSum/src/rouge.py")
+    res=$(docker run --rm -it -v $(pwd):/workspace shi2yu3/bertsum /bin/bash -c "pyrouge_set_rouge_path examples/summarization/BertSum/pyrouge/tools/ROUGE-1.5.5 && python examples/summarization/BertSum/src/rouge.py")
     echo $id
     echo $res
 done
