@@ -1,0 +1,4 @@
+origin	https://github.com/shi2yu3/fairseq.git (fetch)
+origin	https://github.com/shi2yu3/fairseq.git (push)
+upstream	https://github.com/pytorch/fairseq.git (fetch)
+upstream	https://github.com/pytorch/fairseq.git (push)
