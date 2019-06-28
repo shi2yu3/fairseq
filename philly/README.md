@@ -12,7 +12,7 @@ python bo.py --num_new_jobs 6 --num_rounds 10 bo.json
 
 It will generate a folder with job json and job info, say bayesian/07e509b8, and submit 6 jobs to Philly.
 
-**To track and update the jobs**
+**To track and update the status**
 ```
 python bo.py bayesian/07e509b8
 ```
